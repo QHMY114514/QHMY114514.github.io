@@ -113,7 +113,7 @@ export default function () {
                 return `${Math.round(time / 600) / 100}分,为你颁发─=≡Σ((( つ•̀ω•́)つ发呆达人`;
             }
             else {
-                return `${Math.round(time / 360) / 1000}小时,♪＼( >w<)︿(QwQ )／♪`;
+                return `${Math.round(time / 360) / 10000}小时,♪＼( >w<)︿(QwQ )／♪`;
             }
         }
         
