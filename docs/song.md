@@ -120,6 +120,7 @@ Empty old City - Chronicle A (English Ver.)<br />**
     s-don - Upshift (Groundbreaking Extend)<br />
     Skybreak、Aethoro、MIZU - Journey's End<br />
     Laur - 国士無双<br />
+    Redouane Belhadi - Prestige<br />
 </details>
 
 <details>

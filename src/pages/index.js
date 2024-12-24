@@ -74,25 +74,25 @@ export default function () {
                 return `${Math.round(time / 1000)}秒,还在找想看的东西吗?ヾ(=･ω･=)o`;
             }
             else if (time < 90000) {
-                return `${Math.round(time / 600) / 100}分,看看下面这首歌,你可能会喜欢的!(*/ω＼*)`;
+                return `${Math.round(time / 600) / 100}分,原来你是喜欢我吗,在这里呆这么久(*/ω＼*)`;
             }
             else if (time < 120000) {
                 return `${Math.round(time / 600) / 100}分,这条文案不喜欢发颜文字!!!`;
             }
-            else if (time < 186000) {
+            else if (time < 180000) {
                 return `${Math.round(time / 600) / 100}分,你在和我一起发呆吗(｀・ω・´)`;
             }
             else if (time < 240000) {
-                return `${Math.round(time / 600) / 100}分,哇塞,你听完了这首歌!( • ̀ω•́ )✧`;
+                return `${Math.round(time / 600) / 100}分,哇塞!你在这里三分钟了!( • ̀ω•́ )✧`;
             }
             else if (time < 300000) {
                 return `${Math.round(time / 600) / 100}分,你想知道下一次这行字什么时候变化吗?`;
             }
-            else if (time < 372000) {
+            else if (time < 360000) {
                 return `${Math.round(time / 600) / 100}分,答案是五分钟!!!o(￣ε￣*) `;
             }
             else if (time < 480000) {
-                return `${Math.round(time / 600) / 100}分,难道说,你喜欢这首歌?!你已经听了两遍了!`;
+                return `${Math.round(time / 600) / 100}分,嘻嘻~~~杂鱼~杂鱼~❤~见到我就走不开了~`;
             }
             else if (time < 600000) {
                 return `${Math.round(time / 600) / 100}分,后面没有了,相信我☆(ゝω･)v`;
