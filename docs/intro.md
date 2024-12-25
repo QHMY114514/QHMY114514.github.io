@@ -2,6 +2,12 @@
 
 ## 我
 
+---
+
+### 技术栈
+
+[![My Skills](https://skillicons.dev/icons?i=js,html,css,nodejs,md)](https://skillicons.dev)
+
 ### 音游
 
 - Phigros

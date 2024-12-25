@@ -387,7 +387,7 @@ choice启用的状态下,页面的goto属性是无效的
 
 ### 开始你的创作!
 
-```json title="json | 这是上面给出的示例,你可以自己尝试!"
+```json title="json | 这是上面给出的示例,你可以自己尝试!" showLineNumbers
 {
     "meta": {
         "author": "QHLG",

@@ -39,6 +39,10 @@ const sidebars = {
     'song',
     'game',
     {
+      type: 'html',
+      value: '<hr color="#888">'
+    },
+    {
       type: 'category',
       label: 'HTML项目',
       items: ['html/maze', 'html/ball', 'html/art', 'html/gal'],

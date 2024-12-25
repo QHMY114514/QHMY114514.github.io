@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>发牌姬</title>
+    <script src="../node_modules/mahgen/dist/index.umd.js"></script>
+</head>
+
+<!--
+    这是什么?不知道!
+-->
+
+<body id="body">
+    <!--
+    <div class="main">
+        <button type="button" class="back" onclick="window.location.reload()">重抽</button>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #888;">王
+                <img id="dora" class="mahgen" />
+            </p>
+        </div>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #d22;">东
+                <img id="dong" class="mahgen" />
+            </p>
+        </div>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #bb4;">南
+                <img id="nan" class="mahgen" />
+            </p>
+        </div>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #24b;">西
+                <img id="xi" class="mahgen" />
+            </p>
+        </div>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #484;">北
+                <img id="bei" class="mahgen" />
+            </p>
+        </div>
+
+        <div class="mahjonghill">
+            <p class="hill" style="background-color: #444;">
+                <img id="hilla" class="mahgenhill" />
+                <img id="hillb" class="mahgenhill" />
+                <img id="hillc" class="mahgenhill" />
+                山
+            </p>
+        </div>
+    </div>
+    -->
+    <div class="main">
+        <div class="mahjong">
+            <p class="wind" style="background-color: #888;">王
+            </p>
+            <p id="dora" class="mahgen"></p>
+        </div>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #d22;">东
+            </p>
+            <p id="dong" class="mahgen"></p>
+        </div>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #bb4;">南
+            </p>
+            <p id="nan" class="mahgen"></p>
+        </div>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #24b;">西
+            </p>
+            <p id="xi" class="mahgen"></p>
+        </div>
+        <div class="mahjong">
+            <p class="wind" style="background-color: #484;">北
+            </p>
+            <p id="bei" class="mahgen"></p>
+        </div>
+
+        <div class="mahjonghill">
+            <p class="hill" style="background-color: #444;">
+            山
+            </p>
+            <p id="hilla" class="mahgenhill"></p>
+            <p id="hillb" class="mahgenhill"></p>
+            <p id="hillc" class="mahgenhill"></p>
+        </div>
+    </div>
+</body>
+
+<style>
+    /*
+    body {
+        background-color: #000;
+        margin: 0;
+        overflow-x: hidden;
+        overflow-y: scroll;
+    }
+
+    div.main {
+        margin: 4vh 1.5vw;
+    }
+
+    div.mahjong {
+        margin: 3vh 1vw;
+        height: 14vh;
+    }
+
+    div.mahjonghill {
+        margin: 3vh 1vw;
+        height: 34vh;
+    }
+
+    p.wind {
+        padding: 1vh 1vw;
+        margin: 0;
+        width: 92vw;
+        height: 12vh;
+        color: white;
+        font-size: calc(min(6vw, 6vh));
+        border: 1px solid #fff;
+        line-height: 12vh;
+    }
+
+    p.hill {
+        padding: 1vh 1vw;
+        margin: 0;
+        width: 92vw;
+        height: 30.5vh;
+        color: white;
+        font-size: calc(min(6vw, 6vh));
+        border: 1px solid #fff;
+        line-height: 30.5vh;
+    }
+
+    img.mahgen {
+        margin: 0;
+        padding: 0;
+        width: 84vw;
+        height: 12vh;
+        object-fit: scale-down;
+        border: 1px solid #fff;
+        background-color: #bbb;
+        float: right;
+    }
+
+    img.mahgenhill {
+        margin: 0;
+        padding: 0;
+        width: 84vw;
+        height: 10vh;
+        object-fit: scale-down;
+        border: 1px solid #fff;
+        background-color: #bbb;
+        float: right;
+    }
+    */
+
+    /*
+    是谁在用自己电脑分辨率硬写样式
+    是谁在制作这些愚蠢的css
+    */
+    
+    body {
+        background-color: #000;
+        margin: 0;
+        overflow: scroll;
+    }
+    
+    div.main {
+        margin: 4vh 1.5vw;
+        width: 109vw;
+    }
+
+    div.mahjong {
+        margin: 0 1vw;
+        height: 11.2vh;
+    }
+
+    div.mahjonghill {
+        margin: 0 1vw;
+        height: 41vh;
+    }
+
+    p.wind {
+        padding: 0 1vw;
+        margin: 0;
+        width: 3.9vw;
+        height: 11vh;
+        color: white;
+        font-size: calc(min(6vw, 6vh));
+        border: 1px solid #fff;
+        line-height: 11vh;
+        float: left;
+    }
+
+    p.hill {
+        padding: 0 1vw;
+        margin: 0;
+        width: 103.5vw;
+        height: 8vh;
+        color: white;
+        font-size: calc(min(6vw, 6vh));
+        border: 1px solid #fff;
+        line-height: 8vh;
+        float: left;
+    }
+    
+    p.mahgen {
+        margin: 0;
+        padding: 0;
+        width: 68.2vw;
+        height: 11vh;
+        border: 1px solid #fff;
+        background-color: #bbb;
+        float: left;
+    }
+
+    p.mahgenhill {
+        margin: 0;
+        padding: 0;
+        width: 105.5vw;
+        height: 11vh;
+        border: 1px solid #fff;
+        background-color: #bbb;
+        float: left;
+    }
+
+    button.back {
+        font-family: SimHei;
+        text-align: center;
+        border: 1px solid #fff;
+        color: #d8d8d8;
+        font-size: 2vh;
+        background-color: #00000080;
+    }
+
+    button.back:hover {
+        background-color: #80808080;
+    }
+</style>
+
+<script>
+    var dong = document.getElementById('dong');
+    var nan = document.getElementById('nan');
+    var xi = document.getElementById('xi');
+    var bei = document.getElementById('bei');
+    var hilla = document.getElementById('hilla');
+    var hillb = document.getElementById('hillb');
+    var hillc = document.getElementById('hillc');
+
+    var pic = [dora, dong, nan, xi, bei, hilla, hillb, hillc];
+
+    var card = ["", "", "", "", "", "", "", ""];
+
+    const tot = [14, 14, 13, 13, 13, 23, 23, 23];
+
+    var reloadtime = [0, 0, 0, 0, 0, 0, 0, 0];
+
+    getCard();
+
+    for (index in pic) {
+        setPic(pic[index], card[index]);
+    }
+
+    function setPic(obj, card) {
+        //你喜欢404吗?
+        //obj.src = `https://mahjim.black-desk.cn/${card}`;
+        //obj.alt = card;
+        obj.innerHTML = `<mah-gen data-seq="${card}"></mah-gen>`;
+    }
+
+    function getCard() {
+        let wall = [];
+        let tile = [[], [], [], [], [], [], [], []];
+
+        for (let i = 1; i < 137; i++) {
+            wall.push(i);
+        }
+
+        for (index in tile) {
+            for (let j = 0; j < tot[index]; j++) {
+                let t = randint(0, wall.length - 1);
+                tile[index].push(wall[t]);
+                wall.splice(t, 1);
+            }
+        }
+
+        for (index in tile) {
+            if (index > 0 && index < 5) {
+                tile[index].sort((a, b) => { return a - b; });
+            }
+        }
+
+        for (index in tile) {
+            card[index] = pushCard(tile[index], index == 0 ? 1 : index == 1 ? -randint(0, 13) : 0);
+        }
+    }
+
+    function pushCard(tile, space) {
+        let card = "";
+        for (index in tile) {
+            if ((index == 5 || index == 10) && space == 1) {
+                card += "|||";
+            }
+            if ((index == -space) && space < 0) {
+                card += "_";
+            }
+            if (tile[index] == 21) {
+                card += "0m";
+            } else if (tile[index] == 57) {
+                card += "0p";
+            } else if (tile[index] == 93) {
+                card += "0s";
+            } else if (tile[index] <= 36) {
+                card += `${Math.ceil((tile[index]) / 4)}m`
+            } else if (tile[index] <= 72) {
+                card += `${Math.ceil((tile[index] - 36) / 4)}p`
+            } else if (tile[index] <= 108) {
+                card += `${Math.ceil((tile[index] - 72) / 4)}s`
+            } else {
+                card += `${Math.ceil((tile[index] - 108) / 4)}z`
+            }
+        }
+        return card;
+    }
+
+    function rand(min, max) {
+        return typeof min == 'undefined' ?
+            Math.random() :
+            (
+                typeof min == 'object' ?
+                    Math.random() * (min[1] - min[0]) + min[0] :
+                    Math.random() * (max - min) + min
+            )
+    }
+
+    function randint(min, max) {
+        return typeof min == 'object' ?
+            Math.floor(rand([min[0], min[1] + 1])) :
+            Math.floor(rand(min, max + 1))
+    }
+
+</script>

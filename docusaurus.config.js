@@ -65,18 +65,37 @@ const config = {
     ({
       // Replace with your project's social card
       image: 'img/fox.jpg',
+      announcementBar: {
+        id: 'look_at_me_0',
+        content:
+          '看我看我!戳<a href="/blog">这里</a>一下',
+        backgroundColor: '#288',
+        textColor: '#ddd',
+        isCloseable: true,
+      },
       navbar: {
+        hideOnScroll: true,
         title: '乾狐之家,狐狸的衣柜!',
         logo: {
           alt: 'My Site Logo',
           src: 'img/logo.svg',
         },
         items: [
-          { to: '/blog', label: '不准看这里', position: 'left' },
+          { to: '/blog', label: '日记本', position: 'left' },
           {
-            to: '/docs/intro',
+            type: 'dropdown',
+            label: '乾狐一家',
             position: 'left',
-            label: '可以看这里',
+            items: [
+              {
+                label: '关于狐狸',
+                to: '/docs/intro',
+              },
+              {
+                label: '我的项目',
+                to: '/docs/game',
+              },
+            ],
           },
           {
             to: '/docs/jrrp',
