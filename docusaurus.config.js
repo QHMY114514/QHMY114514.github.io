@@ -64,7 +64,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/fox.jpg',
+      image: 'img/fox.png',
       announcementBar: {
         id: 'look_at_me_0',
         content:
