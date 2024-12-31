@@ -96,9 +96,16 @@
             }
         }
     } else if (map == 1) {
-        const totmode = 14;
+        const totmode = 25;
 
+        let pixco = [];
+        let pixro = [];
+        for (let i = 0; i < 16; i++) {
+            pixco.push(Math.random() * 255);
+            pixro.push(Math.random() * 255);
+        }
         let time = Date.now();
+        //let mode = [15, 16, 21];
         let mode = [Math.floor(totmode * Math.random()), Math.floor(totmode * Math.random()), Math.floor(totmode * Math.random())];
 
         for (i = -1; i < size; i++) {
@@ -137,6 +144,28 @@
                 case 12:
                     return ((i ** 2 + j ** 2) ** 0.5 + time) % 255;
                 case 13:
+                    return (j ** 2 / i + time) % 255;
+                case 14:
+                    return ((i * j) ** 0.5 + time) % 255;
+                case 15:
+                    return ((i + j) ** 2 / 1259 + time) % 255;
+                case 16:
+                    return ((size - i + j) ** 2 / 1259 + time) % 255;
+                case 17:
+                    return (i * Math.sin(i ** 0.5) + time) % 255;
+                case 18:
+                    return (j * Math.sin(j ** 0.5) + time) % 255;
+                case 19:
+                    return (i * Math.sin(j / i) + time) % 255;
+                case 20:
+                    return (255 * Math.sin(j / i) + time) % 255;
+                case 21:
+                    return (pixco[Math.floor(16 * i / size)] + pixco[Math.floor(16 * j / size)] + time) % 255;
+                case 22:
+                    return (pixco[Math.floor(16 * i / size)] + pixco[Math.floor(16 - 16 * j / size)] + time) % 255;
+                case 23:
+                    return (pixco[Math.floor(16 * i / size)] + pixro[Math.floor(16 * j / size)] + time) % 255;
+                case 24:
                     return (time) % 255;
             }
         }
@@ -147,15 +176,21 @@
         ctx.fillText(`mode:${mode[0]},${mode[1]},${mode[2]}`, 1020, 24);
         ctx.fillStyle = "#ffffff80";
         ctx.fillText(`mode:${mode[0]},${mode[1]},${mode[2]}`, 1020, 48);
+        ctx.fillStyle = "#00000080";
+        ctx.fillText(`seed:${time}`, 1020, 72);
+        ctx.fillStyle = "#ffffff80";
+        ctx.fillText(`seed:${time}`, 1020, 96);
     } else if (map == 2) {
         let time = Date.now();
         let dis = 0;
         let ang = 0;
-        let mod = [30 + Math.floor(720 * Math.random()), 30 + Math.floor(720 * Math.random()), 30 + Math.floor(720 * Math.random())];
+        let mod = [30 + Math.floor(180 * Math.random()), 30 + Math.floor(180 * Math.random()), 30 + Math.floor(180 * Math.random())];
         let col;
 
-        const forlen = 2048 * 360;
+        const forlen = 512 * 360;
+        const ciro = 4 * 360;
         ctx.fillStyle = "#000";
+        ctx.lineWidth = 3;
         ctx.fillRect(0, 0, size, size);
         for (i = 0; i < forlen; i++) {
             ctx.beginPath();
@@ -165,9 +200,9 @@
                 if (col[index] > 255) col[index] = 510 - col[index];
             }
             ctx.strokeStyle = `rgb(${col[0]},${col[1]},${col[2]})`;
-            ctx.arc(500, 500, dis, ang, ang + 4096 / forlen);
+            ctx.arc(500, 500, dis, ang, ang + ciro / forlen);
             dis += size / 1.4 / forlen;
-            ang += 4096 / forlen;
+            ang += ciro / forlen;
             ctx.stroke();
         }
 

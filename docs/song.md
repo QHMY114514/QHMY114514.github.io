@@ -78,6 +78,8 @@ Empty old City - Chronicle A (English Ver.)<br />**
     What A Shino - Particle Arts (What A Shino Frenchcore Edit)<br />
     DInxm Robinson - 森林之夜<br />
     JVKE - wonder if she loves me<br />
+    中村さんそ、てんひなた - morning lie (feat. てんひなた)<br />
+    Dj Grimoire - Astral Quantization<br />
 </details>
 
 <details>
@@ -101,6 +103,7 @@ Empty old City - Chronicle A (English Ver.)<br />**
     CITY SOUNDS 城市聲音、JocularACE、ADean - Shine After (For Phigros)<br />
     Intercom、Park Avenue - Decoy World VIP<br />
     Link"0 - iL-Artifact<br />
+    初音ミク、はるまきごはん - ドリームレス・ドリームス<br />
 </details>
 
 <details>
