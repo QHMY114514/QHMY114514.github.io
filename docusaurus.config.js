@@ -158,6 +158,10 @@ const config = {
                 label: '狐狸的GitHub主页',
                 href: 'https://github.com/QHMY114514',
               },
+              {
+                label: 'FlimeBot',
+                href: 'https://flime.online',
+              },
             ],
           },
           {
@@ -170,6 +174,10 @@ const config = {
               {
                 label: 'YukieBot(by 户山兔兔)',
                 href: 'https://yukiebot.top',
+              },
+              {
+                label: 'KasumiBot(by 户山兔兔)',
+                href: 'https://ksmbot.top',
               },
               {
                 label: '桑帛云API',
