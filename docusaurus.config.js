@@ -66,11 +66,11 @@ const config = {
       // Replace with your project's social card
       image: 'img/fox.png',
       announcementBar: {
-        id: 'look_at_me_0',
+        id: 'look_at_me_1',
         content:
-          '看我看我!戳<a href="/blog">这里</a>一下',
-        backgroundColor: '#288',
-        textColor: '#ddd',
+          '看看<a href="https://flime.online">狐莱姆官网</a>',
+        backgroundColor: '#FA4',
+        textColor: '#333',
         isCloseable: true,
       },
       navbar: {
