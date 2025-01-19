@@ -32,7 +32,7 @@ const sidebars = {
   tutorialSidebar: [
     {
       type: 'html',
-      value: '<iframe frameborder="no" marginwidth="0" marginheight="0" width="280" height="86" src="//music.163.com/outchain/player?type=2&id=2029600395&auto=1&height=66"></iframe>'
+      value: '<iframe frameborder="no" marginwidth="0" marginheight="0" width="280" height="86" src="//music.163.com/outchain/player?type=2&id=2149080951&auto=1&height=66"></iframe>'
     },
     'intro',
     'jrrp',
@@ -55,7 +55,12 @@ const sidebars = {
         label: '咲希了',
         id: 'joke/joke',
       }],
-    }
+    },
+    {
+      type: 'html',
+      value: '<hr color="#888">'
+    },
+    "surftown"
   ],
 };
 

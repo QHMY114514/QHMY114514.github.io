@@ -98,6 +98,11 @@ const config = {
             ],
           },
           {
+            to: '/docs/surftown',
+            label: '冲浪小镇',
+            position: 'left',
+          },
+          {
             to: '/docs/jrrp',
             label: '今日人品',
             position: 'left',
