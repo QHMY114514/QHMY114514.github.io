@@ -24,7 +24,9 @@ Cloudier - FEAR;life<br />
 A-39 - 夢<br />
 かめりあ - +ERABY+E CONNEC+10N<br />
 GTS Sound Team、DJ Raisei - Fractured Angel<br />
-Empty old City - Chronicle A (English Ver.)<br />**
+Empty old City - Chronicle A (English Ver.)<br />
+Jacoo - Towards The Light<br />
+DInxm Robinson - The Heart Beat(His story)<br />**
 
 ### 特殊推荐
 
