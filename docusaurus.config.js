@@ -98,7 +98,7 @@ const config = {
             ],
           },
           {
-            to: '/docs/surftown',
+            to: '/docs/stwiki',
             label: '冲浪小镇',
             position: 'left',
           },

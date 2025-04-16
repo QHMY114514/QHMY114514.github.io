@@ -60,7 +60,7 @@ const sidebars = {
       type: 'html',
       value: '<hr color="#888">'
     },
-    "surftown"
+    "stwiki"
   ],
 };
 
