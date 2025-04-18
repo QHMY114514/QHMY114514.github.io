@@ -380,8 +380,8 @@
 > 月卡凌晨4点刷新
 - 补签机会 | <span style={{color:'#4A0'}}>28点券</span> | 可补签一天
 - 伯爵 | <span style={{color:'#F00'}}>88RMB</span> | 全服可飞 `/fly`，提升巨大，随身工作台 `/wb`
-- 侯爵 | <span style={{color:'#F00'}}>168RMB</span> | 随身末影箱 `/ec`
-- 公爵 | <span style={{color:'#F00'}}>388RMB</span> | 任意修复物品 `/xf` `/repair`
+- 侯爵 | <span style={{color:'#F00'}}>168RMB</span> | 随身末影箱 `/ec` 任意修复物品 `/xf` `/repair`
+- 公爵 | <span style={{color:'#F00'}}>388RMB</span> | 小镇边界中心点移动 `/sh setspawn`
 > 贵族权益是什么？自己去看！记得在主城 `/gen 伯爵` 领每周奖励，侯爵可领伯爵、侯爵奖励，公爵再额外领公爵奖励<br/>
 > 贵族还可 `/gen 伯爵刷新` `/gen 侯爵刷新` `/gen 公爵刷新` 刷新[神秘商店](#神秘商店)<br/>
 > 贵族可使用 `/trchat color [内容]` 为自己说的话添加前缀，例如 `&6[123]&c` 就是为说的话添加金色的 `[123]` 并将说的话改为红色，请参考[我的世界格式化代码](https://zh.minecraft.wiki/w/%E6%A0%BC%E5%BC%8F%E5%8C%96%E4%BB%A3%E7%A0%81?variant=zh-cn)(`§` 替换为 `&`)
