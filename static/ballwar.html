@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>A Game</title>
+</head>
+<style>
+    html,
+    body {
+        background-color: #444;
+        height: 100%;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+    }
+
+    .map-container {
+        position: relative;
+        width: min(95vh, 95vw);
+        height: min(95vh, 95vw);
+        margin: calc((100vh - min(95vh, 95vw)) / 2) auto;
+    }
+
+    canvas.map {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+    }
+
+    #gameWorld {
+        background-color: #fff;
+        z-index: 1;
+    }
+
+    #uiLayer {
+        z-index: 2;
+        pointer-events: none;
+        transition: transform 0.1s ease-out;
+        will-change: transform;
+    }
+
+    button {
+        font-family: SimHei;
+        text-align: center;
+        border: 1px solid #fff;
+        color: #d8d8d8;
+        height: 3vh;
+        font-size: 2vh;
+        background-color: #00000080;
+        float: left;
+    }
+
+    button:hover {
+        background-color: #80808080;
+    }
+
+    #gameOverOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 100;
+    }
+
+    #gameOverText {
+        color: white;
+        font-size: 48px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    #restartText {
+        color: #aaa;
+        font-size: 24px;
+    }
+</style>
+
+<body>
+    <button onclick="clearGameData()">清空数据</button>
+    <div class="map-container">
+        <canvas id="gameWorld" class="map" width="2048" height="2048"></canvas>
+        <canvas id="uiLayer" class="map" width="2048" height="2048"></canvas>
+    </div>
+    <div id="gameOverOverlay">
+        <div id="gameOverText"></div>
+        <div id="restartText">按空格重新开始游戏</div>
+    </div>
+    <script>
+        function getNewGameState() {
+            return {
+                player: {
+                    x: 1024,
+                    y: 1024
+                },
+                speed: {
+                    x: 0,
+                    y: 0
+                },
+                uiOffset: {
+                    x: 0,
+                    y: 0,
+                    targetX: 0,
+                    targetY: 0,
+                    rotation: 0
+                },
+                animations: {
+                    hpChange: { active: false, progress: 0 },
+                    levelUp: { active: false, progress: 0 }
+                },
+                lastUpdate: 0,
+                keysPressed: {
+                    w: false,
+                    a: false,
+                    s: false,
+                    d: false,
+                    j: false,
+                    space: false
+                },
+                gameData: {
+                    score: 0,
+                    kill: 0,
+                    hp: 1000,
+                    time: 0,
+                    level: 0,
+                    skillPoints: 0,
+                    exp: 0
+                },
+                upgrades: {
+                    damage: 0,
+                    splashDamage: 0,
+                    splashRadius: 0,
+                    fireRate: 0,
+                    power: 0
+                },
+                enemies: [],
+                bullets: [],
+                splashEffects: [],
+                powerups: [],
+                lastPowerupSpawnTime: 0,
+                lastNukeSpawnTime: 0,
+                lastEnemySpawnTime: 0,
+                lastBulletFireTime: 0,
+                isFiring: false,
+                isGameOver: false,
+                pause: true
+            };
+        }
+        function getNewGameConstants() {
+            return {
+                MAP_SIZE: [2048, 2048],
+
+                PLAYER_SIZE: 96,
+                PLAYER_COLOR: '#FF0000',
+
+                ENEMY_SIZE: 64,
+                ENEMY_COLOR: '#0000FF',
+                ENEMY_SPAWN_DISTANCE: 512,
+                ENEMY_SPAWN_RATE: 750,
+                ENEMY_HP: 2,
+                ENEMY_DEMAGE: 25,
+                ENEMY_ACCELERATION: 0.02,
+                ENEMY_MORE: 0,
+
+                ACCELEROMETER: 0.64,
+                DRAG_COEFFICIENT: 0.002,
+
+                BULLET_SIZE: 16,
+                BULLET_COLOR: '#888888',
+                BULLET_SPEED: 32,
+                BULLET_DAMAGE: 2,
+                BULLET_SPLASH_DAMAGE: 1,
+                BULLET_SPLASH_RADIUS: 64,
+                BULLET_FIRE_RATE: 400,
+                BULLET_LIFE: 5000,
+
+                BASE_BULLET_DAMAGE: 2,
+                BASE_BULLET_SPLASH_DAMAGE: 1,
+                BASE_BULLET_SPLASH_RADIUS: 72,
+                BASE_BULLET_FIRE_RATE: 400,
+
+                DAMAGE_UPGRADE: 2,
+                SPLASH_DAMAGE_UPGRADE: 0.5,
+                SPLASH_RADIUS_UPGRADE: 24,
+                FIRE_RATE_UPGRADE: -50,
+
+                SPECIAL_ENEMY_RATE: 0.1,
+                SPECIAL_ENEMY_SIZE: 80,
+                SPECIAL_ENEMY_COLOR: '#6600BB',
+                SPECIAL_ENEMY_HP_MULTIPLIER: 2,
+                SPECIAL_ENEMY_DAMAGE_MULTIPLIER: 3,
+                SPECIAL_ENEMY_BULLET_SIZE: 32,
+                SPECIAL_ENEMY_BULLET_COLOR: '#a713ad',
+                SPECIAL_ENEMY_BULLET_SPEED: 6,
+                SPECIAL_ENEMY_BULLET_LIFE: 2000,
+                SPECIAL_ENEMY_BULLET_DAMAGE_RATIO: 0.2,
+                SPECIAL_ENEMY_SHOOT_INTERVAL: 1000,
+                MAX_SPECIAL_ENEMIES: 16,
+
+                POWER_SIZE: 32,
+                POWER_COLOR: '#FF8800',
+                POWER_OUTLINE: '#00FF00',
+                POWER_SPAWN_INTERVAL: [5000, 10000],
+                POWER_LIFETIME: 30000,
+
+                NUKE_SIZE: 64,
+                NUKE_COLOR: '#FFFFFF',
+                NUKE_OUTLINE: '#00FF00',
+                NUKE_SPAWN_INTERVAL: [15000, 45000],
+                NUKE_LIFETIME: 30000,
+                NUKE_RUN_ACCELERATION: 0.01
+            }
+        }
+
+        function randomBetween(min, max) {
+            return min + Math.random() * (max - min);
+        }
+
+        function getAnimatedColor(baseColor, progress, highlightColor = "#FF0000") {
+            if (progress <= 0) return baseColor;
+            if (progress >= 1) return highlightColor;
+            return lerpColor(baseColor, highlightColor, progress);
+        }
+
+        function lerpColor(color1, color2, factor) {
+            if (factor <= 0) return color1;
+            if (factor >= 1) return color2;
+            const hex3 = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+            const hex6 = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i;
+            const normalize = (hex) => {
+                hex = hex.replace(hex3, (m, r, g, b) => r + r + g + g + b + b);
+                const result = hex.match(hex6);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            };
+            const c1 = normalize(color1);
+            const c2 = normalize(color2);
+            if (!c1 || !c2) return color1;
+            const r = Math.round(c1.r + (c2.r - c1.r) * factor).toString(16).padStart(2, '0');
+            const g = Math.round(c1.g + (c2.g - c1.g) * factor).toString(16).padStart(2, '0');
+            const b = Math.round(c1.b + (c1.b - c1.b) * factor).toString(16).padStart(2, '0');
+            return `#${r}${g}${b}`;
+        }
+
+        let GameState = getNewGameState();
+        let GameConstants = getNewGameConstants();
+
+        const gameWorld = document.getElementById("gameWorld");
+        const uiLayer = document.getElementById("uiLayer");
+        const gameCtx = gameWorld.getContext("2d");
+        const uiCtx = uiLayer.getContext("2d");
+        const gameOverOverlay = document.getElementById("gameOverOverlay");
+        const gameOverText = document.getElementById("gameOverText");
+
+        let frameTimes = new Array(300).fill(16.67);
+        const MAX_FRAME_SAMPLES = 300;
+
+        function initGame() {
+            loadGameData();
+            enemyUpgrade();
+            meUpgrade();
+
+            setupEventListeners();
+
+            lastFrameTime = performance.now();
+            main(lastFrameTime);
+        }
+
+        function main(timestamp) {
+            const deltaTime = timestamp - lastFrameTime;
+            lastFrameTime = timestamp;
+
+            frameTimes.push(deltaTime);
+            if (frameTimes.length > MAX_FRAME_SAMPLES) {
+                frameTimes.shift();
+            }
+
+            if (!GameState.isGameOver && !GameState.pause) {
+                update(deltaTime);
+            }
+
+            render();
+
+            if (GameState.isGameOver && GameState.keysPressed.space) {
+                resetGame();
+            }
+            animationFrameId = requestAnimationFrame(main);
+        }
+
+        function Cal_FPS() {
+            if (frameTimes.length === 0) return 0;
+            const totalTime = frameTimes.reduce((sum, time) => sum + time, 0);
+            const averageFrameTime = totalTime / frameTimes.length;
+            return 1000 / averageFrameTime;
+        }
+
+        function resetGame() {
+            GameState = getNewGameState();
+            GameConstants = getNewGameConstants();
+            gameOverOverlay.style.display = "none";
+        }
+
+        function showGameOver() {
+            GameState.isGameOver = true;
+            gameOverText.textContent = `分数：${Math.floor(GameState.gameData.score)}`;
+            gameOverOverlay.style.display = "flex";
+        }
+
+        function update(deltaTime) {
+
+            if (GameState.gameData.hp <= 0) {
+                showGameOver();
+                return;
+            }
+            GameState.gameData.score += 1 / 6;
+            GameState.gameData.time += 1 / 60;
+
+            GameState.gameData.hp += (10 + (1000 - GameState.gameData.hp) / 50) * (deltaTime / 1000);
+
+            GameState.gameData.hp = Math.min(1000, GameState.gameData.hp);
+
+            updateAnimations(deltaTime);
+
+            spawnEnemies(deltaTime);
+
+            move(deltaTime);
+
+            updateEnemies(deltaTime);
+
+            updateBullets(deltaTime);
+
+            handleShooting(deltaTime);
+
+            updateEffect(deltaTime);
+
+            spawnPowerups(deltaTime);
+
+            updatePowerups(deltaTime);
+
+            enemyUpgrade();
+            const smoothFactor = 0.06;
+            GameState.uiOffset.x += (GameState.uiOffset.targetX - GameState.uiOffset.x) * smoothFactor;
+            GameState.uiOffset.y += (GameState.uiOffset.targetY - GameState.uiOffset.y) * smoothFactor;
+            GameState.uiOffset.rotation += (GameState.uiOffset.targetRotation - GameState.uiOffset.rotation) * smoothFactor;
+            GameState.lastUpdate = Date.now();
+        }
+
+        function updateAnimations(deltaTime) {
+            if (GameState.animations.hpChange.active) {
+                GameState.animations.hpChange.progress =
+                    Math.max(0, GameState.animations.hpChange.progress - deltaTime / 1000);
+                if (GameState.animations.hpChange.progress <= 0) {
+                    GameState.animations.hpChange.active = false;
+                }
+            }
+
+            if (GameState.animations.levelUp.active) {
+                GameState.animations.levelUp.progress =
+                    Math.max(0, GameState.animations.levelUp.progress - deltaTime / 2000);
+                if (GameState.animations.levelUp.progress <= 0) {
+                    GameState.animations.levelUp.active = false;
+                }
+            }
+        }
+
+        function spawnEnemies(deltaTime) {
+            GameState.lastEnemySpawnTime += deltaTime;
+            if (GameState.lastEnemySpawnTime >= GameConstants.ENEMY_SPAWN_RATE) {
+                GameState.lastEnemySpawnTime = 0;
+                newEemey();
+                while (Math.random() < GameConstants.ENEMY_MORE) newEemey();
+                function newEemey() {
+                    let angle = Math.random() * Math.PI * 2;
+                    let distance = GameConstants.ENEMY_SPAWN_DISTANCE + Math.random() * 1024;
+                    let x = GameState.player.x + Math.cos(angle) * distance;
+                    let y = GameState.player.y + Math.sin(angle) * distance;
+                    const isSpecial = Math.random() < GameConstants.SPECIAL_ENEMY_RATE;
+                    const currentSpecialEnemies = GameState.enemies.filter(e => e.isSpecial).length;
+                    const canSpawnSpecial = isSpecial && currentSpecialEnemies < GameConstants.MAX_SPECIAL_ENEMIES;
+                    if (canSpawnSpecial) {
+
+                        GameState.enemies.push({
+                            x: x,
+                            y: y,
+                            speed: {
+                                x: 0,
+                                y: 0
+                            },
+                            hp: GameConstants.ENEMY_HP * GameConstants.SPECIAL_ENEMY_HP_MULTIPLIER,
+                            isSpecial: true,
+                            lastShootTime: 0,
+                            size: GameConstants.SPECIAL_ENEMY_SIZE
+                        });
+                    } else {
+
+                        GameState.enemies.push({
+                            x: x,
+                            y: y,
+                            speed: {
+                                x: 0,
+                                y: 0
+                            },
+                            hp: GameConstants.ENEMY_HP,
+                            isSpecial: false,
+                            size: GameConstants.ENEMY_SIZE
+                        });
+                    }
+                }
+            }
+        }
+
+        function updateEnemies(deltaTime) {
+            const timeFactor = deltaTime / 16;
+
+            for (let i = GameState.enemies.length - 1; i >= 0; i--) {
+                const enemy = GameState.enemies[i];
+                const dx = GameState.player.x - enemy.x;
+                const dy = GameState.player.y - enemy.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (Math.random() < (i - 300) / 700 && distance >= 1024 * 2 ** 0.5 && !enemy.isSpecial) {
+                    GameState.enemies.splice(i, 1);
+                    continue;
+                }
+
+                if (distance > 3172) {
+                    const angle = Math.random() * Math.PI * 2;
+                    enemy.x = GameState.player.x + Math.cos(angle) * 2560;
+                    enemy.y = GameState.player.y + Math.sin(angle) * 2560;
+                    enemy.speed.x = 0;
+                    enemy.speed.y = 0;
+                    continue;
+                }
+
+                if (enemy.isSpecial) {
+                    enemy.lastShootTime += deltaTime;
+                    if (enemy.lastShootTime >= GameConstants.SPECIAL_ENEMY_SHOOT_INTERVAL) {
+                        enemy.lastShootTime = 0;
+
+                        const dx = GameState.player.x - enemy.x;
+                        const dy = GameState.player.y - enemy.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance > 0) {
+
+                            const dirX = dx / distance;
+                            const dirY = dy / distance;
+
+                            GameState.bullets.push({
+                                x: enemy.x,
+                                y: enemy.y,
+                                speed: {
+                                    x: dirX * GameConstants.SPECIAL_ENEMY_BULLET_SPEED,
+                                    y: dirY * GameConstants.SPECIAL_ENEMY_BULLET_SPEED
+                                },
+                                size: GameConstants.SPECIAL_ENEMY_BULLET_SIZE,
+                                color: GameConstants.SPECIAL_ENEMY_BULLET_COLOR,
+                                isSpecial: true,
+                                life: GameConstants.SPECIAL_ENEMY_BULLET_LIFE,
+                                damage: GameConstants.ENEMY_DEMAGE * GameConstants.SPECIAL_ENEMY_DAMAGE_MULTIPLIER * GameConstants.SPECIAL_ENEMY_BULLET_DAMAGE_RATIO
+                            });
+                        }
+                    }
+                }
+
+                if (distance < (GameConstants.PLAYER_SIZE / 2 + enemy.size / 2)) {
+                    GameState.enemies.splice(i, 1);
+                    const damage = enemy.isSpecial ?
+                        GameConstants.ENEMY_DEMAGE * GameConstants.SPECIAL_ENEMY_DAMAGE_MULTIPLIER :
+                        GameConstants.ENEMY_DEMAGE;
+                    GameState.gameData.hp -= damage;
+                    GameState.animations.hpChange = { active: true, progress: 1 };
+                    continue;
+                }
+                if (distance > 0) {
+                    const dirX = dx / distance;
+                    const dirY = dy / distance;
+
+                    enemy.speed.x += dirX * GameConstants.ENEMY_ACCELERATION * timeFactor;
+                    enemy.speed.y += dirY * GameConstants.ENEMY_ACCELERATION * timeFactor;
+                }
+
+                const oldX = enemy.x;
+                const oldY = enemy.y;
+
+                let newX = oldX + enemy.speed.x * timeFactor;
+                let newY = oldY + enemy.speed.y * timeFactor;
+                enemy.x = newX;
+                enemy.y = newY;
+
+                const dragX = enemy.speed.x * Math.abs(enemy.speed.x) * GameConstants.DRAG_COEFFICIENT;
+                const dragY = enemy.speed.y * Math.abs(enemy.speed.y) * GameConstants.DRAG_COEFFICIENT;
+                enemy.speed.x -= dragX * timeFactor;
+                enemy.speed.y -= dragY * timeFactor;
+            }
+        }
+
+        function updateBullets(deltaTime) {
+            const timeFactor = deltaTime / 16;
+
+            for (let i = GameState.bullets.length - 1; i >= 0; i--) {
+                const bullet = GameState.bullets[i];
+
+                if (!bullet.life) {
+                    bullet.life = GameConstants.BULLET_LIFE;
+                } else {
+                    bullet.life -= deltaTime;
+                    if (bullet.life <= 0) {
+                        GameState.bullets.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                bullet.x += bullet.speed.x * timeFactor;
+                bullet.y += bullet.speed.y * timeFactor;
+
+                if (bullet.isSpecial) {
+                    const dx = bullet.x - GameState.player.x;
+                    const dy = bullet.y - GameState.player.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < (GameConstants.PLAYER_SIZE / 2 + bullet.size / 2)) {
+                        GameState.bullets.splice(i, 1);
+                        GameState.gameData.hp -= bullet.damage;
+                        GameState.animations.hpChange = { active: true, progress: 1 };
+                        continue;
+                    }
+                } else {
+
+                    let hitEnemy = false;
+                    for (let j = GameState.enemies.length - 1; j >= 0; j--) {
+                        const enemy = GameState.enemies[j];
+                        const dx = bullet.x - enemy.x;
+                        const dy = bullet.y - enemy.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < (GameConstants.ENEMY_SIZE / 2 + GameConstants.BULLET_SIZE / 2)) {
+
+                            enemy.hp -= GameConstants.BULLET_DAMAGE;
+                            GameState.gameData.score += GameConstants.BASE_BULLET_DAMAGE;
+
+                            GameState.enemies.forEach(e => {
+                                const splashDx = bullet.x - e.x;
+                                const splashDy = bullet.y - e.y;
+                                const splashDistance = Math.sqrt(splashDx * splashDx + splashDy * splashDy);
+                                if (splashDistance <= GameConstants.BULLET_SPLASH_RADIUS) {
+                                    e.hp -= GameConstants.BULLET_SPLASH_DAMAGE;
+                                    GameState.gameData.score += GameConstants.BULLET_SPLASH_DAMAGE * 1.5;
+                                }
+                            });
+                            GameState.splashEffects.push({
+                                x: bullet.x,
+                                y: bullet.y,
+                                radius: GameConstants.BULLET_SPLASH_RADIUS,
+                                alpha: 1.0,
+                                duration: 300
+                            });
+
+                            GameState.bullets.splice(i, 1);
+                            hitEnemy = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            let enemyCount = GameState.enemies.length;
+
+            let specialKills = 0;
+            GameState.enemies = GameState.enemies.filter(enemy => {
+                if (enemy.hp <= 0 && enemy.isSpecial) {
+                    specialKills++;
+                    return false;
+                }
+
+                if (Math.random() < 0.01 && enemy.hp < 0) GameState.powerups.push({
+                    x: enemy.x,
+                    y: enemy.y,
+                    type: 'power',
+                    size: GameConstants.POWER_SIZE,
+                    color: GameConstants.POWER_COLOR,
+                    outline: GameConstants.POWER_OUTLINE,
+                    speed: { x: 0, y: 0 },
+                    accelerometer: -0.08,
+                    lifetime: GameConstants.POWER_LIFETIME,
+                    spawnTime: Date.now()
+                });
+
+                return enemy.hp > 0;
+            });
+            let kills = enemyCount - GameState.enemies.length;
+            GameState.gameData.kill += kills;
+
+            if (specialKills > 0) {
+                GameState.gameData.exp += specialKills * 3;
+                GameState.gameData.score += 9;
+            }
+
+            if (kills > 0) {
+                GameState.gameData.exp += kills - specialKills;
+                GameState.gameData.score += 1;
+                checkLevelUp();
+            }
+        }
+
+        function updateEffect(deltaTime) {
+            for (let i = GameState.splashEffects.length - 1; i >= 0; i--) {
+                const effect = GameState.splashEffects[i];
+                effect.duration -= deltaTime;
+                effect.alpha = effect.duration / 300;
+                effect.radius = GameConstants.BULLET_SPLASH_RADIUS * (effect.duration / 300) ** 2;
+                if (effect.duration <= 0) {
+                    GameState.splashEffects.splice(i, 1);
+                }
+            }
+        }
+
+        function spawnPowerups(deltaTime) {
+            GameState.lastPowerupSpawnTime += deltaTime;
+            GameState.lastNukeSpawnTime += deltaTime;
+
+            // 生成伤害道具
+            const powerupInterval = randomBetween(GameConstants.POWER_SPAWN_INTERVAL[0], GameConstants.POWER_SPAWN_INTERVAL[1]);
+            if (GameState.lastPowerupSpawnTime >= powerupInterval) {
+                GameState.lastPowerupSpawnTime = 0;
+                spawnPowerup('power');
+            }
+
+            // 5分钟后生成核弹
+            if (GameState.gameData.time >= 300 && GameState.lastNukeSpawnTime >= randomBetween(GameConstants.NUKE_SPAWN_INTERVAL[0], GameConstants.NUKE_SPAWN_INTERVAL[1])) {
+                GameState.lastNukeSpawnTime = 0;
+                spawnPowerup('nuke');
+            }
+
+            function spawnPowerup(type) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = randomBetween(512, 1536);
+                const x = GameState.player.x + Math.cos(angle) * distance;
+                const y = GameState.player.y + Math.sin(angle) * distance;
+
+                switch (type) {
+                    case 'power':
+                        GameState.powerups.push({
+                            x: x,
+                            y: y,
+                            type: type,
+                            size: GameConstants.POWER_SIZE,
+                            color: GameConstants.POWER_COLOR,
+                            outline: GameConstants.POWER_OUTLINE,
+                            speed: { x: 0, y: 0 },
+                            accelerometer: 0,
+                            lifetime: GameConstants.POWER_LIFETIME,
+                            spawnTime: Date.now()
+                        });
+                        break;
+                    case 'nuke':
+                        GameState.powerups.push({
+                            x: x,
+                            y: y,
+                            type: type,
+                            size: GameConstants.NUKE_SIZE,
+                            color: GameConstants.NUKE_COLOR,
+                            outline: GameConstants.NUKE_OUTLINE,
+                            speed: { x: 0, y: 0 },
+                            accelerometer: GameConstants.NUKE_RUN_ACCELERATION,
+                            lifetime: GameConstants.NUKE_LIFETIME,
+                            spawnTime: Date.now()
+                        });
+                        break;
+                }
+            }
+        }
+
+        function updatePowerups(deltaTime) {
+            for (let i = GameState.powerups.length - 1; i >= 0; i--) {
+                const powerup = GameState.powerups[i];
+
+                if (Date.now() - powerup.spawnTime > powerup.lifetime) {
+                    GameState.powerups.splice(i, 1);
+                    continue;
+                }
+
+                const dx = powerup.x - GameState.player.x;
+                const dy = powerup.y - GameState.player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                const collisionDistance = GameConstants.PLAYER_SIZE / 2 + powerup.size / 2;
+
+                if (distance < collisionDistance) {
+                    if (powerup.type === 'power') {
+                        GameState.upgrades.power++;
+                        meUpgrade();
+                    } else if (powerup.type === 'nuke') {
+                        GameState.enemies.forEach(enemy => {
+                            enemy.hp -= GameConstants.BULLET_DAMAGE;
+                        });
+                        GameState.splashEffects.push({
+                            x: powerup.x,
+                            y: powerup.y,
+                            radius: 2048,
+                            alpha: 0.3,
+                            duration: 2500
+                        });
+                    }
+
+                    GameState.powerups.splice(i, 1);
+
+                    continue;
+                }
+
+                const dirX = dx / distance;
+                const dirY = dy / distance;
+
+                powerup.speed.x += dirX * powerup.accelerometer * (deltaTime / 16);
+                powerup.speed.y += dirY * powerup.accelerometer * (deltaTime / 16);
+
+                powerup.x += powerup.speed.x * (deltaTime / 16);
+                powerup.y += powerup.speed.y * (deltaTime / 16);
+
+            }
+        }
+
+        function handleShooting(deltaTime) {
+            if (GameState.keysPressed.j) {
+                GameState.lastBulletFireTime += deltaTime;
+                if (GameState.lastBulletFireTime >= GameConstants.BULLET_FIRE_RATE) {
+                    GameState.lastBulletFireTime = 0;
+                    fireBullet();
+                }
+            } else {
+                GameState.lastBulletFireTime = 0;
+            }
+        }
+
+        function fireBullet() {
+
+            let closestEnemy = null;
+            let minDistance = Infinity;
+            GameState.enemies.forEach(enemy => {
+                const dx = enemy.x - GameState.player.x;
+                const dy = enemy.y - GameState.player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestEnemy = enemy;
+                }
+            });
+            if (closestEnemy != null) {
+                const dx = closestEnemy.x - GameState.player.x;
+                const dy = closestEnemy.y - GameState.player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance > 0) {
+
+                    const dirX = dx / distance;
+                    const dirY = dy / distance;
+
+                    GameState.bullets.push({
+                        x: GameState.player.x,
+                        y: GameState.player.y,
+                        speed: {
+                            x: dirX * GameConstants.BULLET_SPEED,
+                            y: dirY * GameConstants.BULLET_SPEED,
+                        },
+                        size: GameConstants.BULLET_SIZE,
+                        color: GameConstants.BULLET_COLOR,
+                        isSpecial: false,
+                        damage: GameConstants.BULLET_DAMAGE
+                    });
+                }
+            } else {
+                const x = Math.random() * 2048;
+                const y = Math.random() * 2048;
+                const dx = x - GameState.player.x;
+                const dy = y - GameState.player.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance > 0) {
+
+                    const dirX = dx / distance;
+                    const dirY = dy / distance;
+
+                    GameState.bullets.push({
+                        x: GameState.player.x,
+                        y: GameState.player.y,
+                        speed: {
+                            x: dirX * GameConstants.BULLET_SPEED,
+                            y: dirY * GameConstants.BULLET_SPEED,
+                        },
+                        size: GameConstants.BULLET_SIZE,
+                        color: GameConstants.BULLET_COLOR,
+                        isSpecial: false,
+                        damage: GameConstants.BULLET_DAMAGE
+                    });
+                }
+            }
+        }
+
+        function render() {
+            gameCtx.clearRect(0, 0, gameWorld.width, gameWorld.height);
+
+            const viewportOffsetX = GameState.player.x - gameWorld.width / 2;
+            const viewportOffsetY = GameState.player.y - gameWorld.height / 2;
+
+            gameCtx.save();
+
+            gameCtx.translate(-viewportOffsetX, -viewportOffsetY);
+
+            renderGameWorld(gameCtx);
+
+            gameCtx.restore();
+
+            uiCtx.clearRect(0, 0, uiLayer.width, uiLayer.height);
+
+            renderUI(uiCtx);
+        }
+
+        function renderGameWorld(ctx) {
+            const viewportWidth = gameWorld.width;
+            const viewportHeight = gameWorld.height;
+            const viewportLeft = GameState.player.x - viewportWidth / 2;
+            const viewportTop = GameState.player.y - viewportHeight / 2;
+
+            const viewportRight = viewportLeft + viewportWidth;
+            const viewportBottom = viewportTop + viewportHeight;
+
+            function isInViewport(x, y, size) {
+                return x + size / 2 > viewportLeft &&
+                    x - size / 2 < viewportRight &&
+                    y + size / 2 > viewportTop &&
+                    y - size / 2 < viewportBottom;
+            }
+
+            if (Math.abs(GameState.player.x - 1024) < 2048 && Math.abs(GameState.player.y - 1024) < 2048) {
+                const hue = (6 * GameState.gameData.time) % 360;
+                const bgColor = `hsla(${hue}, 100%, 85%,50%)`;
+
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, gameWorld.width, gameWorld.height);
+
+                ctx.save();
+                ctx.fillStyle = "#DDDDDD";
+                ctx.font = "256px Consolas";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("BALLS", 1024, 1024 - 256);
+                ctx.fillText("MADE BY QHLG", 1024, 1024);
+                ctx.fillText("WAR", 1024, 1024 + 256);
+                ctx.restore();
+            }
+
+            GameState.splashEffects.forEach(effect => {
+                if (!isInViewport(effect.x, effect.y, effect.radius * 2)) return;
+                ctx.save();
+                ctx.globalAlpha = effect.alpha;
+                ctx.fillStyle = 'rgba(255,255,0,0.5)';
+                ctx.beginPath();
+                ctx.arc(effect.x, effect.y, effect.radius, 0, Math.PI * 2, true);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            GameState.enemies.forEach(enemy => {
+                if (!isInViewport(enemy.x, enemy.y, enemy.size)) return;
+                ctx.fillStyle = enemy.isSpecial ? GameConstants.SPECIAL_ENEMY_COLOR : GameConstants.ENEMY_COLOR;
+                ctx.beginPath();
+                ctx.arc(enemy.x, enemy.y, enemy.size / 2, 0, Math.PI * 2, true);
+                ctx.fill();
+
+                ctx.fillStyle = "#ff0000";
+                const maxHp = enemy.isSpecial ?
+                    GameConstants.ENEMY_HP * GameConstants.SPECIAL_ENEMY_HP_MULTIPLIER :
+                    GameConstants.ENEMY_HP;
+                ctx.fillRect(
+                    enemy.x - enemy.size / 2,
+                    enemy.y - enemy.size / 2 - 15,
+                    enemy.size * (enemy.hp / maxHp),
+                    10
+                );
+            });
+
+            GameState.powerups.forEach(powerup => {
+                if (!isInViewport(powerup.x, powerup.y, powerup.size)) return;
+                ctx.save();
+                ctx.fillStyle = powerup.color;
+                ctx.strokeStyle = powerup.outline;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(powerup.x, powerup.y, powerup.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            });
+
+            GameState.bullets.forEach(bullet => {
+                if (!isInViewport(bullet.x, bullet.y, bullet.size)) return;
+                ctx.fillStyle = bullet.color || GameConstants.BULLET_COLOR;
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bullet.size / 2, 0, Math.PI * 2, true);
+                ctx.fill();
+            });
+
+            ctx.fillStyle = GameConstants.PLAYER_COLOR;
+            ctx.beginPath();
+            ctx.strokeStyle = "#00DD00";
+            ctx.lineWidth = 3;
+            ctx.arc(GameState.player.x, GameState.player.y, GameConstants.PLAYER_SIZE / 2, 0, Math.PI * 2, true);
+            ctx.fill();
+            ctx.stroke();
+
+            if (GameState.gameData.hp <= 500) {
+                const hpFactor = Math.max(0, GameState.gameData.hp / 500);
+                const innerRadius = 384 + (1024 * 2 ** 0.5 - 384) * hpFactor;
+                const outerRadius = 1024 * 2 ** 0.5;
+
+                const gradient = ctx.createRadialGradient(
+                    GameState.player.x, GameState.player.y, innerRadius,
+                    GameState.player.x, GameState.player.y, outerRadius
+                );
+
+                gradient.addColorStop(0, 'rgba(255, 0, 0, 0)');
+                gradient.addColorStop(1, 'rgba(255, 0, 0, 1)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(GameState.player.x, GameState.player.y, outerRadius, 0, Math.PI * 2);
+                ctx.arc(GameState.player.x, GameState.player.y, innerRadius, 0, Math.PI * 2, true);
+                ctx.fill();
+            }
+        }
+
+        function renderUI(ctx) {
+            ctx.save();
+
+            const centerX = uiLayer.width / 2;
+            const centerY = uiLayer.height / 2;
+            ctx.translate(centerX, centerY);
+            ctx.rotate(GameState.uiOffset.rotation * Math.PI / 180);
+            ctx.translate(-centerX, -centerY);
+            ctx.translate(GameState.uiOffset.x, GameState.uiOffset.y);
+            ctx.clearRect(0, 0, uiLayer.width, uiLayer.height);
+
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "left";
+            ctx.font = "96px Consolas";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`TIME ${formatFloatAsTime(GameState.gameData.time)}`, 64, 128);
+            ctx.fillText(`${GameState.pause ? "PAUSING" : "RUNNING"}`, 64, 224);
+            ctx.fillText(`SCORE ${Math.floor(GameState.gameData.score)}`, 64, 416);
+            ctx.fillText(`KILL ${Math.floor(GameState.gameData.kill)}`, 64, 512);
+
+            ctx.fillStyle = getAnimatedColor("#666", GameState.animations.hpChange.progress, "#FF0000");
+            ctx.fillText(`HP ${Math.floor(GameState.gameData.hp)}`, 64, 320);
+
+            ctx.fillStyle = "#F66";
+            ctx.fillText(`${GameState.pause ? "P" : ""}`, 64, 224);
+
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "center";
+            ctx.font = "64px Consolas";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`[${Math.round((GameState.player.x - 1024) / 10.24)},${Math.round((GameState.player.y - 1024) / 10.24)}]`, 1024, 128);
+
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "left";
+            ctx.font = "64px Consolas";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`EXP ${GameState.gameData.exp}/${CalExp(GameState.gameData.level)}`, 64, 672);
+            ctx.fillText(`1 DMG ${GameState.upgrades.damage}/10`, 64, 800);
+            ctx.fillText(`2 SPL ${GameState.upgrades.splashDamage}/10`, 64, 864);
+            ctx.fillText(`3 RAD ${GameState.upgrades.splashRadius}/8`, 64, 928);
+            ctx.fillText(`4 SPD ${GameState.upgrades.fireRate}/6`, 64, 992);
+            ctx.fillText(`Use skillpoint`, 64, 1056);
+            ctx.fillText(`to upgrade`, 64, 1120);
+
+            if (GameState.gameData.skillPoints != 0) ctx.fillStyle = "#0D0";
+            ctx.fillText(`SKILL ${GameState.gameData.skillPoints}`, 64, 736);
+
+            ctx.fillStyle = getAnimatedColor("#666", GameState.animations.levelUp.progress, "#00FF00");
+            ctx.fillText(`LV ${GameState.gameData.level}`, 64, 608);
+
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "right";
+            ctx.font = "64px Consolas";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`ENEMY`, 2048 - 64, 96);
+            ctx.fillText(`${GameConstants.ENEMY_HP.toFixed(2)} HP`, 2048 - 64, 160);
+            ctx.fillText(`${Math.floor(GameConstants.ENEMY_SPAWN_RATE)} SPAWN GAP`, 2048 - 64, 224);
+            ctx.fillText(`${(GameConstants.ENEMY_ACCELERATION / 0.02).toFixed(2)} ENEMY SPEED`, 2048 - 64, 288);
+            ctx.fillText(`${GameConstants.ENEMY_MORE.toFixed(3)} EXTRA ENEMY`, 2048 - 64, 352);
+            ctx.fillText(`${GameConstants.ENEMY_DEMAGE.toFixed(1)} ENEMY DEMAGE`, 2048 - 64, 416);
+            ctx.fillText(`${(GameConstants.SPECIAL_ENEMY_RATE * 4).toFixed(3)} SP RATE`, 2048 - 64, 480);
+            ctx.fillText(`${(GameConstants.ENEMY_HP * GameConstants.SPECIAL_ENEMY_HP_MULTIPLIER).toFixed(2)} SP HP`, 2048 - 64, 544);
+            ctx.fillText(`${Math.floor(GameConstants.SPECIAL_ENEMY_SHOOT_INTERVAL)} FIRE RATE`, 2048 - 64, 608);
+            ctx.fillText(`${(GameConstants.SPECIAL_ENEMY_BULLET_SPEED / 6).toFixed(2)} BULLET SPEED`, 2048 - 64, 672);
+            ctx.fillText(`${Math.floor(GameConstants.SPECIAL_ENEMY_BULLET_LIFE)} BULLET LIFE`, 2048 - 64, 736);
+
+            ctx.fillText(`ENEMIES COUNT`, 2048 - 64, 1024 - 32);
+            ctx.fillText(`${GameState.enemies.length}`, 2048 - 64, 1024 + 32);
+
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "left";
+            ctx.font = "64px Consolas";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`P to Pause`, 64, 2048 - 320);
+            ctx.fillText(`J to Shot`, 64, 2048 - 256);
+            ctx.fillText(`1234 to Upgrade`, 64, 2048 - 192);
+            ctx.fillText(`WASD to Move`, 64, 2048 - 128);
+
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "center";
+            ctx.font = "80px Consolas";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`FPS ${Math.round(Cal_FPS())}`, 1024, 2048 - 128);
+
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "right";
+            ctx.font = "64px Consolas";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`${GameConstants.BULLET_DAMAGE.toFixed(2)} BALLET DAMAGE`, 2048 - 64, 2048 - 384);
+            ctx.fillText(`${GameConstants.BULLET_SPLASH_DAMAGE.toFixed(2)} SPLASH DAMAGE`, 2048 - 64, 2048 - 320);
+            ctx.fillText(`${GameConstants.BULLET_SPLASH_RADIUS} SPLASH RADIUS`, 2048 - 64, 2048 - 256);
+            ctx.fillText(`${GameConstants.BULLET_FIRE_RATE} FIRE RATE`, 2048 - 64, 2048 - 192);
+            ctx.fillText(`YOU`, 2048 - 64, 2048 - 128);
+
+            ctx.restore();
+        }
+
+        function move(deltaTime) {
+            const timeFactor = deltaTime / 16;
+            let accX = 0;
+            let accY = 0;
+            const currentAcceleration = GameState.keysPressed.j ?
+                GameConstants.ACCELEROMETER * 0.5 :
+                GameConstants.ACCELEROMETER;
+            if (GameState.keysPressed.w) accY -= currentAcceleration * timeFactor;
+            if (GameState.keysPressed.a) accX -= currentAcceleration * timeFactor;
+            if (GameState.keysPressed.s) accY += currentAcceleration * timeFactor;
+            if (GameState.keysPressed.d) accX += currentAcceleration * timeFactor;
+            if (accX && accY) {
+                accX *= 2 ** -0.5;
+                accY *= 2 ** -0.5;
+            }
+
+            const maxOffset = 96;
+            GameState.uiOffset.targetX = -accX * maxOffset * 2;
+            GameState.uiOffset.targetY = -accY * maxOffset * 2;
+
+            const speed = Math.sqrt(GameState.speed.x ** 2 + GameState.speed.y ** 2);
+            const maxRotation = 2;
+            GameState.uiOffset.targetRotation = (GameState.speed.x / 10) * Math.min(speed / 5, maxRotation);
+            GameState.speed.x += accX;
+            GameState.speed.y += accY;
+
+            GameState.player.x += GameState.speed.x * timeFactor;
+            GameState.player.y += GameState.speed.y * timeFactor;
+
+            const dragX = GameState.speed.x * Math.abs(GameState.speed.x) * GameConstants.DRAG_COEFFICIENT;
+            const dragY = GameState.speed.y * Math.abs(GameState.speed.y) * GameConstants.DRAG_COEFFICIENT;
+            GameState.speed.x -= dragX * timeFactor;
+            GameState.speed.y -= dragY * timeFactor;
+        }
+
+        function formatFloatAsTime(number) {
+            if (number < 60) {
+
+                return number.toFixed(1) + '"';
+            } else if (number < 3600) {
+
+                const minutes = Math.floor(number / 60);
+                const seconds = (number % 60).toFixed(1);
+
+                const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+                return minutes + ':' + formattedSeconds + '"';
+            } else {
+
+                const hours = Math.floor(number / 3600);
+                const remainingMinutes = Math.floor((number % 3600) / 60);
+                const seconds = (number % 60).toFixed(1);
+
+                const formattedMinutes = remainingMinutes < 10 ? '0' + remainingMinutes : remainingMinutes;
+                const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+                return hours + ':' + formattedMinutes + ':' + formattedSeconds + '"';
+            }
+        }
+
+        function checkLevelUp() {
+            const requiredExp = CalExp(GameState.gameData.level);
+            if (GameState.gameData.exp >= requiredExp) {
+                GameState.gameData.exp -= requiredExp;
+                GameState.gameData.level++;
+                GameState.gameData.skillPoints++;
+                GameState.animations.levelUp = { active: true, progress: 1 };
+            }
+        }
+
+        function enemyUpgrade() {
+            const time = GameState.gameData.time;
+            GameConstants.ENEMY_HP = 2 + (time / 120) ** 1.5;
+            GameConstants.ENEMY_SPAWN_RATE = 1000 - Math.min(600, Math.max(0, time)) * 850 / 600;
+            GameConstants.ENEMY_DEMAGE = 10 + (((Math.max(300, time) - 300)) / 300) ** 1.5 * 15;
+            GameConstants.ENEMY_ACCELERATION = 0.02 + Math.max(0, time - 60) / 6000;
+            GameConstants.ENEMY_MORE = 0 + ((Math.min(600, Math.max(120, time)) - 120) / 480) ** 2 * 0.75;
+            GameConstants.SPECIAL_ENEMY_HP_MULTIPLIER = 1 + Math.max(300, time) / 300;
+            GameConstants.SPECIAL_ENEMY_BULLET_LIFE = 1000 + time * 1000 / 600;
+            GameConstants.SPECIAL_ENEMY_BULLET_SPEED = 3 + ((Math.min(600, Math.max(180, time)) - 180) / 420) * 21;
+            GameConstants.SPECIAL_ENEMY_SHOOT_INTERVAL = 1000 - Math.min(600, Math.max(0, time)) * 5 / 4;
+            GameConstants.SPECIAL_ENEMY_RATE = 0 + (Math.min(300, time) / 300) ** 5 * 0.25;
+        }
+
+        function meUpgrade() {
+            GameConstants.BULLET_DAMAGE = (GameConstants.BASE_BULLET_DAMAGE +
+                GameState.upgrades.damage * GameConstants.DAMAGE_UPGRADE) * (1 + GameState.upgrades.power / 100);
+            GameConstants.BULLET_SPLASH_DAMAGE = (GameConstants.BASE_BULLET_SPLASH_DAMAGE +
+                GameState.upgrades.splashDamage * GameConstants.SPLASH_DAMAGE_UPGRADE) * (1 + GameState.upgrades.power / 100);
+            GameConstants.BULLET_SPLASH_RADIUS = GameConstants.BASE_BULLET_SPLASH_RADIUS +
+                GameState.upgrades.splashRadius * GameConstants.SPLASH_RADIUS_UPGRADE;
+            GameConstants.BULLET_FIRE_RATE = GameConstants.BASE_BULLET_FIRE_RATE +
+                GameState.upgrades.fireRate * GameConstants.FIRE_RATE_UPGRADE;
+        }
+
+        function CalExp(level) {
+            return [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 150, 155, 160, 165, 170, 175, 180, 185, 190, 195, 200, 210, 230, 250, 1e308][level];
+        }
+        function setupEventListeners() {
+            window.addEventListener('keydown', (e) => {
+                switch (e.key.toLowerCase()) {
+                    case 'w':
+                        GameState.keysPressed.w = true;
+                        break;
+                    case 'a':
+                        GameState.keysPressed.a = true;
+                        break;
+                    case 's':
+                        GameState.keysPressed.s = true;
+                        break;
+                    case 'd':
+                        GameState.keysPressed.d = true;
+                        break;
+                    case 'j':
+                        GameState.keysPressed.j = true;
+                        break;
+                    case 'p':
+                        GameState.pause = !GameState.pause;
+                        break;
+                    case ' ':
+                        GameState.keysPressed.space = true;
+                        break;
+                    case '1':
+                        if (GameState.gameData.skillPoints > 0 && GameState.upgrades.damage < 10) {
+                            GameState.upgrades.damage++;
+                            GameState.gameData.skillPoints--;
+                            meUpgrade();
+                        }
+                        break;
+                    case '2':
+                        if (GameState.gameData.skillPoints > 0 && GameState.upgrades.splashDamage < 10) {
+                            GameState.upgrades.splashDamage++;
+                            GameState.gameData.skillPoints--;
+                            meUpgrade();
+                        }
+                        break;
+                    case '3':
+                        if (GameState.gameData.skillPoints > 0 && GameState.upgrades.splashRadius < 8) {
+                            GameState.upgrades.splashRadius++;
+                            GameState.gameData.skillPoints--;
+                            meUpgrade();
+                        }
+                        break;
+                    case '4':
+                        if (GameState.gameData.skillPoints > 0 && GameState.upgrades.fireRate < 6) {
+                            GameState.upgrades.fireRate++;
+                            GameState.gameData.skillPoints--;
+                            meUpgrade();
+                        }
+                        break;
+                }
+            });
+
+            window.addEventListener('keyup', (e) => {
+                switch (e.key.toLowerCase()) {
+                    case 'w':
+                        GameState.keysPressed.w = false;
+                        break;
+                    case 'a':
+                        GameState.keysPressed.a = false;
+                        break;
+                    case 's':
+                        GameState.keysPressed.s = false;
+                        break;
+                    case 'd':
+                        GameState.keysPressed.d = false;
+                        break;
+                    case 'j':
+                        GameState.keysPressed.j = false;
+                        break;
+                    case ' ':
+                        GameState.keysPressed.space = false;
+                        break;
+                }
+            });
+
+        }
+
+        window.addEventListener('beforeunload', saveGameData);
+
+        function saveGameData() {
+            try {
+                localStorage.setItem('gameSaveData', JSON.stringify(GameState));
+                console.log('游戏数据已保存');
+            } catch (e) {
+                console.error('保存游戏数据失败:', e);
+            }
+        }
+
+        function loadGameData() {
+            try {
+                const savedData = localStorage.getItem('gameSaveData');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    Object.assign(GameState, parsedData);
+                    console.log('游戏数据已加载');
+
+                    if (GameState.gameData.hp <= 0) {
+                        showGameOver();
+                    }
+                }
+            } catch (e) {
+                console.error('加载游戏数据失败:', e);
+            }
+        }
+
+        function clearGameData() {
+            try {
+                localStorage.removeItem('gameSaveData');
+                GameState = getNewGameState();
+                GameConstants = getNewGameConstants();
+                gameOverOverlay.style.display = "none";
+                console.log('游戏数据已清空');
+            } catch (e) {
+                console.error('清空游戏数据失败:', e);
+            }
+        }
+
+        initGame();
+    </script>
+</body>
+
+</html>
