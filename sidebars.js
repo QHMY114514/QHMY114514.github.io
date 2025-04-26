@@ -48,6 +48,11 @@ const sidebars = {
       items: ['html/maze', 'html/ball', 'html/art', 'html/gal', 'html/war'],
     },
     {
+      type: 'doc',
+      label: '永恒之息',
+      id: 'forever',
+    },
+    {
       type: 'category',
       label: '冷咲话',
       items: [{

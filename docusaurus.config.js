@@ -5,6 +5,8 @@
 // See: https://docusaurus.io/docs/api/docusaurus-config
 
 import { themes as prismThemes } from 'prism-react-renderer';
+const fs = require('fs-extra');
+const path = require('path');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -95,8 +97,8 @@ const config = {
             ],
           },
           {
-            to: '/docs/stwiki',
-            label: '冲浪小镇',
+            to: '/docs/forever',
+            label: '永恒之息',
             position: 'left',
           },
           {
