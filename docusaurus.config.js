@@ -187,6 +187,10 @@ const config = {
                 label: '桑帛云API',
                 href: 'https://api.lolimi.cn',
               },
+              {
+                label: '孤影墨香',
+                href: 'https://www.iloli.xin/',
+              }
             ],
           },
         ],
