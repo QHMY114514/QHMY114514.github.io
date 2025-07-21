@@ -303,7 +303,7 @@ addLayer("a", {
         1015: {
             name: "📰 读新闻",
             tooltip: "[隐藏]阅读一条新闻",
-            done() { return news.text=="VHJ5IEZpbmQgTkFQUEVSIFJJTkFUT1I=" },
+            done() { return news.text == "VHJ5IEZpbmQgTkFQUEVSIFJJTkFUT1I=" },
             unlocked() { return hasAchievement("a", 1015) },
             style: {
                 color: "#FFFFFF",
@@ -329,7 +329,7 @@ addLayer("a", {
         1021: {
             name: "🕛 你来晚了",
             tooltip: "[隐藏]离线时间超过12小时",
-            done() { return player.offTime.remain >= 12*3600 },
+            done() { return player.offTime.remain ?? 0 >= 12 * 3600 },
             unlocked() { return hasAchievement("a", 1016) },
             style: {
                 color: "#FFFFFF",
@@ -726,9 +726,9 @@ addLayer("t", {
                 <br>
                 <button onclick="layers.t.password = ''">清空</button>
                 ` },
-                unlocked() {
-                    return hasMilestone("m", 5)
-                }
+            unlocked() {
+                return hasMilestone("m", 5)
+            }
         },
         tsp: {
             title: "Chat-SLP为您服务",
