@@ -1,0 +1,81 @@
+@font-face {
+	font-family: Angus;
+	src: url('../font/angus.otf');
+	unicode-range: U+0000-007F;
+}
+
+@font-face {
+	font-family: Stepmono;
+	src: url('../font/Steps-Mono.otf');
+	unicode-range: U+0000-007F;
+}
+
+@font-face {
+	font-family: Unica;
+	src: url('../font/unica-one.ttf');
+	unicode-range: U+0000-007F;
+}
+
+@font-face {
+	font-family: Sligoil;
+	src: url('../font/Sligoil-Micro.otf');
+	unicode-range: U+0000-007F;
+}
+
+@font-face {
+	font-family: Mathd;
+	src: url('../font/MATHD.ttf');
+	unicode-range: U+0000-007F;
+}
+
+/* Global things */
+body {
+	color: var(--color);
+	overflow: hidden;
+	--background: #0f0f0f;
+	--color: #dfdfdf;
+	--points: #ffffff;
+	--bought: #d8d8d8;
+	background: var(--background)
+}
+
+/* General text */
+h1,
+h2,
+h3,
+b,
+input {
+	display: inline;
+	font-family: var(--Font, "Microsoft YaHei"), "Microsoft YaHei";
+}
+
+/* These are styles for different states of components. You can make layer-specific versions with .c.locked, for example */
+.locked {
+	background-color: var(--locked);
+	cursor: not-allowed;
+}
+
+/* Can meens can be clicked/bought/etc */
+.can {
+	cursor: pointer;
+}
+
+.can:hover {
+	transform: scale(1.15, 1.15);
+	box-shadow: 0 0 20px var(--points)
+}
+
+.bought {
+	background-color: var(--bought);
+	cursor: default;
+}
+
+#points {
+	color: var(--points);
+	text-shadow: 0 0 10px var(--points);
+}
+
+#super-points {
+	color: var(--super-points);
+	text-shadow: 0 0 10px var(--super-points);
+}
