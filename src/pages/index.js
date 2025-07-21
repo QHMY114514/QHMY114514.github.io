@@ -54,9 +54,9 @@ export default function () {
         }, 100);
 
         function update() {
-            setLogoColor(`hsl(${(new Date() / 30) % 360},50%,70%)`);
-            setOpenTime(TimetoTextDay(new Date() - 1732948276347));
-            setStayTime(TimetoTextStay(new Date() - cometime));
+            setLogoColor(`hsl(${(Date.now() / 30) % 360},50%,70%)`);
+            setOpenTime(TimetoTextDay(Date.now() - 1732948276347));
+            setStayTime(TimetoTextStay(Date.now() - cometime));
         }
 
         function TimetoTextDay(time) {

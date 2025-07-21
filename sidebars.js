@@ -45,7 +45,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'HTML项目',
-      items: ['html/maze', 'html/ball', 'html/art', 'html/gal', 'html/war'],
+      items: ['html/sleep','html/maze', 'html/ball', 'html/art', 'html/gal', 'html/war' ],
     },
     {
       type: 'doc',
