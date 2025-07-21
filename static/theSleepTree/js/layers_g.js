@@ -330,8 +330,7 @@ addLayer("a", {
             name: "🕛 你来晚了",
             tooltip: "[隐藏]离线时间超过12小时",
             done() { 
-                if (player.offTime) return false
-                return player.offTime.remain >= 12 * 3600 
+                return player.offTime?.remain >= 12 * 3600 
             },
             unlocked() { return hasAchievement("a", 1016) },
             style: {
