@@ -48,24 +48,9 @@ const sidebars = {
       items: ['html/maze', 'html/ball', 'html/art', 'html/gal', 'html/war' ],
     },
     {
-      type: 'doc',
-      label: '永恒之息',
-      id: 'forever',
-    },
-    {
-      type: 'category',
-      label: '冷咲话',
-      items: [{
-        type: 'doc',
-        label: '咲希了',
-        id: 'joke/joke',
-      }],
-    },
-    {
       type: 'html',
       value: '<hr color="#888">'
-    },
-    "stwiki"
+    }
   ],
 };
 

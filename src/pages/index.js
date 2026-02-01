@@ -8,16 +8,13 @@ export default function () {
 
     // 定义背景图片链接数组
     const desktopBackgroundImages = [
-        "https://api.oick.cn/random/api.php?type=pc",
         "https://t.mwm.moe/fj",
-        "https://t.mwm.moe/pc",
         "https://api.miaomc.cn/image/get",
         "https://bing.img.run/rand_1366x768.php",
         "https://api.mtyqx.cn/api/random.php"
     ];
 
     const mobileBackgroundImages = [
-        "https://api.oick.cn/random/api.php?type=pe",
         "https://api.suyanw.cn/api/mao/",
         "https://t.mwm.moe/mp",
         "https://moe.jitsu.top/api",
