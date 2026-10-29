@@ -1,0 +1,97 @@
+{
+    "dps": {
+        "trident": {
+            "super": {
+                "hp": 32805,
+                "armor": 10935,
+                "fusion": 3
+            },
+            "ultra": {
+                "hp": 10935,
+                "armor": 3645,
+                "fusion": 3
+            }
+        },
+        "bone": {
+            "unique": {
+                "hp": 59049,
+                "armor": 767637
+            },
+            "omega": {
+                "hp": 19683,
+                "armor": 255879
+            }
+        },
+        "magic_bone": {
+            "unique": {
+                "hp": 1476225,
+                "armor": 1180980
+            },
+            "omega": {
+                "hp": 492075,
+                "armor": 393660
+            }
+        },
+        "maple": {
+            "unique": {
+                "hp": 2361960,
+                "armor": 177147
+            },
+            "omega": {
+                "hp": 787320,
+                "armor": 59049
+            }
+        }
+    },
+    "heal": {
+        "chromosome": {
+            "unique": {
+                "heal": 984150
+            },
+            "omega": {
+                "heal": 328050
+            },
+            "super": {
+                "heal": 109350
+            }
+        }
+    },
+    "shield": {
+        "magic_chromosome": {
+            "omega": {
+                "shield": 721710,
+                "harmony_stack": true
+            },
+            "super": {
+                "shield": 240570,
+                "harmony_stack": true
+            }
+        }
+    },
+    "dmg_reduce": {
+        "neurotoxin": {
+            "omega": {
+                "dmg_reduce": 0.6
+            },
+            "super": {
+                "dmg_reduce": 0.45
+            },
+            "ultra": {
+                "dmg_reduce": 0.4
+            }
+        }
+    },
+    "increase_max_hp": {
+        "golden_cactus": {
+            "omega": {
+                "increase_max_hp": 0.55
+            },
+            "super": {
+                "increase_max_hp": 0.34
+            },
+            "ultra": {
+                "increase_max_hp": 0.21
+            }
+        }
+    }
+}

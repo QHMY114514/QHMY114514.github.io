@@ -1,0 +1,3229 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f6f8">
+<title>连击计算器</title>
+<link rel="icon" type="image/png" href="./image/mob.png">
+<script>
+  (function () {
+    try {
+      var savedTheme = localStorage.getItem('combo-calc-theme');
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    } catch (e) {}
+  }());
+</script>
+<style>
+  @font-face {
+    font-family: "DIN Next LT Pro";
+    src: url("./DINNextLTPro.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Sarasa Mono SC";
+    src: url("./等距更纱黑体.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #f4f6f8;
+    --panel: #ffffff;
+    --panel-2: #eef2f6;
+    --text: #1f2937;
+    --muted: #64748b;
+    --border: #cbd5e1;
+    --accent: #2563eb;
+    --red: #d64545;
+    --green: #2e8b57;
+    --gold: #b8860b;
+    --shadow: 0 12px 32px rgba(31, 41, 55, 0.08);
+    --shadow-soft: 0 4px 14px rgba(31, 41, 55, 0.05);
+    --accent-soft: rgba(37, 99, 235, 0.09);
+    --scroll-thumb: #b9c4d1;
+    --mask: rgba(203, 213, 225, 0.78);
+    --font-latin: "DIN Next LT Pro";
+    --font-cjk: "Sarasa Mono SC";
+    --font-stack: var(--font-latin), var(--font-cjk), "微软雅黑", "Microsoft YaHei", system-ui, sans-serif;
+    --radius: 15px;
+    color-scheme: light;
+  }
+
+  html[data-theme="dark"] {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --border: #475569;
+    --accent: #60a5fa;
+    --red: #ff6b6b;
+    --green: #4ade80;
+    --gold: #fbbf24;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    --shadow-soft: 0 5px 18px rgba(0, 0, 0, 0.18);
+    --accent-soft: rgba(96, 165, 250, 0.12);
+    --scroll-thumb: #52637b;
+    --mask: rgba(71, 85, 105, 0.78);
+    color-scheme: dark;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    height: 100%;
+    background: var(--bg);
+  }
+
+  body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 8% -15%, var(--accent-soft), transparent 32rem),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: 14px;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  input {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  /* ---------- Header ---------- */
+
+  .site-header {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 10px 18px 8px;
+  }
+
+  .brand {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-icon {
+    display: block;
+    width: 35px;
+    height: 35px;
+    flex: 0 0 35px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel-2);
+    box-shadow: var(--shadow-soft);
+    object-fit: cover;
+  }
+
+  .brand h1 {
+    margin: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-size: clamp(18px, 1.7vw, 23px);
+    font-weight: 750;
+    letter-spacing: 0.045em;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brand h1::after {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    content: "";
+    vertical-align: 0.28em;
+  }
+
+  .header-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .icon-button {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--panel);
+    box-shadow: var(--shadow-soft);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 650;
+    transition: border-color 140ms ease, background 140ms ease, color 140ms ease, transform 140ms ease;
+  }
+
+  .icon-button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .icon-button:active {
+    transform: translateY(0);
+  }
+
+  .icon-button svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .icon-sun {
+    display: none;
+  }
+
+  html[data-theme="dark"] .icon-sun {
+    display: block;
+  }
+
+  html[data-theme="dark"] .icon-moon {
+    display: none;
+  }
+
+  /* ---------- Shared panel ---------- */
+
+  .panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--panel);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .panel-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 7px;
+  }
+
+  .panel-heading h2,
+  .panel-heading h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+  }
+
+  .panel-heading .heading-hint {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- Top fixed deck ---------- */
+
+  .control-deck {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 12px;
+    padding: 0 18px 12px;
+  }
+
+  .deck-creature {
+    display: flex;
+    min-width: 0;
+    flex: 0 1 355px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mob-panel {
+    display: flex;
+    width: clamp(88px, 9.5vw, 122px);
+    flex: 0 0 clamp(88px, 9.5vw, 122px);
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .mob-panel img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 17px;
+    box-shadow: var(--shadow-soft);
+    object-fit: cover;
+  }
+
+  .input-panel {
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 9px 11px 10px;
+  }
+
+  .input-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 84px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .input-label {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 5px;
+  }
+
+  .input-label b {
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .input-label small {
+    color: var(--muted);
+    font-size: 8.5px;
+    white-space: nowrap;
+  }
+
+  .number-input {
+    width: 100%;
+    height: 27px;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    background: var(--panel-2);
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    transition: border-color 130ms ease, box-shadow 130ms ease, background 130ms ease;
+  }
+
+  .number-input:hover {
+    border-color: var(--muted);
+  }
+
+  .number-input:focus {
+    border-color: var(--accent);
+    background: var(--panel);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .number-input::-webkit-inner-spin-button,
+  .number-input::-webkit-outer-spin-button {
+    opacity: 0.7;
+  }
+
+  .damage-actions {
+    display: grid;
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px dashed var(--border);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .quick-button {
+    min-width: 0;
+    min-height: 25px;
+    padding: 2px 3px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--panel-2);
+    color: var(--muted);
+    font-family: var(--font-stack);
+    font-size: 9px;
+    font-weight: 650;
+    line-height: 1.15;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    transition: border-color 120ms ease, color 120ms ease, background 120ms ease, transform 120ms ease;
+  }
+
+  .quick-button:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .quick-button:active {
+    transform: translateY(1px);
+  }
+
+  .quick-button.is-danger {
+    color: var(--red);
+  }
+
+  .quick-button.is-danger:hover {
+    border-color: var(--red);
+    background: color-mix(in srgb, var(--red) 9%, var(--panel));
+    color: var(--red);
+  }
+
+  .quick-button.is-emphasis {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    color: var(--accent);
+  }
+
+  .deck-combat {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 560px;
+    gap: 12px;
+  }
+
+  .stats-grid {
+    display: grid;
+    min-width: 0;
+    flex: 1 1 auto;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 12px;
+  }
+
+  .stats-panel,
+  .results-panel {
+    min-width: 0;
+    padding: 9px 12px 10px;
+  }
+
+  .stat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .stat-row {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 2px;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .stat-row:last-child {
+    border-bottom: 0;
+  }
+
+  .stat-label {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.015em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .stat-value {
+    flex: 0 1 auto;
+    overflow: hidden;
+    color: var(--text);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .stat-formula {
+    grid-column: 2;
+    overflow: hidden;
+    margin-top: -1px;
+    color: var(--muted);
+    font-size: 8.5px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .hp-stat {
+    align-items: flex-start;
+  }
+
+  .hp-stat .stat-value {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .results-panel {
+    position: relative;
+    overflow: hidden;
+    border-color: var(--border);
+  }
+
+  .result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .result-row {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 1.5px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .result-row:last-child {
+    border-bottom: 0;
+  }
+
+  .result-label {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.01em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .result-value {
+    flex: 0 1 auto;
+    overflow: hidden;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 750;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .result-value.is-wide {
+    font-size: 12px;
+  }
+
+  .tone-red { color: var(--red) !important; }
+  .tone-green { color: var(--green) !important; }
+  .tone-gold { color: var(--gold) !important; }
+  .tone-accent { color: var(--accent) !important; }
+  .tone-muted { color: var(--muted) !important; }
+
+  .output-mask {
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px;
+    border-radius: var(--radius);
+    background: var(--mask);
+    color: var(--text);
+    text-align: center;
+   -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+
+  .output-mask[hidden] {
+    display: none;
+  }
+
+  .output-mask strong {
+    font-size: 12px;
+    font-weight: 750;
+  }
+
+  .output-mask span {
+    color: var(--muted);
+    font-size: 9.5px;
+  }
+
+  .dps-preview {
+    display: flex;
+    flex: 0 0 clamp(88px, 9.5vw, 122px);
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .preview-frame {
+    position: relative;
+    width: 100%;
+    max-width: 122px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background:
+      linear-gradient(145deg, var(--panel-2), var(--panel));
+    box-shadow: var(--shadow-soft);
+    transition: border-color 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  }
+
+  .preview-frame.is-empty {
+    border-style: dashed;
+    opacity: 0.62;
+  }
+
+  .preview-frame.is-empty::after {
+    position: absolute;
+    inset: 14%;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    content: "";
+  }
+
+  .preview-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .preview-frame img[hidden] {
+    display: none;
+  }
+
+  /* ---------- Scrollable card area ---------- */
+
+  .scroll-area {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0 18px 16px;
+    overscroll-behavior: contain;
+    scrollbar-color: var(--scroll-thumb) transparent;
+    scrollbar-width: thin;
+  }
+
+  .content-grid {
+    display: grid;
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+
+  .card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+  }
+
+  .card-head {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 13px;
+    border-bottom: 1px solid var(--border);
+    background:
+      linear-gradient(100deg, var(--panel-2), var(--panel) 72%);
+  }
+
+  .card-heading {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .card-heading h2 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 750;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+  }
+
+  .card-subtitle {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 8.5px;
+    letter-spacing: 0.08em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .card-badge {
+    display: inline-flex;
+    min-width: 27px;
+    height: 22px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 0 7px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--panel);
+    color: var(--accent);
+    font-size: 10.5px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 750;
+  }
+
+  .card-scroll {
+    height: 320px;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 8px;
+    scrollbar-color: var(--scroll-thumb) transparent;
+    scrollbar-width: thin;
+  }
+
+  .card-scroll::-webkit-scrollbar,
+  .scroll-area::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .card-scroll::-webkit-scrollbar-thumb,
+  .scroll-area::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--scroll-thumb);
+    background-clip: padding-box;
+  }
+
+  .card-scroll::-webkit-scrollbar-track,
+  .scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .petal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .petal-item {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 7px;
+    padding: 7px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: var(--panel-2);
+    transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+  }
+
+  .petal-item:hover {
+    border-color: var(--border);
+  }
+
+  .petal-item.is-selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 1px var(--accent) inset;
+  }
+
+  .petal-main {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+  }
+
+  .petal-main.is-static {
+    cursor: default;
+  }
+
+  .petal-check {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .petal-checkbox {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    background: var(--panel);
+    transition: border-color 130ms ease, background 130ms ease, box-shadow 130ms ease;
+  }
+
+  .petal-checkbox::after {
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 4px;
+    height: 8px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    content: "";
+    opacity: 0;
+    transform: rotate(42deg) scale(0.65);
+    transition: opacity 120ms ease, transform 120ms ease;
+  }
+
+  .petal-check:checked + .petal-checkbox {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .petal-check:checked + .petal-checkbox::after {
+    opacity: 1;
+    transform: rotate(42deg) scale(1);
+  }
+
+  .petal-check:focus-visible + .petal-checkbox {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .petal-thumb {
+    position: relative;
+    display: block;
+    width: 51px;
+    height: 51px;
+    flex: 0 0 51px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background:
+      linear-gradient(145deg, var(--panel-2), var(--panel));
+  }
+
+  .petal-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .petal-thumb img[hidden] {
+    display: none;
+  }
+
+  .petal-info {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .petal-name-row {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .petal-name {
+    overflow: hidden;
+    color: var(--text);
+    font-size: 12.5px;
+    font-weight: 750;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .rarity-badge {
+    display: inline-flex;
+    height: 16px;
+    flex: 0 0 auto;
+    align-items: center;
+    padding: 0 5px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  [data-rarity="unique"] { color: #c26b1b; }
+  [data-rarity="omega"] { color: #8b5cf6; }
+  [data-rarity="super"] { color: #0e8fbf; }
+  [data-rarity="ultra"] { color: #2e8b57; }
+
+  html[data-theme="dark"] [data-rarity="unique"] { color: #f5a855; }
+  html[data-theme="dark"] [data-rarity="omega"] { color: #b794ff; }
+  html[data-theme="dark"] [data-rarity="super"] { color: #5bc8ef; }
+  html[data-theme="dark"] [data-rarity="ultra"] { color: #63d994; }
+
+  .attr-line {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 4px;
+    color: var(--muted);
+    font-size: 9.5px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .attr-line b {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+  }
+
+  .attr-sep {
+    opacity: 0.5;
+  }
+
+  .harmony-tag {
+    display: inline-flex;
+    height: 16px;
+    align-items: center;
+    padding: 0 5px;
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    color: var(--gold);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .petal-control {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .mini-field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 8px;
+    white-space: nowrap;
+  }
+
+  .mini-input {
+    width: 54px;
+    height: 26px;
+    padding: 1px 3px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    outline: none;
+    background: var(--panel);
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    transition: border-color 130ms ease, box-shadow 130ms ease;
+  }
+
+  .mini-input:hover {
+    border-color: var(--muted);
+  }
+
+  .mini-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-soft);
+  }
+
+  .fusion-input {
+    width: 48px;
+  }
+
+  /* ---------- Talent card ---------- */
+
+  .talent-body {
+    display: flex;
+    height: 320px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    padding: 18px;
+    text-align: center;
+  }
+
+  .talent-picker {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .talent-picker-label {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+
+  .talent-input {
+    width: 84px;
+    height: 46px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    outline: none;
+    background: var(--panel-2);
+    color: var(--accent);
+    font-family: var(--font-stack);
+    font-size: 25px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 750;
+    text-align: center;
+    transition: border-color 130ms ease, box-shadow 130ms ease;
+  }
+
+  .talent-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .talent-caption {
+    max-width: 320px;
+    margin: 0;
+    color: var(--muted);
+    font-size: 10.5px;
+    line-height: 1.6;
+  }
+
+  .talent-coef {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 10.5px;
+  }
+
+  .talent-coef b {
+    color: var(--green);
+    font-size: 17px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 750;
+  }
+
+  .talent-meter {
+    width: min(240px, 86%);
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--panel-2);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+
+  .talent-meter span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    transition: width 180ms ease;
+  }
+
+  .talent-scale {
+    display: flex;
+    width: min(240px, 86%);
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 8px;
+    letter-spacing: 0.03em;
+  }
+
+  /* ---------- Footer ---------- */
+
+  .site-footer {
+    flex: 0 0 auto;
+    padding: 5px 12px 7px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-align: center;
+    opacity: 0.5;
+    user-select: none;
+  }
+
+  /* ---------- Settings dialog ---------- */
+
+  .settings-dialog {
+    width: min(570px, calc(100vw - 28px));
+    max-height: min(720px, calc(100dvh - 28px));
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 19px;
+    background: var(--panel);
+    box-shadow: 0 26px 80px rgba(15, 23, 42, 0.34);
+    color: var(--text);
+  }
+
+  .settings-dialog::backdrop {
+    background: rgba(15, 23, 42, 0.52);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 18px 13px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(100deg, var(--panel-2), var(--panel));
+  }
+
+  .modal-head h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+  }
+
+  .modal-close {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--panel);
+    color: var(--muted);
+    transition: border-color 130ms ease, color 130ms ease, background 130ms ease;
+  }
+
+  .modal-close:hover {
+    border-color: var(--red);
+    background: color-mix(in srgb, var(--red) 8%, var(--panel));
+    color: var(--red);
+  }
+
+  .modal-close svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+  }
+
+  .modal-body {
+    display: flex;
+    max-height: calc(100dvh - 150px);
+    flex-direction: column;
+    gap: 18px;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .setting-block {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .setting-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .setting-label label {
+    font-size: 13.5px;
+    font-weight: 750;
+    letter-spacing: 0.02em;
+  }
+
+  .setting-label span {
+    color: var(--muted);
+    font-size: 9.5px;
+  }
+
+  .setting-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 92px;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .setting-slider {
+    width: 100%;
+    height: 26px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .setting-number {
+    width: 100%;
+    height: 34px;
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    outline: none;
+    background: var(--panel-2);
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    transition: border-color 130ms ease, box-shadow 130ms ease;
+  }
+
+  .setting-number:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .setting-tip {
+    margin: 0;
+    padding-top: 2px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.65;
+  }
+
+  .modal-foot {
+    padding: 12px 20px 15px;
+    border-top: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--muted);
+    font-size: 9.5px;
+    text-align: right;
+  }
+
+  /* ---------- Loading / empty states ---------- */
+
+  .loading-state {
+    grid-column: 1 / -1;
+    display: flex;
+    min-height: 190px;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 1080px) {
+    .deck-creature {
+      flex: 1 1 300px;
+      max-width: 370px;
+    }
+
+    .deck-combat {
+      flex: 1 1 610px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .deck-creature {
+      max-width: none;
+      flex: 1 1 100%;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .input-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .site-header {
+      padding: 8px 12px 7px;
+    }
+
+    .control-deck {
+      gap: 9px;
+      padding: 0 12px 10px;
+    }
+
+    .deck-combat {
+      flex: 1 1 100%;
+      gap: 9px;
+    }
+
+    .stats-grid {
+      gap: 9px;
+    }
+
+    .scroll-area {
+      padding: 0 12px 12px;
+    }
+
+    .content-grid {
+      gap: 11px;
+    }
+
+    .card-scroll,
+    .talent-body {
+      height: 286px;
+    }
+
+    .dps-preview {
+      flex-basis: 92px;
+    }
+
+    .mob-panel {
+      width: 92px;
+      flex-basis: 92px;
+    }
+
+    .result-label {
+      font-size: 9.5px;
+    }
+
+    .result-value {
+      font-size: 11.5px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+    }
+
+    .stat-value {
+      font-size: 11.5px;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .control-deck {
+      zoom: 0.92;
+    }
+
+    .brand h1 {
+      font-size: 17px;
+    }
+
+    .header-actions .button-label {
+      display: none;
+    }
+
+    .icon-button {
+      width: 35px;
+      padding: 6px;
+    }
+
+    .stats-grid {
+      grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    }
+
+    .dps-preview {
+      flex-basis: 78px;
+    }
+
+    .mob-panel {
+      width: 78px;
+      flex-basis: 78px;
+    }
+
+    .stats-panel,
+    .results-panel {
+      padding: 8px 9px 9px;
+    }
+
+    .result-row {
+      gap: 4px;
+    }
+
+    .result-label {
+      font-size: 8.7px;
+    }
+
+    .result-value {
+      font-size: 10.5px;
+    }
+
+    .result-value.is-wide {
+      font-size: 9.8px;
+    }
+
+    .petal-thumb {
+      width: 46px;
+      height: 46px;
+      flex-basis: 46px;
+    }
+
+    .mini-input {
+      width: 49px;
+    }
+
+    .fusion-input {
+      width: 44px;
+    }
+
+    .mini-field {
+      font-size: 7.5px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .control-deck {
+      zoom: 0.84;
+    }
+
+    .mob-panel {
+      width: 78px;
+      flex-basis: 78px;
+    }
+
+    .quick-button {
+      padding: 2px;
+      font-size: 8px;
+    }
+
+    .setting-controls {
+      grid-template-columns: minmax(0, 1fr) 78px;
+    }
+  }
+
+  @media (orientation: portrait) {
+    .content-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Short landscape screens: keep the fixed deck from crowding out the cards. */
+  @media (max-height: 620px) and (orientation: landscape) {
+    .site-header {
+      padding: 6px 16px 5px;
+    }
+
+    .brand-icon {
+      width: 30px;
+      height: 30px;
+      flex-basis: 30px;
+    }
+
+    .control-deck {
+      zoom: 0.78;
+    }
+
+    .stats-panel,
+    .results-panel {
+      padding: 7px 9px 8px;
+    }
+
+    .panel-heading {
+      margin-bottom: 5px;
+    }
+
+    .result-row {
+      padding: 1px 0;
+    }
+
+    .result-label {
+      font-size: clamp(8.7px, 1.15vw, 11px);
+    }
+
+    .result-value {
+      font-size: clamp(10.5px, 1.35vw, 13px);
+    }
+
+    .result-value.is-wide {
+      font-size: clamp(9.8px, 1.2vw, 12px);
+    }
+
+    .stat-label {
+      font-size: clamp(8.7px, 1.15vw, 11px);
+    }
+
+    .stat-value {
+      font-size: clamp(10.5px, 1.35vw, 13px);
+    }
+
+    .card-scroll,
+    .talent-body {
+      height: 244px;
+    }
+
+    .site-footer {
+      padding: 2px 12px 4px;
+      font-size: 9px;
+    }
+  }
+
+  @media (max-width: 900px) and (max-height: 620px) and (orientation: landscape) {
+    .damage-actions {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .quick-button {
+      font-size: clamp(8px, 2vw, 8.5px);
+    }
+  }
+
+  @media (max-height: 480px) and (orientation: landscape) {
+    .control-deck {
+      zoom: 0.72;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="site-header">
+    <div class="brand">
+      <img class="brand-icon" src="./image/mob.png" alt="连击计算器图标" onerror="this.style.visibility='hidden'">
+      <h1>连击计算器</h1>
+    </div>
+    <div class="header-actions">
+      <button class="icon-button" id="themeToggle" type="button" aria-label="切换至暗色主题" title="切换至暗色主题">
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.2 14.3A8.4 8.4 0 0 1 9.7 3.8 8.4 8.4 0 1 0 20.2 14.3Z"></path>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.7"></circle>
+          <path d="M12 2.2v2M12 19.8v2M4.6 4.6 6 6M18 18l1.4 1.4M2.2 12h2M19.8 12h2M4.6 19.4 6 18M18 6l1.4-1.4"></path>
+        </svg>
+        <span class="button-label" id="themeLabel">暗色</span>
+      </button>
+      <button class="icon-button" id="settingsButton" type="button" aria-haspopup="dialog" aria-controls="settingsDialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.1"></circle>
+          <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.95 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.58 15 1.7 1.7 0 0 0 3.03 14H3v-4h.08A1.7 1.7 0 0 0 4.6 8.95a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 8.97 4.6 1.7 1.7 0 0 0 10 3.03V3h4v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 20.97 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"></path>
+        </svg>
+        <span class="button-label">设置</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="control-deck" aria-label="输入与计算结果">
+    <div class="deck-creature">
+      <div class="mob-panel">
+        <img src="./image/mob.png" alt="生物图标" onerror="this.style.visibility='hidden'">
+      </div>
+
+      <div class="input-panel panel">
+        <div class="panel-heading">
+          <h2>输入</h2>
+          <span class="heading-hint">INPUT</span>
+        </div>
+        <div class="input-grid">
+          <label class="input-row" for="inputDamage">
+            <span class="input-label"><b>Damage</b><small>每刻</small></span>
+            <input class="number-input" id="inputDamage" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Damage，每刻普通伤害">
+          </label>
+          <label class="input-row" for="inputPosion">
+            <span class="input-label"><b>Posion</b><small>每秒</small></span>
+            <input class="number-input" id="inputPosion" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Posion，每秒毒伤">
+          </label>
+          <label class="input-row" for="inputFire">
+            <span class="input-label"><b>Fire</b><small>每秒</small></span>
+            <input class="number-input" id="inputFire" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Fire，每秒火伤">
+          </label>
+        </div>
+        <div class="damage-actions" role="group" aria-label="生物伤害快捷操作">
+          <button class="quick-button is-danger" type="button" data-damage-action="clear-normal" title="将普通伤害清空为 0">普通伤害清空</button>
+          <button class="quick-button is-danger" type="button" data-damage-action="clear-status" title="将毒伤和火伤清空为 0">火毒清空</button>
+          <button class="quick-button is-emphasis" type="button" data-damage-action="set-normal-65610" title="将普通伤害设置为 65610">设为65610</button>
+          <button class="quick-button" type="button" data-damage-action="add-normal-65610" title="普通伤害增加 65610">普通+65610</button>
+          <button class="quick-button" type="button" data-damage-action="sub-normal-65610" title="普通伤害减少 65610">普通-65610</button>
+          <button class="quick-button" type="button" data-damage-action="add-normal-32805" title="普通伤害增加 32805">普通+32805</button>
+          <button class="quick-button" type="button" data-damage-action="sub-normal-32805" title="普通伤害减少 32805">普通-32805</button>
+          <button class="quick-button is-emphasis" type="button" data-damage-action="multiply-all-3" title="所有伤害乘以 3">所有伤害*3</button>
+          <button class="quick-button is-emphasis" type="button" data-damage-action="divide-all-3" title="所有伤害除以 3">所有伤害/3</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="deck-combat">
+      <div class="stats-grid">
+        <section class="stats-panel panel" aria-labelledby="statsTitle">
+          <div class="panel-heading">
+            <h2 id="statsTitle">加成后的花瓣参数</h2>
+            <span class="heading-hint">STATS</span>
+          </div>
+          <div class="stat-list">
+            <div class="stat-row hp-stat">
+              <span class="stat-label">总耐久 HP</span>
+              <span class="stat-value" id="statHp">-</span>
+            </div>
+            <div class="stat-formula" id="hpFormula"></div>
+            <div class="stat-row">
+              <span class="stat-label">护甲 Armor</span>
+              <span class="stat-value" id="statArmor">-</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">总治疗 Heal <small>/s</small></span>
+              <span class="stat-value" id="statHeal">0.00</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">总护盾 Shield <small>/s</small></span>
+              <span class="stat-value" id="statShield">0.00</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-label">总减伤 Damage Reduce</span>
+              <span class="stat-value" id="statDr">0.0%</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="results-panel panel" id="resultsPanel" aria-labelledby="resultsTitle">
+          <div class="panel-heading">
+            <h2 id="resultsTitle">计算结果</h2>
+            <span class="heading-hint">OUTPUT</span>
+          </div>
+          <div class="result-list">
+            <div class="result-row">
+              <span class="result-label">Comboable</span>
+              <span class="result-value" id="resCombo">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Max TPS</span>
+              <span class="result-value" id="resMaxTps">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Damage per second</span>
+              <span class="result-value" id="resDps">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">HP per second</span>
+              <span class="result-value" id="resHps">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Break Time</span>
+              <span class="result-value is-wide" id="resBreak">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Pressure</span>
+              <span class="result-value" id="resPressure">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Max Damage</span>
+              <span class="result-value" id="resMaxDamage">—</span>
+            </div>
+          </div>
+          <div class="output-mask" id="resultsMask">
+            <strong>未选择 DPS 花瓣</strong>
+            <span>请选择一个 DPS 花瓣后计算</span>
+          </div>
+        </section>
+      </div>
+
+      <div class="dps-preview" aria-label="当前 DPS 花瓣">
+        <div class="preview-frame is-empty" id="previewFrame">
+          <img id="previewImage" alt="" hidden>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="scroll-area" id="scrollArea">
+    <div class="content-grid" id="contentGrid" aria-live="off">
+      <div class="loading-state">正在读取 petal.json …</div>
+    </div>
+  </div>
+
+  <footer class="site-footer">copyright @2026 QHLG</footer>
+</div>
+
+<dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+  <div class="modal-head">
+    <h2 id="settingsTitle">设置</h2>
+    <button class="modal-close" id="closeSettings" type="button" aria-label="关闭设置">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m6 6 12 12M18 6 6 18"></path>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="setting-block">
+      <div class="setting-label">
+        <label for="tpsNumber">计算模拟TPS</label>
+        <span>10 – 25 / 步长 1</span>
+      </div>
+      <div class="setting-controls">
+        <input class="setting-slider" id="tpsRange" type="range" min="10" max="25" step="1" value="20" aria-label="Caculate TPS 滑动条">
+        <input class="setting-number" id="tpsNumber" type="number" min="10" max="25" step="1" value="20" inputmode="numeric" aria-label="Caculate TPS 数值">
+      </div>
+    </div>
+    <div class="setting-block">
+      <div class="setting-label">
+        <label for="fireRateNumber">火伤倍率(火伤实际上是浮动的，计算可能不精准)</label>
+        <span>1 – 2 / 步长 0.05</span>
+      </div>
+      <div class="setting-controls">
+        <input class="setting-slider" id="fireRateRange" type="range" min="1" max="2" step="0.05" value="1.5" aria-label="Fire Rate 滑动条">
+        <input class="setting-number" id="fireRateNumber" type="number" min="1" max="2" step="0.05" value="1.5" inputmode="decimal" aria-label="Fire Rate 数值">
+      </div>
+    </div>
+    <p class="setting-tip">修改后即时生效。</p>
+  </div>
+  <div class="modal-foot">刷新页面重置选择 · TPS 默认 20 · 火伤倍率 默认 1.5</div>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ------------------------------------------------------------------
+   * Constants and fallback data
+   * ------------------------------------------------------------------ */
+
+  var RARITIES = ['unique', 'omega', 'super', 'ultra'];
+  var RARITY_ORDER = { unique: 0, omega: 1, super: 2, ultra: 3 };
+  var TYPES = ['dps', 'heal', 'shield', 'dmg_reduce', 'increase_max_hp'];
+  var SINGLE_TYPES = ['dps', 'dmg_reduce', 'increase_max_hp'];
+  /* Treat a near-zero HP/s balance as comboable (0.01 tolerance). */
+  var COMBO_EPSILON = 0.01 + 1e-9;
+  var MAX_BREAK_SECONDS = 120;
+
+  var TYPE_META = {
+    dps: { title: 'DPS 花瓣', subtitle: 'DPS PETAL', kind: 'single' },
+    heal: { title: 'Heal 花瓣', subtitle: 'HEAL PETAL', kind: 'quantity' },
+    shield: { title: 'Shield 花瓣', subtitle: 'SHIELD PETAL', kind: 'quantity' },
+    dmg_reduce: { title: 'Damage Reduce 花瓣', subtitle: 'DAMAGE REDUCE', kind: 'single' },
+    increase_max_hp: { title: 'Increase Max HP 花瓣', subtitle: 'INCREASE MAX HP', kind: 'single' }
+  };
+
+  var STORAGE_THEME = 'combo-calc-theme';
+  var STORAGE_SETTINGS = 'combo-calc-settings';
+
+  var FALLBACK_DATA = {
+    dps: {
+      trident: {
+        super: { hp: 32805, armor: 10935, fusion: 3 },
+        ultra: { hp: 10935, armor: 3645, fusion: 3 }
+      },
+      bone: {
+        unique: { hp: 59049, armor: 767637 },
+        omega: { hp: 19683, armor: 255879 }
+      },
+      magic_bone: {
+        unique: { hp: 1476225, armor: 1180980 },
+        omega: { hp: 492075, armor: 393660 }
+      },
+      maple: {
+        unique: { hp: 2361960, armor: 177147 },
+        omega: { hp: 787320, armor: 59049 }
+      }
+    },
+    heal: {
+      chromosome: {
+        unique: { heal: 984150 },
+        omega: { heal: 328050 },
+        super: { heal: 109350 }
+      }
+    },
+    shield: {
+      magic_chromosome: {
+        omega: { shield: 721710, harmony_stack: true },
+        super: { shield: 240570, harmony_stack: true }
+      }
+    },
+    dmg_reduce: {
+      neurotoxin: {
+        omega: { dmg_reduce: 0.6 },
+        super: { dmg_reduce: 0.45 },
+        ultra: { dmg_reduce: 0.4 }
+      }
+    },
+    increase_max_hp: {
+      golden_cactus: {
+        omega: { increase_max_hp: 0.55 },
+        super: { increase_max_hp: 0.34 },
+        ultra: { increase_max_hp: 0.21 }
+      }
+    }
+  };
+
+  var state = {
+    data: null,
+    entries: new Map(),
+    settings: { tps: 20, fireRate: 1.5 },
+    inputs: { damage: 0, posion: 0, fire: 0 },
+    talent: 0,
+    selected: { dps: null, dmg_reduce: null, increase_max_hp: null },
+    fusion: {},
+    quantities: { heal: {}, shield: {} }
+  };
+
+  var ui = {};
+
+  /* ------------------------------------------------------------------
+   * Small helpers
+   * ------------------------------------------------------------------ */
+
+  function byId(id) {
+    return document.getElementById(id);
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function numberOr(value, fallback) {
+    var n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function readStorage(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeStorage(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch (error) {
+      /* Local storage may be unavailable in private or sandboxed contexts. */
+    }
+  }
+
+  /**
+   * General display format from the specification:
+   * abs < 1000 -> 2 decimals, abs < 100000 -> 1 decimal, otherwise 0.
+   */
+  function formatNumber(value) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) {
+      return '\u221e';
+    }
+    var absolute = Math.abs(n);
+    var digits = absolute < 1000 ? 2 : (absolute < 100000 ? 1 : 0);
+    var text = n.toFixed(digits);
+    if (/^-0(?:\.0+)?$/.test(text)) {
+      text = text.slice(1);
+    }
+    return text;
+  }
+
+  function formatInteger(value) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) {
+      return '\u221e';
+    }
+    return String(Math.trunc(n));
+  }
+
+  function formatPercent(value, digits) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) {
+      return '\u221e';
+    }
+    return (n * 100).toFixed(digits == null ? 1 : digits) + '%';
+  }
+
+  function formatPlain(value) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) {
+      return '\u221e';
+    }
+    if (Number.isInteger(n)) {
+      return String(n);
+    }
+    return String(Number(n.toFixed(4)));
+  }
+
+  function escapeHtml(text) {
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function makeElement(tag, className, text) {
+    var element = document.createElement(tag);
+    if (className) {
+      element.className = className;
+    }
+    if (text !== undefined && text !== null) {
+      element.textContent = String(text);
+    }
+    return element;
+  }
+
+  function itemKey(type, petal, rarity) {
+    return type + '|' + petal + '|' + rarity;
+  }
+
+  function displayPetalName(name) {
+    return String(name)
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b[a-z]/g, function (letter) {
+        return letter.toUpperCase();
+      });
+  }
+
+  function petalImagePath(entry) {
+    var rarity = String(entry.rarity).toLowerCase();
+    var petal = String(entry.petal).toLowerCase().replace(/\s+/g, '_');
+    return './image/' + rarity + '_' + petal + '_200x200.png';
+  }
+
+  function rarityRank(rarity) {
+    return Object.prototype.hasOwnProperty.call(RARITY_ORDER, rarity)
+      ? RARITY_ORDER[rarity]
+      : 99;
+  }
+
+  function wireImageFallback(image) {
+    image.dataset.fallback = '0';
+    image.dataset.failed = '0';
+    image.addEventListener('error', function () {
+      if (image.dataset.fallback === '1') {
+        image.hidden = true;
+        image.removeAttribute('src');
+        image.dataset.failed = '1';
+        var thumb = image.closest('.petal-thumb, .preview-frame');
+        if (thumb) {
+          thumb.classList.add('image-missing');
+        }
+        return;
+      }
+      image.dataset.fallback = '1';
+      image.src = './image/mob.png';
+    });
+  }
+
+  function applyImageSource(image, source) {
+    image.dataset.fallback = '0';
+    image.dataset.failed = '0';
+    image.hidden = false;
+    if (image.getAttribute('src') !== source) {
+      image.src = source;
+    }
+  }
+
+  /* ------------------------------------------------------------------
+   * Settings and theme persistence
+   * ------------------------------------------------------------------ */
+
+  function normalizeFireRate(value) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) {
+      return 1.5;
+    }
+    n = clamp(n, 1, 2);
+    return Number((Math.round(n / 0.05) * 0.05).toFixed(2));
+  }
+
+  function loadSettings() {
+    var result = { tps: 20, fireRate: 1.5 };
+    var raw = readStorage(STORAGE_SETTINGS);
+    if (raw) {
+      try {
+        var parsed = JSON.parse(raw);
+        var tps = Number(parsed.tps);
+        if (Number.isInteger(tps) && tps >= 10 && tps <= 25) {
+          result.tps = tps;
+        }
+        var fireRate = Number(parsed.fireRate);
+        if (Number.isFinite(fireRate) && fireRate >= 1 && fireRate <= 2) {
+          result.fireRate = normalizeFireRate(fireRate);
+        }
+      } catch (error) {
+        /* Keep defaults for malformed storage. */
+      }
+    }
+    return result;
+  }
+
+  function saveSettings() {
+    writeStorage(STORAGE_SETTINGS, JSON.stringify({
+      tps: state.settings.tps,
+      fireRate: state.settings.fireRate
+    }));
+  }
+
+  function applyTheme(theme, persist) {
+    var next = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    var label = next === 'dark' ? '亮色' : '暗色';
+    if (ui.themeLabel) {
+      ui.themeLabel.textContent = label;
+    }
+    if (ui.themeToggle) {
+      ui.themeToggle.setAttribute('aria-label', '切换至' + label + '主题');
+      ui.themeToggle.setAttribute('title', '切换至' + label + '主题');
+      ui.themeToggle.setAttribute('aria-pressed', next === 'dark' ? 'true' : 'false');
+    }
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute('content', next === 'dark' ? '#0f172a' : '#f4f6f8');
+    }
+    if (persist) {
+      writeStorage(STORAGE_THEME, next);
+    }
+  }
+
+  function initializeTheme() {
+    var saved = readStorage(STORAGE_THEME);
+    applyTheme(saved === 'dark' ? 'dark' : 'light', false);
+  }
+
+  /* ------------------------------------------------------------------
+   * Data loading and indexing
+   * ------------------------------------------------------------------ */
+
+  function isValidData(data) {
+    if (!data || typeof data !== 'object') {
+      return false;
+    }
+    return TYPES.every(function (type) {
+      return data[type] && typeof data[type] === 'object';
+    });
+  }
+
+  async function loadPetalData() {
+    try {
+      var response = await fetch('./petal.json', { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error('HTTP ' + response.status);
+      }
+      var data = await response.json();
+      if (!isValidData(data)) {
+        throw new Error('petal.json 数据结构不正确');
+      }
+      return data;
+    } catch (error) {
+      console.warn('读取 petal.json 失败，使用内置数据。', error);
+      return FALLBACK_DATA;
+    }
+  }
+
+  function indexEntries() {
+    state.entries.clear();
+    TYPES.forEach(function (type) {
+      var group = state.data[type];
+      if (!group || typeof group !== 'object') {
+        return;
+      }
+      Object.keys(group).forEach(function (petal) {
+        var rarities = group[petal];
+        if (!rarities || typeof rarities !== 'object') {
+          return;
+        }
+        Object.keys(rarities).forEach(function (rarity) {
+          var attrs = rarities[rarity];
+          if (!attrs || typeof attrs !== 'object') {
+            return;
+          }
+          var key = itemKey(type, petal, rarity);
+          state.entries.set(key, {
+            key: key,
+            type: type,
+            petal: petal,
+            rarity: rarity,
+            attrs: attrs
+          });
+        });
+      });
+    });
+  }
+
+  function getEntries(type) {
+    var result = [];
+    state.entries.forEach(function (entry) {
+      if (entry.type === type) {
+        result.push(entry);
+      }
+    });
+    result.sort(function (a, b) {
+      var rarityDifference = rarityRank(a.rarity) - rarityRank(b.rarity);
+      if (rarityDifference !== 0) {
+        return rarityDifference;
+      }
+      return displayPetalName(a.petal).localeCompare(displayPetalName(b.petal));
+    });
+    return result;
+  }
+
+  function selectedEntry(type) {
+    var key = state.selected[type];
+    return key ? state.entries.get(key) || null : null;
+  }
+
+  function quantityFor(type, key) {
+    var group = state.quantities[type];
+    if (!group) {
+      return 0;
+    }
+    var value = Number(group[key]);
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+    return clamp(Math.trunc(value), 0, 20);
+  }
+
+  function fusionMax(entry) {
+    if (!entry || entry.attrs.fusion === undefined || entry.attrs.fusion === null) {
+      return null;
+    }
+    var max = Number(entry.attrs.fusion);
+    if (!Number.isFinite(max) || max < 1) {
+      return null;
+    }
+    return Math.max(1, Math.floor(max));
+  }
+
+  function fusionFor(entry) {
+    var max = fusionMax(entry);
+    if (max === null) {
+      return 1;
+    }
+    var value = Number(state.fusion[entry.key]);
+    if (!Number.isFinite(value)) {
+      return 1;
+    }
+    return clamp(Math.round(value), 1, max);
+  }
+
+  function numericAttr(entry, key) {
+    if (!entry || !entry.attrs) {
+      return 0;
+    }
+    var value = Number(entry.attrs[key]);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  /* ------------------------------------------------------------------
+   * Core calculations
+   * ------------------------------------------------------------------ */
+
+  function sumHealInstances() {
+    var total = 0;
+    state.entries.forEach(function (entry) {
+      if (entry.type !== 'heal') {
+        return;
+      }
+      var quantity = quantityFor('heal', entry.key);
+      if (quantity > 0) {
+        total += numericAttr(entry, 'heal') * quantity;
+      }
+    });
+    return total;
+  }
+
+  function sumShieldHarmony() {
+    var instances = [];
+    var unharmonized = 0;
+
+    state.entries.forEach(function (entry) {
+      if (entry.type !== 'shield') {
+        return;
+      }
+      var quantity = quantityFor('shield', entry.key);
+      if (quantity <= 0) {
+        return;
+      }
+      var shieldValue = numericAttr(entry, 'shield');
+      if (entry.attrs.harmony_stack === true) {
+        for (var index = 0; index < quantity; index += 1) {
+          instances.push({
+            rarity: entry.rarity,
+            value: shieldValue
+          });
+        }
+      } else {
+        unharmonized += shieldValue * quantity;
+      }
+    });
+
+    instances.sort(function (a, b) {
+      var rarityDifference = rarityRank(a.rarity) - rarityRank(b.rarity);
+      if (rarityDifference !== 0) {
+        return rarityDifference;
+      }
+      return b.value - a.value;
+    });
+
+    var total = unharmonized;
+    for (var i = 0; i < instances.length; i += 1) {
+      total += instances[i].value / (i + 1);
+    }
+    return total;
+  }
+
+  function findMaxTps(healTotal, shieldTotal, normalTick, posion, fire, fireRate) {
+    var incomingWithoutNormal = posion + fire * fireRate;
+    for (var tps = 25; tps >= 10; tps -= 1) {
+      if (healTotal + shieldTotal >= normalTick * tps + incomingWithoutNormal) {
+        return tps;
+      }
+    }
+    return null;
+  }
+
+  function simulateBreak(maxHp, shieldTick, healTick, damageTick, tps) {
+    var hp = maxHp;
+    var shieldPool = 0;
+    /* 120 second cap; at the default 20 TPS this is exactly 2400 ticks. */
+    var maxTicks = Math.max(1, Math.round(MAX_BREAK_SECONDS * tps));
+
+    for (var tick = 1; tick <= maxTicks; tick += 1) {
+      /* 1. Gain shield first. The shield pool persists across ticks. */
+      shieldPool = Math.min(maxHp, shieldPool + shieldTick);
+
+      /* 2. Take damage. Shield absorbs first, then HP. */
+      var shieldBefore = shieldPool;
+      var hpBefore = hp;
+      var incoming = damageTick;
+
+      if (incoming >= hpBefore + shieldBefore) {
+        return { broken: true, tick: tick };
+      }
+
+      var absorbed = Math.min(shieldPool, incoming);
+      shieldPool -= absorbed;
+      hp -= incoming - absorbed;
+
+      if (hp <= 0) {
+        return { broken: true, tick: tick };
+      }
+
+      /* 3. Heal after damage. Healing cannot overflow max HP. */
+      hp = Math.min(maxHp, hp + healTick);
+    }
+
+    return { broken: false, tick: maxTicks, maxTicks: maxTicks };
+  }
+
+  function computeAll() {
+    var tps = state.settings.tps;
+    var fireRate = state.settings.fireRate;
+    var dps = selectedEntry('dps');
+    var cactusEntry = selectedEntry('increase_max_hp');
+    var reduceEntry = selectedEntry('dmg_reduce');
+
+    var cactus = numericAttr(cactusEntry, 'increase_max_hp');
+    var dr = clamp(numericAttr(reduceEntry, 'dmg_reduce'), 0, 1);
+    var talentBonus = state.talent * 0.05;
+    var k = dps ? fusionFor(dps) : 1;
+
+    var hp0 = numericAttr(dps, 'hp');
+    var armor0 = numericAttr(dps, 'armor');
+
+    var hp = hp0 * (1 + cactus) * (1 + talentBonus) * k;
+    var armor = armor0 * k;
+
+    var healTotal = sumHealInstances() * k;
+    var shieldBase = sumShieldHarmony();
+    var shieldTotal = shieldBase * k;
+    var drPercent = dr * 100;
+
+    var normalTick = Math.max(0, state.inputs.damage * (1 - dr) - armor);
+    var posionTick = state.inputs.posion / tps;
+    var fireTick = state.inputs.fire * fireRate / tps;
+    var totalDamageTick = normalTick + posionTick + fireTick;
+    var damagePerSecond = totalDamageTick * tps;
+    var healTick = healTotal / tps;
+    var shieldTick = shieldTotal / tps;
+
+    var theoreticalHpPerSecond = healTotal + shieldTotal - damagePerSecond;
+    var hpPerSecond = (
+      theoreticalHpPerSecond < 0 &&
+      theoreticalHpPerSecond >= -COMBO_EPSILON
+    ) ? 0 : theoreticalHpPerSecond;
+    var comboable = theoreticalHpPerSecond >= -COMBO_EPSILON;
+    var maxTps = findMaxTps(healTotal, shieldTotal, normalTick, state.inputs.posion, state.inputs.fire, fireRate);
+
+    var denominator = healTick + shieldTick;
+    var pressure;
+    if (denominator === 0) {
+      pressure = totalDamageTick === 0 ? 0 : Infinity;
+    } else {
+      pressure = totalDamageTick / denominator * 100;
+    }
+
+    var maxDamage = (hp + shieldTick + armor) / (1 - dr);
+
+    var breakResult = null;
+    if (dps && !comboable) {
+      breakResult = simulateBreak(hp, shieldTick, healTick, totalDamageTick, tps);
+    }
+
+    return {
+      hasDps: Boolean(dps),
+      dpsEntry: dps,
+      k: k,
+      hp0: hp0,
+      armor0: armor0,
+      hp: hp,
+      armor: armor,
+      cactus: cactus,
+      talentBonus: talentBonus,
+      healTotal: healTotal,
+      shieldBase: shieldBase,
+      shieldTotal: shieldTotal,
+      dr: dr,
+      drPercent: drPercent,
+      normalTick: normalTick,
+      posionTick: posionTick,
+      fireTick: fireTick,
+      totalDamageTick: totalDamageTick,
+      damagePerSecond: damagePerSecond,
+      healTick: healTick,
+      shieldTick: shieldTick,
+      hpPerSecond: hpPerSecond,
+      comboable: comboable,
+      maxTps: maxTps,
+      pressure: pressure,
+      maxDamage: maxDamage,
+      breakResult: breakResult
+    };
+  }
+
+  /* ------------------------------------------------------------------
+   * Rendering
+   * ------------------------------------------------------------------ */
+
+  function setTone(element, tone) {
+    element.classList.remove('tone-red', 'tone-green', 'tone-gold', 'tone-accent', 'tone-muted');
+    if (tone) {
+      element.classList.add('tone-' + tone);
+    }
+  }
+
+  function setResult(element, text, tone, wide) {
+    element.textContent = text;
+    setTone(element, tone);
+    element.classList.toggle('is-wide', Boolean(wide));
+  }
+
+  function hpFormulaText(result) {
+    return '(\u57fa\u7840hp\u00d7(1+' + result.cactus.toFixed(2) + ')\u00d7(1+' +
+      result.talentBonus.toFixed(2) + ')\u00d7' + formatPlain(result.k) + ')';
+  }
+
+  function pressureText(pressure) {
+    if (!Number.isFinite(pressure)) {
+      return '\u221e';
+    }
+    return pressure.toFixed(1) + '%';
+  }
+
+  function breakTimeText(result) {
+    if (result.comboable) {
+      return { text: 'combo', tone: 'accent' };
+    }
+    if (!result.breakResult) {
+      return { text: '\u2014', tone: 'muted' };
+    }
+    if (!result.breakResult.broken) {
+      return {
+        text: '>' + MAX_BREAK_SECONDS.toFixed(2) + 's',
+        tone: 'gold'
+      };
+    }
+    var tick = result.breakResult.tick;
+    var seconds = tick / state.settings.tps;
+    if (seconds < 1) {
+      return {
+        text: tick + 'tick(' + seconds.toFixed(2) + 's)',
+        tone: 'gold'
+      };
+    }
+    return {
+      text: seconds.toFixed(2) + 's',
+      tone: 'gold'
+    };
+  }
+
+  function renderPreview(result) {
+    if (!ui.previewImage || !ui.previewFrame) {
+      return;
+    }
+    if (!result.hasDps) {
+      if (ui.previewRequestedSource !== '') {
+        ui.previewRequestedSource = '';
+        ui.previewImage.hidden = true;
+        ui.previewImage.removeAttribute('src');
+        ui.previewImage.dataset.fallback = '0';
+        ui.previewImage.dataset.failed = '0';
+      }
+      ui.previewImage.alt = '';
+      ui.previewFrame.classList.add('is-empty');
+      ui.previewFrame.classList.remove('image-missing');
+      ui.previewFrame.removeAttribute('title');
+      return;
+    }
+
+    var entry = result.dpsEntry;
+    var source = petalImagePath(entry);
+    var name = displayPetalName(entry.petal) + ' · ' + entry.rarity;
+    if (ui.previewRequestedSource !== source) {
+      ui.previewRequestedSource = source;
+      applyImageSource(ui.previewImage, source);
+      ui.previewFrame.classList.remove('image-missing');
+    }
+    ui.previewImage.hidden = ui.previewImage.dataset.failed === '1';
+    ui.previewImage.alt = name;
+    ui.previewFrame.classList.remove('is-empty');
+    ui.previewFrame.title = name;
+  }
+
+  function renderTalent() {
+    var bonus = state.talent * 0.05;
+    if (ui.talentCoef) {
+      ui.talentCoef.textContent = formatPercent(bonus);
+    }
+    if (ui.talentMeter) {
+      ui.talentMeter.style.width = (state.talent / 5 * 100) + '%';
+    }
+  }
+
+  function render() {
+    if (!state.data) {
+      return;
+    }
+
+    var result = computeAll();
+
+    if (result.hasDps) {
+      ui.statHp.textContent = formatNumber(result.hp);
+      ui.statArmor.textContent = formatNumber(result.armor);
+      ui.hpFormula.textContent = hpFormulaText(result);
+    } else {
+      ui.statHp.textContent = '-';
+      ui.statArmor.textContent = '-';
+      ui.hpFormula.textContent = '';
+    }
+    ui.statHeal.textContent = formatNumber(result.healTotal);
+    ui.statShield.textContent = formatNumber(result.shieldTotal);
+    ui.statDr.textContent = result.drPercent.toFixed(1) + '%';
+
+    if (!result.hasDps) {
+      setResult(ui.resCombo, '\u2014', 'muted');
+      setResult(ui.resMaxTps, '\u2014', 'muted');
+      setResult(ui.resDps, '\u2014', 'muted');
+      setResult(ui.resHps, '\u2014', 'muted');
+      setResult(ui.resBreak, '\u2014', 'muted', true);
+      setResult(ui.resPressure, '\u2014', 'muted');
+      setResult(ui.resMaxDamage, '\u2014', 'muted');
+      ui.resultsMask.hidden = false;
+    } else {
+      setResult(ui.resCombo, result.comboable ? 'Yes' : 'No', result.comboable ? 'green' : 'red');
+
+      if (result.maxTps === null) {
+        setResult(ui.resMaxTps, '<10', 'red');
+      } else {
+        setResult(
+          ui.resMaxTps,
+          String(result.maxTps),
+          result.maxTps >= state.settings.tps ? 'green' : 'red'
+        );
+      }
+
+      setResult(ui.resDps, formatNumber(result.damagePerSecond), 'red');
+
+      var hpsTone = 'accent';
+      if (result.hpPerSecond < 0) {
+        hpsTone = 'red';
+      } else if (result.hpPerSecond === 0) {
+        hpsTone = 'accent';
+      } else if (result.shieldTotal > 0) {
+        hpsTone = 'gold';
+      } else if (result.healTotal > 0) {
+        hpsTone = 'green';
+      }
+      setResult(ui.resHps, formatNumber(result.hpPerSecond), hpsTone);
+
+      var breakData = breakTimeText(result);
+      setResult(ui.resBreak, breakData.text, breakData.tone, true);
+      setResult(ui.resPressure, pressureText(result.pressure), 'gold');
+      setResult(ui.resMaxDamage, formatNumber(result.maxDamage), 'accent');
+      ui.resultsMask.hidden = true;
+    }
+
+    renderPreview(result);
+    renderTalent();
+    updateChoiceVisuals();
+    updateCounts();
+  }
+
+  /* ------------------------------------------------------------------
+   * Building petal cards
+   * ------------------------------------------------------------------ */
+
+  function makeThumb(entry) {
+    var thumb = makeElement('span', 'petal-thumb');
+    var image = makeElement('img');
+    image.alt = displayPetalName(entry.petal) + ' ' + entry.rarity;
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    wireImageFallback(image);
+    image.src = petalImagePath(entry);
+    thumb.appendChild(image);
+    return thumb;
+  }
+
+  function makeRarityBadge(rarity) {
+    var badge = makeElement('span', 'rarity-badge', rarity);
+    badge.dataset.rarity = rarity;
+    return badge;
+  }
+
+  function appendAttribute(line, label, value, separator) {
+    if (separator) {
+      line.appendChild(makeElement('span', 'attr-sep', '·'));
+    }
+    var span = makeElement('span', 'attr');
+    span.appendChild(document.createTextNode(label + ' '));
+    span.appendChild(makeElement('b', null, value));
+    line.appendChild(span);
+  }
+
+  function makeAttributeLine(entry) {
+    var line = makeElement('span', 'attr-line');
+
+    if (entry.type === 'dps') {
+      appendAttribute(line, 'HP', formatNumber(numericAttr(entry, 'hp')), false);
+      appendAttribute(line, 'Armor', formatNumber(numericAttr(entry, 'armor')), true);
+      var maxFusion = fusionMax(entry);
+      if (maxFusion !== null) {
+        appendAttribute(line, 'Fusion', String(maxFusion), true);
+      }
+    } else if (entry.type === 'heal') {
+      appendAttribute(line, 'Heal/s', formatNumber(numericAttr(entry, 'heal')), false);
+    } else if (entry.type === 'shield') {
+      appendAttribute(line, 'Shield/s', formatNumber(numericAttr(entry, 'shield')), false);
+      if (entry.attrs.harmony_stack === true) {
+        line.appendChild(makeElement('span', 'harmony-tag', '调和'));
+      }
+    } else if (entry.type === 'dmg_reduce') {
+      appendAttribute(line, 'Damage Reduce', formatPercent(numericAttr(entry, 'dmg_reduce')), false);
+    } else if (entry.type === 'increase_max_hp') {
+      appendAttribute(line, 'Max HP', formatPercent(numericAttr(entry, 'increase_max_hp')), false);
+    }
+
+    return line;
+  }
+
+  function makeMiniNumber(kind, key, labelText, min, max, step, value, ariaLabel, extraClass) {
+    var label = makeElement('label', 'mini-field');
+    label.appendChild(makeElement('span', null, labelText));
+    var input = makeElement('input', 'mini-input' + (extraClass ? ' ' + extraClass : ''));
+    input.type = 'number';
+    input.min = String(min);
+    input.max = String(max);
+    input.step = String(step);
+    input.value = String(value);
+    input.dataset.kind = kind;
+    input.dataset.key = key;
+    input.setAttribute('aria-label', ariaLabel);
+    label.appendChild(input);
+    return label;
+  }
+
+  function makePetalItem(entry) {
+    var item = makeElement('article', 'petal-item');
+    item.dataset.key = entry.key;
+    item.dataset.type = entry.type;
+
+    var isSelectable = SINGLE_TYPES.indexOf(entry.type) !== -1;
+    var main;
+
+    if (isSelectable) {
+      main = makeElement('label', 'petal-main');
+      var checkbox = makeElement('input', 'petal-check');
+      checkbox.type = 'checkbox';
+      checkbox.value = entry.key;
+      checkbox.dataset.choiceType = entry.type;
+      checkbox.checked = state.selected[entry.type] === entry.key;
+      checkbox.setAttribute('aria-label', '选择 ' + displayPetalName(entry.petal) + ' ' + entry.rarity);
+      main.appendChild(checkbox);
+      main.appendChild(makeElement('span', 'petal-checkbox'));
+    } else {
+      main = makeElement('div', 'petal-main is-static');
+    }
+
+    main.appendChild(makeThumb(entry));
+
+    var info = makeElement('span', 'petal-info');
+    var nameRow = makeElement('span', 'petal-name-row');
+    nameRow.appendChild(makeElement('span', 'petal-name', displayPetalName(entry.petal)));
+    nameRow.appendChild(makeRarityBadge(entry.rarity));
+    info.appendChild(nameRow);
+    info.appendChild(makeAttributeLine(entry));
+    main.appendChild(info);
+    item.appendChild(main);
+
+    var control = makeElement('div', 'petal-control');
+
+    if (entry.type === 'dps' && fusionMax(entry) !== null) {
+      var max = fusionMax(entry);
+      var current = fusionFor(entry);
+      control.appendChild(makeMiniNumber(
+        'fusion',
+        entry.key,
+        '聚变',
+        1,
+        max,
+        1,
+        current,
+        displayPetalName(entry.petal) + ' ' + entry.rarity + ' 聚变量',
+        'fusion-input'
+      ));
+    } else if (entry.type === 'heal' || entry.type === 'shield') {
+      var quantity = quantityFor(entry.type, entry.key);
+      control.appendChild(makeMiniNumber(
+        'quantity',
+        entry.key,
+        '数量',
+        0,
+        20,
+        1,
+        quantity,
+        displayPetalName(entry.petal) + ' ' + entry.rarity + ' 数量',
+        'qty-input'
+      ));
+    }
+
+    if (control.childNodes.length > 0) {
+      item.appendChild(control);
+    }
+
+    return item;
+  }
+
+  function makeTalentCard() {
+    var card = makeElement('section', 'card');
+    card.dataset.card = 'talent';
+
+    var head = makeElement('div', 'card-head');
+    var heading = makeElement('div', 'card-heading');
+    heading.appendChild(makeElement('h2', null, '天赋'));
+    heading.appendChild(makeElement('span', 'card-subtitle', 'Talent'));
+    head.appendChild(heading);
+    head.appendChild(makeElement('span', 'card-badge', '0–5'));
+    card.appendChild(head);
+
+    var body = makeElement('div', 'card-scroll talent-body');
+
+    var picker = makeElement('label', 'talent-picker');
+    picker.appendChild(makeElement('span', 'talent-picker-label', '天赋等级'));
+    var input = makeElement('input', 'talent-input');
+    input.id = 'talentInput';
+    input.type = 'number';
+    input.min = '0';
+    input.max = '5';
+    input.step = '1';
+    input.value = String(state.talent);
+    input.setAttribute('aria-label', '天赋等级，范围 0 到 5');
+    picker.appendChild(input);
+    body.appendChild(picker);
+
+    body.appendChild(makeElement('p', 'talent-caption', '每级提升 5% 花瓣耐久，天赋增血系数最多 25%。'));
+
+    var coefficient = makeElement('div', 'talent-coef');
+    coefficient.appendChild(document.createTextNode('天赋增血系数'));
+    var coefficientValue = makeElement('b', null, '0.0%');
+    coefficientValue.id = 'talentCoef';
+    coefficient.appendChild(coefficientValue);
+    body.appendChild(coefficient);
+
+    var meter = makeElement('div', 'talent-meter');
+    var meterFill = makeElement('span');
+    meterFill.id = 'talentMeter';
+    meter.appendChild(meterFill);
+    body.appendChild(meter);
+
+    var scale = makeElement('div', 'talent-scale');
+    scale.appendChild(makeElement('span', null, '0'));
+    scale.appendChild(makeElement('span', null, '1'));
+    scale.appendChild(makeElement('span', null, '2'));
+    scale.appendChild(makeElement('span', null, '3'));
+    scale.appendChild(makeElement('span', null, '4'));
+    scale.appendChild(makeElement('span', null, '5'));
+    body.appendChild(scale);
+
+    card.appendChild(body);
+    return card;
+  }
+
+  function makeTypeCard(type) {
+    var meta = TYPE_META[type];
+    var card = makeElement('section', 'card');
+    card.dataset.card = type;
+
+    var head = makeElement('div', 'card-head');
+    var heading = makeElement('div', 'card-heading');
+    heading.appendChild(makeElement('h2', null, meta.title));
+    heading.appendChild(makeElement('span', 'card-subtitle', meta.subtitle));
+    head.appendChild(heading);
+
+    var count = makeElement('span', 'card-badge', '0');
+    count.dataset.countType = type;
+    count.title = meta.kind === 'single' ? '已选择数量' : '数量合计';
+    head.appendChild(count);
+    card.appendChild(head);
+
+    var scroll = makeElement('div', 'card-scroll');
+    scroll.dataset.listType = type;
+    scroll.setAttribute('aria-label', meta.title);
+    var list = makeElement('div', 'petal-list');
+
+    getEntries(type).forEach(function (entry) {
+      if (entry.type === 'dps' && fusionMax(entry) !== null && state.fusion[entry.key] === undefined) {
+        state.fusion[entry.key] = 1;
+      }
+      list.appendChild(makePetalItem(entry));
+    });
+
+    scroll.appendChild(list);
+    card.appendChild(scroll);
+    return card;
+  }
+
+  function buildCards() {
+    var grid = ui.contentGrid;
+    grid.innerHTML = '';
+    grid.appendChild(makeTalentCard());
+    TYPES.forEach(function (type) {
+      grid.appendChild(makeTypeCard(type));
+    });
+    ui.talentCoef = byId('talentCoef');
+    ui.talentMeter = byId('talentMeter');
+  }
+
+  function updateChoiceVisuals() {
+    var checkboxes = ui.contentGrid.querySelectorAll('.petal-check');
+    checkboxes.forEach(function (checkbox) {
+      var isChecked = state.selected[checkbox.dataset.choiceType] === checkbox.value;
+      checkbox.checked = isChecked;
+      var item = checkbox.closest('.petal-item');
+      if (item) {
+        item.classList.toggle('is-selected', isChecked);
+      }
+    });
+  }
+
+  function updateCounts() {
+    TYPES.forEach(function (type) {
+      var badge = ui.contentGrid.querySelector('[data-count-type="' + type + '"]');
+      if (!badge) {
+        return;
+      }
+      if (type === 'heal' || type === 'shield') {
+        var total = 0;
+        state.entries.forEach(function (entry) {
+          if (entry.type === type) {
+            total += quantityFor(type, entry.key);
+          }
+        });
+        badge.textContent = 'Σ ' + total;
+      } else {
+        badge.textContent = state.selected[type] ? '1' : '0';
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------
+   * Input event handling
+   * ------------------------------------------------------------------ */
+
+  function normalizeActionDamage(value) {
+    var n = Number(value);
+    if (!Number.isFinite(n) || n < 0) {
+      return 0;
+    }
+    return Number(n.toFixed(6));
+  }
+
+  function syncTopInputValues() {
+    ui.inputDamage.value = String(state.inputs.damage);
+    ui.inputPosion.value = String(state.inputs.posion);
+    ui.inputFire.value = String(state.inputs.fire);
+  }
+
+  function performDamageAction(action) {
+    var damage = Number.isFinite(state.inputs.damage) ? state.inputs.damage : 0;
+    var posion = Number.isFinite(state.inputs.posion) ? state.inputs.posion : 0;
+    var fire = Number.isFinite(state.inputs.fire) ? state.inputs.fire : 0;
+
+    switch (action) {
+      case 'clear-normal':
+        damage = 0;
+        break;
+      case 'clear-status':
+        posion = 0;
+        fire = 0;
+        break;
+      case 'set-normal-65610':
+        damage = 65610;
+        break;
+      case 'add-normal-65610':
+        damage = normalizeActionDamage(damage + 65610);
+        break;
+      case 'sub-normal-65610':
+        damage = normalizeActionDamage(damage - 65610);
+        break;
+      case 'add-normal-32805':
+        damage = normalizeActionDamage(damage + 32805);
+        break;
+      case 'sub-normal-32805':
+        damage = normalizeActionDamage(damage - 32805);
+        break;
+      case 'multiply-all-3':
+        damage = normalizeActionDamage(damage * 3);
+        posion = normalizeActionDamage(posion * 3);
+        fire = normalizeActionDamage(fire * 3);
+        break;
+      case 'divide-all-3':
+        damage = normalizeActionDamage(damage / 3);
+        posion = normalizeActionDamage(posion / 3);
+        fire = normalizeActionDamage(fire / 3);
+        break;
+      default:
+        return;
+    }
+
+    state.inputs.damage = damage;
+    state.inputs.posion = posion;
+    state.inputs.fire = fire;
+    syncTopInputValues();
+    render();
+  }
+
+  function bindTopInput(key, input) {
+    input.addEventListener('input', function () {
+      var raw = input.value.trim();
+      if (raw === '') {
+        state.inputs[key] = 0;
+        render();
+        return;
+      }
+      var value = Number(raw);
+      if (!Number.isFinite(value) || value < 0) {
+        state.inputs[key] = 0;
+        if (Number.isFinite(value) && value < 0) {
+          input.value = '0';
+        }
+        render();
+        return;
+      }
+      state.inputs[key] = value;
+      render();
+    });
+
+    input.addEventListener('change', function () {
+      var raw = input.value.trim();
+      var value = Number(raw);
+      if (raw === '' || !Number.isFinite(value) || value < 0) {
+        input.value = '0';
+        state.inputs[key] = 0;
+      } else {
+        state.inputs[key] = value;
+      }
+      render();
+    });
+  }
+
+  function finalizeTalentInput(input) {
+    var value = Number(input.value);
+    if (input.value.trim() === '' || !Number.isInteger(value) || value < 0 || value > 5) {
+      state.talent = 0;
+    } else {
+      state.talent = value;
+    }
+    input.value = String(state.talent);
+    render();
+  }
+
+  function handleGridInput(event) {
+    var target = event.target;
+
+    if (target.id === 'talentInput') {
+      var talentValue = Number(target.value);
+      if (target.value.trim() === '') {
+        state.talent = 0;
+      } else if (Number.isInteger(talentValue) && talentValue >= 0 && talentValue <= 5) {
+        state.talent = talentValue;
+      }
+      render();
+      return;
+    }
+
+    if (!target.dataset || !target.dataset.kind) {
+      return;
+    }
+
+    var key = target.dataset.key;
+
+    if (target.dataset.kind === 'quantity') {
+      var type = state.entries.get(key) ? state.entries.get(key).type : null;
+      if (type !== 'heal' && type !== 'shield') {
+        return;
+      }
+      var quantity = Number(target.value);
+      if (target.value.trim() === '') {
+        state.quantities[type][key] = 0;
+      } else if (Number.isInteger(quantity) && quantity >= 0 && quantity <= 20) {
+        state.quantities[type][key] = quantity;
+      }
+      render();
+    } else if (target.dataset.kind === 'fusion') {
+      var entry = state.entries.get(key);
+      var max = fusionMax(entry);
+      if (max === null) {
+        return;
+      }
+      var fusion = Number(target.value);
+      if (target.value.trim() === '') {
+        state.fusion[key] = 1;
+      } else if (Number.isInteger(fusion) && fusion >= 1 && fusion <= max) {
+        state.fusion[key] = fusion;
+      }
+      render();
+    }
+  }
+
+  function handleGridChange(event) {
+    var target = event.target;
+
+    if (target.classList && target.classList.contains('petal-check')) {
+      var type = target.dataset.choiceType;
+      if (target.checked) {
+        state.selected[type] = target.value;
+      } else if (state.selected[type] === target.value) {
+        state.selected[type] = null;
+      }
+      render();
+      return;
+    }
+
+    if (target.id === 'talentInput') {
+      finalizeTalentInput(target);
+      return;
+    }
+
+    if (!target.dataset || !target.dataset.kind) {
+      return;
+    }
+
+    var key = target.dataset.key;
+
+    if (target.dataset.kind === 'quantity') {
+      var entry = state.entries.get(key);
+      if (!entry || (entry.type !== 'heal' && entry.type !== 'shield')) {
+        return;
+      }
+      var quantity = Number(target.value);
+      if (target.value.trim() === '' || !Number.isInteger(quantity) || quantity < 0 || quantity > 20) {
+        quantity = 0;
+      }
+      state.quantities[entry.type][key] = quantity;
+      target.value = String(quantity);
+      render();
+    } else if (target.dataset.kind === 'fusion') {
+      var fusionEntry = state.entries.get(key);
+      var max = fusionMax(fusionEntry);
+      if (max === null) {
+        return;
+      }
+      var fusion = Number(target.value);
+      if (target.value.trim() === '' || !Number.isInteger(fusion) || fusion < 1 || fusion > max) {
+        fusion = 1;
+      }
+      state.fusion[key] = fusion;
+      target.value = String(fusion);
+      render();
+    }
+  }
+
+  function bindCardEvents() {
+    ui.contentGrid.addEventListener('input', handleGridInput);
+    ui.contentGrid.addEventListener('change', handleGridChange);
+  }
+
+  function bindStaticEvents() {
+    bindTopInput('damage', ui.inputDamage);
+    bindTopInput('posion', ui.inputPosion);
+    bindTopInput('fire', ui.inputFire);
+
+    document.querySelectorAll('[data-damage-action]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        performDamageAction(button.dataset.damageAction);
+      });
+    });
+
+    ui.themeToggle.addEventListener('click', function () {
+      var current = document.documentElement.getAttribute('data-theme');
+      applyTheme(current === 'dark' ? 'light' : 'dark', true);
+    });
+
+    ui.settingsButton.addEventListener('click', function () {
+      syncSettingsUI(true);
+      if (typeof ui.settingsDialog.showModal === 'function') {
+        if (!ui.settingsDialog.open) {
+          ui.settingsDialog.showModal();
+        }
+      } else {
+        ui.settingsDialog.setAttribute('open', '');
+      }
+    });
+
+    ui.closeSettings.addEventListener('click', function () {
+      if (typeof ui.settingsDialog.close === 'function') {
+        ui.settingsDialog.close();
+      } else {
+        ui.settingsDialog.removeAttribute('open');
+        finalizeSettings();
+      }
+    });
+
+    ui.settingsDialog.addEventListener('click', function (event) {
+      if (event.target === ui.settingsDialog && typeof ui.settingsDialog.close === 'function') {
+        ui.settingsDialog.close();
+      }
+    });
+
+    ui.settingsDialog.addEventListener('close', function () {
+      finalizeSettings();
+      saveSettings();
+    });
+
+    ui.tpsRange.addEventListener('input', function () {
+      var value = clamp(Math.round(Number(ui.tpsRange.value)), 10, 25);
+      state.settings.tps = value;
+      ui.tpsNumber.value = String(value);
+      saveSettings();
+      render();
+    });
+
+    ui.tpsNumber.addEventListener('input', function () {
+      var value = Number(ui.tpsNumber.value);
+      if (ui.tpsNumber.value.trim() !== '' && Number.isInteger(value) && value >= 10 && value <= 25) {
+        state.settings.tps = value;
+        ui.tpsRange.value = String(value);
+        saveSettings();
+        render();
+      }
+    });
+
+    ui.tpsNumber.addEventListener('change', function () {
+      finalizeSettings();
+    });
+
+    ui.fireRateRange.addEventListener('input', function () {
+      var value = normalizeFireRate(ui.fireRateRange.value);
+      state.settings.fireRate = value;
+      ui.fireRateNumber.value = String(value);
+      saveSettings();
+      render();
+    });
+
+    ui.fireRateNumber.addEventListener('input', function () {
+      var value = Number(ui.fireRateNumber.value);
+      if (Number.isFinite(value) && value >= 1 && value <= 2) {
+        state.settings.fireRate = normalizeFireRate(value);
+        ui.fireRateRange.value = String(state.settings.fireRate);
+        saveSettings();
+        render();
+      }
+    });
+
+    ui.fireRateNumber.addEventListener('change', function () {
+      finalizeSettings();
+    });
+  }
+
+  function finalizeSettings() {
+    var tps = Number(ui.tpsNumber.value);
+    if (!Number.isInteger(tps) || tps < 10 || tps > 25) {
+      tps = 20;
+    }
+    var fireRate = Number(ui.fireRateNumber.value);
+    if (!Number.isFinite(fireRate) || fireRate < 1 || fireRate > 2) {
+      fireRate = 1.5;
+    } else {
+      fireRate = normalizeFireRate(fireRate);
+    }
+    state.settings.tps = tps;
+    state.settings.fireRate = fireRate;
+    syncSettingsUI(true);
+    saveSettings();
+    render();
+  }
+
+  function syncSettingsUI(forceValues) {
+    if (!ui.tpsNumber) {
+      return;
+    }
+    if (forceValues !== false) {
+      ui.tpsNumber.value = String(state.settings.tps);
+      ui.fireRateNumber.value = String(state.settings.fireRate);
+    }
+    ui.tpsRange.value = String(state.settings.tps);
+    ui.fireRateRange.value = String(state.settings.fireRate);
+  }
+
+  /* ------------------------------------------------------------------
+   * Boot
+   * ------------------------------------------------------------------ */
+
+  function cacheUi() {
+    ui.themeToggle = byId('themeToggle');
+    ui.themeLabel = byId('themeLabel');
+    ui.settingsButton = byId('settingsButton');
+    ui.settingsDialog = byId('settingsDialog');
+    ui.closeSettings = byId('closeSettings');
+    ui.tpsRange = byId('tpsRange');
+    ui.tpsNumber = byId('tpsNumber');
+    ui.fireRateRange = byId('fireRateRange');
+    ui.fireRateNumber = byId('fireRateNumber');
+    ui.contentGrid = byId('contentGrid');
+    ui.inputDamage = byId('inputDamage');
+    ui.inputPosion = byId('inputPosion');
+    ui.inputFire = byId('inputFire');
+    ui.statHp = byId('statHp');
+    ui.statArmor = byId('statArmor');
+    ui.statHeal = byId('statHeal');
+    ui.statShield = byId('statShield');
+    ui.statDr = byId('statDr');
+    ui.hpFormula = byId('hpFormula');
+    ui.resultsMask = byId('resultsMask');
+    ui.resCombo = byId('resCombo');
+    ui.resMaxTps = byId('resMaxTps');
+    ui.resDps = byId('resDps');
+    ui.resHps = byId('resHps');
+    ui.resBreak = byId('resBreak');
+    ui.resPressure = byId('resPressure');
+    ui.resMaxDamage = byId('resMaxDamage');
+    ui.previewFrame = byId('previewFrame');
+    ui.previewImage = byId('previewImage');
+    ui.previewRequestedSource = '';
+    ui.talentCoef = null;
+    ui.talentMeter = null;
+  }
+
+  async function boot() {
+    cacheUi();
+    initializeTheme();
+    state.settings = loadSettings();
+    syncSettingsUI(true);
+    bindStaticEvents();
+
+    if (ui.previewImage) {
+      wireImageFallback(ui.previewImage);
+    }
+
+    state.data = await loadPetalData();
+    indexEntries();
+    buildCards();
+    bindCardEvents();
+    render();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+}());
+</script>
+</body>
+</html>
