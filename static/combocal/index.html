@@ -5,13 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f6f8">
 <title>连击计算器</title>
-<link rel="icon" type="image/png" href="./image/mob.png">
+<link rel="icon" type="image/png" href="./image/gift.png">
 <script>
   (function () {
     try {
       var savedTheme = localStorage.getItem('combo-calc-theme');
       if (savedTheme === 'dark' || savedTheme === 'light') {
         document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+      var savedSettings = localStorage.getItem('combo-calc-settings');
+      if (savedSettings) {
+        var parsedSettings = JSON.parse(savedSettings);
+        var savedScale = Number(parsedSettings.fontScale);
+        if (Number.isFinite(savedScale) && savedScale >= 80 && savedScale <= 140) {
+          var normalizedScale = Math.round(savedScale / 5) * 5;
+          document.documentElement.style.setProperty('--font-scale', String(normalizedScale / 100));
+        }
       }
     } catch (e) {}
   }());
@@ -52,6 +61,7 @@
     --font-latin: "DIN Next LT Pro";
     --font-cjk: "Sarasa Mono SC";
     --font-stack: var(--font-latin), var(--font-cjk), "微软雅黑", "Microsoft YaHei", system-ui, sans-serif;
+    --font-scale: 1;
     --radius: 15px;
     color-scheme: light;
   }
@@ -95,7 +105,7 @@
       var(--bg);
     color: var(--text);
     font-family: var(--font-stack);
-    font-size: 14px;
+    font-size: calc(14px * var(--font-scale));
     line-height: 1.4;
     -webkit-font-smoothing: antialiased;
   }
@@ -161,7 +171,7 @@
     margin: 0;
     overflow: hidden;
     color: var(--text);
-    font-size: clamp(18px, 1.7vw, 23px);
+    font-size: calc(clamp(18px, 1.7vw, 23px) * var(--font-scale));
     font-weight: 750;
     letter-spacing: 0.045em;
     line-height: 1.15;
@@ -200,7 +210,7 @@
     background: var(--panel);
     box-shadow: var(--shadow-soft);
     color: var(--text);
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
     font-weight: 650;
     transition: border-color 140ms ease, background 140ms ease, color 140ms ease, transform 140ms ease;
   }
@@ -259,7 +269,7 @@
   .panel-heading h3 {
     margin: 0;
     color: var(--text);
-    font-size: 11px;
+    font-size: calc(11px * var(--font-scale));
     font-weight: 750;
     letter-spacing: 0.055em;
     text-transform: uppercase;
@@ -267,7 +277,7 @@
 
   .panel-heading .heading-hint {
     color: var(--muted);
-    font-size: 9px;
+    font-size: calc(9px * var(--font-scale));
     letter-spacing: 0.04em;
   }
 
@@ -341,7 +351,7 @@
 
   .input-label b {
     overflow: hidden;
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
     font-weight: 650;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -349,7 +359,7 @@
 
   .input-label small {
     color: var(--muted);
-    font-size: 8.5px;
+    font-size: calc(8.5px * var(--font-scale));
     white-space: nowrap;
   }
 
@@ -363,8 +373,9 @@
     background: var(--panel-2);
     color: var(--text);
     font-family: var(--font-stack);
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
     font-variant-numeric: tabular-nums;
+    line-height: 1.2;
     text-align: right;
     transition: border-color 130ms ease, box-shadow 130ms ease, background 130ms ease;
   }
@@ -403,7 +414,7 @@
     background: var(--panel-2);
     color: var(--muted);
     font-family: var(--font-stack);
-    font-size: 9px;
+    font-size: calc(9px * var(--font-scale));
     font-weight: 650;
     line-height: 1.15;
     text-overflow: clip;
@@ -481,7 +492,7 @@
   .stat-label {
     overflow: hidden;
     color: var(--muted);
-    font-size: 11px;
+    font-size: calc(11px * var(--font-scale));
     letter-spacing: 0.015em;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -491,7 +502,7 @@
     flex: 0 1 auto;
     overflow: hidden;
     color: var(--text);
-    font-size: 13px;
+    font-size: calc(13px * var(--font-scale));
     font-variant-numeric: tabular-nums;
     font-weight: 700;
     text-align: right;
@@ -504,7 +515,7 @@
     overflow: hidden;
     margin-top: -1px;
     color: var(--muted);
-    font-size: 8.5px;
+    font-size: calc(8.5px * var(--font-scale));
     font-variant-numeric: tabular-nums;
     line-height: 1.3;
     text-align: right;
@@ -549,7 +560,7 @@
   .result-label {
     overflow: hidden;
     color: var(--muted);
-    font-size: 11px;
+    font-size: calc(11px * var(--font-scale));
     letter-spacing: 0.01em;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -558,7 +569,7 @@
   .result-value {
     flex: 0 1 auto;
     overflow: hidden;
-    font-size: 13px;
+    font-size: calc(13px * var(--font-scale));
     font-variant-numeric: tabular-nums;
     font-weight: 750;
     text-align: right;
@@ -567,7 +578,7 @@
   }
 
   .result-value.is-wide {
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
   }
 
   .tone-red { color: var(--red) !important; }
@@ -599,13 +610,13 @@
   }
 
   .output-mask strong {
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
     font-weight: 750;
   }
 
   .output-mask span {
     color: var(--muted);
-    font-size: 9.5px;
+    font-size: calc(9.5px * var(--font-scale));
   }
 
   .dps-preview {
@@ -709,16 +720,18 @@
 
   .card-heading h2 {
     margin: 0;
-    font-size: 14px;
+    overflow: hidden;
+    font-size: calc(14px * var(--font-scale));
     font-weight: 750;
     letter-spacing: 0.025em;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .card-subtitle {
     overflow: hidden;
     color: var(--muted);
-    font-size: 8.5px;
+    font-size: calc(8.5px * var(--font-scale));
     letter-spacing: 0.08em;
     text-overflow: ellipsis;
     text-transform: uppercase;
@@ -737,9 +750,36 @@
     border-radius: 999px;
     background: var(--panel);
     color: var(--accent);
-    font-size: 10.5px;
+    font-size: calc(10.5px * var(--font-scale));
     font-variant-numeric: tabular-nums;
     font-weight: 750;
+    line-height: 1;
+  }
+
+  .card-head-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-clear {
+    height: 22px;
+    padding: 0 7px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--panel);
+    color: var(--muted);
+    font-family: var(--font-stack);
+    font-size: calc(9px * var(--font-scale));
+    font-weight: 650;
+    transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+  }
+
+  .card-clear:hover {
+    border-color: var(--red);
+    background: color-mix(in srgb, var(--red) 8%, var(--panel));
+    color: var(--red);
   }
 
   .card-scroll {
@@ -905,7 +945,7 @@
   .petal-name {
     overflow: hidden;
     color: var(--text);
-    font-size: 12.5px;
+    font-size: calc(12.5px * var(--font-scale));
     font-weight: 750;
     letter-spacing: 0.01em;
     line-height: 1.25;
@@ -921,7 +961,7 @@
     padding: 0 5px;
     border: 1px solid currentColor;
     border-radius: 4px;
-    font-size: 8px;
+    font-size: calc(8px * var(--font-scale));
     font-weight: 700;
     letter-spacing: 0.07em;
     line-height: 1;
@@ -945,7 +985,7 @@
     align-items: center;
     gap: 2px 4px;
     color: var(--muted);
-    font-size: 9.5px;
+    font-size: calc(9.5px * var(--font-scale));
     line-height: 1.35;
     overflow-wrap: anywhere;
   }
@@ -968,9 +1008,10 @@
     border: 1px solid var(--gold);
     border-radius: 4px;
     color: var(--gold);
-    font-size: 8px;
+    font-size: calc(8px * var(--font-scale));
     font-weight: 700;
     letter-spacing: 0.04em;
+    line-height: 1;
   }
 
   .petal-control {
@@ -985,7 +1026,7 @@
     align-items: center;
     gap: 4px;
     color: var(--muted);
-    font-size: 8px;
+    font-size: calc(8px * var(--font-scale));
     white-space: nowrap;
   }
 
@@ -999,8 +1040,9 @@
     background: var(--panel);
     color: var(--text);
     font-family: var(--font-stack);
-    font-size: 11px;
+    font-size: calc(11px * var(--font-scale));
     font-variant-numeric: tabular-nums;
+    line-height: 1.2;
     text-align: center;
     transition: border-color 130ms ease, box-shadow 130ms ease;
   }
@@ -1012,6 +1054,57 @@
   .mini-input:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 2px var(--accent-soft);
+  }
+
+  .number-editor {
+    display: flex;
+    width: 74px;
+    flex: 0 0 74px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+
+  .number-editor .mini-field {
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 1px;
+    justify-content: flex-end;
+  }
+
+  .step-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.9fr;
+    gap: 2px;
+  }
+
+  .step-button {
+    height: 18px;
+    min-width: 0;
+    padding: 0 1px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel-2);
+    color: var(--muted);
+    font-family: var(--font-stack);
+    font-size: calc(7.5px * var(--font-scale));
+    font-weight: 650;
+    line-height: 1;
+    text-overflow: clip;
+    white-space: nowrap;
+    transition: border-color 110ms ease, color 110ms ease, background 110ms ease;
+  }
+
+  .step-button:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .step-button.is-clear:hover {
+    border-color: var(--red);
+    color: var(--red);
   }
 
   .fusion-input {
@@ -1039,7 +1132,7 @@
 
   .talent-picker-label {
     color: var(--muted);
-    font-size: 11px;
+    font-size: calc(11px * var(--font-scale));
     letter-spacing: 0.02em;
   }
 
@@ -1052,9 +1145,10 @@
     background: var(--panel-2);
     color: var(--accent);
     font-family: var(--font-stack);
-    font-size: 25px;
+    font-size: calc(25px * var(--font-scale));
     font-variant-numeric: tabular-nums;
     font-weight: 750;
+    line-height: 1.15;
     text-align: center;
     transition: border-color 130ms ease, box-shadow 130ms ease;
   }
@@ -1068,7 +1162,7 @@
     max-width: 320px;
     margin: 0;
     color: var(--muted);
-    font-size: 10.5px;
+    font-size: calc(10.5px * var(--font-scale));
     line-height: 1.6;
   }
 
@@ -1077,12 +1171,12 @@
     align-items: baseline;
     gap: 6px;
     color: var(--muted);
-    font-size: 10.5px;
+    font-size: calc(10.5px * var(--font-scale));
   }
 
   .talent-coef b {
     color: var(--green);
-    font-size: 17px;
+    font-size: calc(17px * var(--font-scale));
     font-variant-numeric: tabular-nums;
     font-weight: 750;
   }
@@ -1110,7 +1204,7 @@
     width: min(240px, 86%);
     justify-content: space-between;
     color: var(--muted);
-    font-size: 8px;
+    font-size: calc(8px * var(--font-scale));
     letter-spacing: 0.03em;
   }
 
@@ -1120,7 +1214,7 @@
     flex: 0 0 auto;
     padding: 5px 12px 7px;
     color: var(--muted);
-    font-size: 10px;
+    font-size: calc(10px * var(--font-scale));
     letter-spacing: 0.06em;
     text-align: center;
     opacity: 0.5;
@@ -1159,7 +1253,7 @@
 
   .modal-head h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: calc(18px * var(--font-scale));
     font-weight: 750;
     letter-spacing: 0.08em;
   }
@@ -1216,14 +1310,14 @@
   }
 
   .setting-label label {
-    font-size: 13.5px;
+    font-size: calc(13.5px * var(--font-scale));
     font-weight: 750;
     letter-spacing: 0.02em;
   }
 
   .setting-label span {
     color: var(--muted);
-    font-size: 9.5px;
+    font-size: calc(9.5px * var(--font-scale));
   }
 
   .setting-controls {
@@ -1250,8 +1344,9 @@
     background: var(--panel-2);
     color: var(--text);
     font-family: var(--font-stack);
-    font-size: 13px;
+    font-size: calc(13px * var(--font-scale));
     font-variant-numeric: tabular-nums;
+    line-height: 1.2;
     text-align: right;
     transition: border-color 130ms ease, box-shadow 130ms ease;
   }
@@ -1265,7 +1360,7 @@
     margin: 0;
     padding-top: 2px;
     color: var(--muted);
-    font-size: 10px;
+    font-size: calc(10px * var(--font-scale));
     line-height: 1.65;
   }
 
@@ -1274,7 +1369,7 @@
     border-top: 1px solid var(--border);
     background: var(--panel-2);
     color: var(--muted);
-    font-size: 9.5px;
+    font-size: calc(9.5px * var(--font-scale));
     text-align: right;
   }
 
@@ -1290,7 +1385,36 @@
     border-radius: 16px;
     background: var(--panel);
     color: var(--muted);
-    font-size: 12px;
+    font-size: calc(12px * var(--font-scale));
+  }
+
+  .loading-state.error-state {
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px;
+    border-color: var(--red);
+    background: color-mix(in srgb, var(--red) 6%, var(--panel));
+    color: var(--text);
+    text-align: center;
+  }
+
+  .error-state strong {
+    color: var(--red);
+    font-size: calc(15px * var(--font-scale));
+  }
+
+  .error-state p {
+    max-width: 680px;
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  .error-state code {
+    padding: 2px 5px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--panel-2);
+    font-family: var(--font-stack);
   }
 
   /* ---------- Responsive ---------- */
@@ -1365,19 +1489,19 @@
     }
 
     .result-label {
-      font-size: 9.5px;
+      font-size: calc(9.5px * var(--font-scale));
     }
 
     .result-value {
-      font-size: 11.5px;
+      font-size: calc(11.5px * var(--font-scale));
     }
 
     .stat-label {
-      font-size: 10px;
+      font-size: calc(10px * var(--font-scale));
     }
 
     .stat-value {
-      font-size: 11.5px;
+      font-size: calc(11.5px * var(--font-scale));
     }
   }
 
@@ -1387,7 +1511,7 @@
     }
 
     .brand h1 {
-      font-size: 17px;
+      font-size: calc(17px * var(--font-scale));
     }
 
     .header-actions .button-label {
@@ -1422,15 +1546,15 @@
     }
 
     .result-label {
-      font-size: 8.7px;
+      font-size: calc(8.7px * var(--font-scale));
     }
 
     .result-value {
-      font-size: 10.5px;
+      font-size: calc(10.5px * var(--font-scale));
     }
 
     .result-value.is-wide {
-      font-size: 9.8px;
+      font-size: calc(9.8px * var(--font-scale));
     }
 
     .petal-thumb {
@@ -1448,7 +1572,7 @@
     }
 
     .mini-field {
-      font-size: 7.5px;
+      font-size: calc(7.5px * var(--font-scale));
     }
   }
 
@@ -1464,7 +1588,7 @@
 
     .quick-button {
       padding: 2px;
-      font-size: 8px;
+      font-size: calc(8px * var(--font-scale));
     }
 
     .setting-controls {
@@ -1508,23 +1632,23 @@
     }
 
     .result-label {
-      font-size: clamp(8.7px, 1.15vw, 11px);
+      font-size: calc(clamp(8.7px, 1.15vw, 11px) * var(--font-scale));
     }
 
     .result-value {
-      font-size: clamp(10.5px, 1.35vw, 13px);
+      font-size: calc(clamp(10.5px, 1.35vw, 13px) * var(--font-scale));
     }
 
     .result-value.is-wide {
-      font-size: clamp(9.8px, 1.2vw, 12px);
+      font-size: calc(clamp(9.8px, 1.2vw, 12px) * var(--font-scale));
     }
 
     .stat-label {
-      font-size: clamp(8.7px, 1.15vw, 11px);
+      font-size: calc(clamp(8.7px, 1.15vw, 11px) * var(--font-scale));
     }
 
     .stat-value {
-      font-size: clamp(10.5px, 1.35vw, 13px);
+      font-size: calc(clamp(10.5px, 1.35vw, 13px) * var(--font-scale));
     }
 
     .card-scroll,
@@ -1534,7 +1658,7 @@
 
     .site-footer {
       padding: 2px 12px 4px;
-      font-size: 9px;
+      font-size: calc(9px * var(--font-scale));
     }
   }
 
@@ -1544,7 +1668,7 @@
     }
 
     .quick-button {
-      font-size: clamp(8px, 2vw, 8.5px);
+      font-size: calc(clamp(8px, 2vw, 8.5px) * var(--font-scale));
     }
   }
 
@@ -1570,10 +1694,17 @@
 <div class="app">
   <header class="site-header">
     <div class="brand">
-      <img class="brand-icon" src="./image/mob.png" alt="连击计算器图标" onerror="this.style.visibility='hidden'">
+      <img class="brand-icon" src="./image/gift.png" alt="连击计算器图标" onerror="this.style.visibility='hidden'">
       <h1>连击计算器</h1>
     </div>
     <div class="header-actions">
+      <button class="icon-button" id="clearAllButton" type="button" aria-label="清空所有选择并初始化" title="清空所有选择并初始化">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 11a9 9 0 1 0 3-6.7"></path>
+          <path d="M3 4v7h7"></path>
+        </svg>
+        <span class="button-label">清空</span>
+      </button>
       <button class="icon-button" id="themeToggle" type="button" aria-label="切换至暗色主题" title="切换至暗色主题">
         <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M20.2 14.3A8.4 8.4 0 0 1 9.7 3.8 8.4 8.4 0 1 0 20.2 14.3Z"></path>
@@ -1610,9 +1741,9 @@
             <span class="input-label"><b>Damage</b><small>每刻</small></span>
             <input class="number-input" id="inputDamage" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Damage，每刻普通伤害">
           </label>
-          <label class="input-row" for="inputPosion">
-            <span class="input-label"><b>Posion</b><small>每秒</small></span>
-            <input class="number-input" id="inputPosion" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Posion，每秒毒伤">
+          <label class="input-row" for="inputPoison">
+            <span class="input-label"><b>Poison</b><small>每秒</small></span>
+            <input class="number-input" id="inputPoison" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Poison，每秒毒伤">
           </label>
           <label class="input-row" for="inputFire">
             <span class="input-label"><b>Fire</b><small>每秒</small></span>
@@ -1754,9 +1885,19 @@
         <input class="setting-number" id="fireRateNumber" type="number" min="1" max="2" step="0.05" value="1.5" inputmode="decimal" aria-label="Fire Rate 数值">
       </div>
     </div>
-    <p class="setting-tip">修改后即时生效。</p>
+    <div class="setting-block">
+      <div class="setting-label">
+        <label for="fontScaleNumber">字号</label>
+        <span>80 – 140 % / 步长 5</span>
+      </div>
+      <div class="setting-controls">
+        <input class="setting-slider" id="fontScaleRange" type="range" min="80" max="140" step="5" value="100" aria-label="字号滑动条">
+        <input class="setting-number" id="fontScaleNumber" type="number" min="80" max="140" step="5" value="100" inputmode="numeric" aria-label="字号百分比">
+      </div>
+    </div>
+    <p class="setting-tip">修改后即时生效，关闭设置窗口时保存。</p>
   </div>
-  <div class="modal-foot">刷新页面重置选择 · TPS 默认 20 · 火伤倍率 默认 1.5</div>
+  <div class="modal-foot">TPS 默认 20 · 火伤倍率 默认 1.5 · 字号默认 100%</div>
 </dialog>
 
 <script>
@@ -1764,7 +1905,7 @@
   'use strict';
 
   /* ------------------------------------------------------------------
-   * Constants and fallback data
+   * Constants and application state
    * ------------------------------------------------------------------ */
 
   var RARITIES = ['unique', 'omega', 'super', 'ultra'];
@@ -1786,59 +1927,11 @@
   var STORAGE_THEME = 'combo-calc-theme';
   var STORAGE_SETTINGS = 'combo-calc-settings';
 
-  var FALLBACK_DATA = {
-    dps: {
-      trident: {
-        super: { hp: 32805, armor: 10935, fusion: 3 },
-        ultra: { hp: 10935, armor: 3645, fusion: 3 }
-      },
-      bone: {
-        unique: { hp: 59049, armor: 767637 },
-        omega: { hp: 19683, armor: 255879 }
-      },
-      magic_bone: {
-        unique: { hp: 1476225, armor: 1180980 },
-        omega: { hp: 492075, armor: 393660 }
-      },
-      maple: {
-        unique: { hp: 2361960, armor: 177147 },
-        omega: { hp: 787320, armor: 59049 }
-      }
-    },
-    heal: {
-      chromosome: {
-        unique: { heal: 984150 },
-        omega: { heal: 328050 },
-        super: { heal: 109350 }
-      }
-    },
-    shield: {
-      magic_chromosome: {
-        omega: { shield: 721710, harmony_stack: true },
-        super: { shield: 240570, harmony_stack: true }
-      }
-    },
-    dmg_reduce: {
-      neurotoxin: {
-        omega: { dmg_reduce: 0.6 },
-        super: { dmg_reduce: 0.45 },
-        ultra: { dmg_reduce: 0.4 }
-      }
-    },
-    increase_max_hp: {
-      golden_cactus: {
-        omega: { increase_max_hp: 0.55 },
-        super: { increase_max_hp: 0.34 },
-        ultra: { increase_max_hp: 0.21 }
-      }
-    }
-  };
-
   var state = {
     data: null,
     entries: new Map(),
-    settings: { tps: 20, fireRate: 1.5 },
-    inputs: { damage: 0, posion: 0, fire: 0 },
+    settings: { tps: 20, fireRate: 1.5, fontScale: 100 },
+    inputs: { damage: 0, poison: 0, fire: 0 },
     talent: 0,
     selected: { dps: null, dmg_reduce: null, increase_max_hp: null },
     fusion: {},
@@ -2010,8 +2103,22 @@
     return Number((Math.round(n / 0.05) * 0.05).toFixed(2));
   }
 
+  function normalizeFontScale(value) {
+    var n = Number(value);
+    if (!Number.isFinite(n)) {
+      return 100;
+    }
+    n = clamp(n, 80, 140);
+    return Math.round(n / 5) * 5;
+  }
+
+  function applyFontScale() {
+    var scale = normalizeFontScale(state.settings.fontScale) / 100;
+    document.documentElement.style.setProperty('--font-scale', String(scale));
+  }
+
   function loadSettings() {
-    var result = { tps: 20, fireRate: 1.5 };
+    var result = { tps: 20, fireRate: 1.5, fontScale: 100 };
     var raw = readStorage(STORAGE_SETTINGS);
     if (raw) {
       try {
@@ -2024,6 +2131,10 @@
         if (Number.isFinite(fireRate) && fireRate >= 1 && fireRate <= 2) {
           result.fireRate = normalizeFireRate(fireRate);
         }
+        var fontScale = Number(parsed.fontScale);
+        if (Number.isFinite(fontScale) && fontScale >= 80 && fontScale <= 140) {
+          result.fontScale = normalizeFontScale(fontScale);
+        }
       } catch (error) {
         /* Keep defaults for malformed storage. */
       }
@@ -2034,7 +2145,8 @@
   function saveSettings() {
     writeStorage(STORAGE_SETTINGS, JSON.stringify({
       tps: state.settings.tps,
-      fireRate: state.settings.fireRate
+      fireRate: state.settings.fireRate,
+      fontScale: state.settings.fontScale
     }));
   }
 
@@ -2078,20 +2190,15 @@
   }
 
   async function loadPetalData() {
-    try {
-      var response = await fetch('./petal.json', { cache: 'no-store' });
-      if (!response.ok) {
-        throw new Error('HTTP ' + response.status);
-      }
-      var data = await response.json();
-      if (!isValidData(data)) {
-        throw new Error('petal.json 数据结构不正确');
-      }
-      return data;
-    } catch (error) {
-      console.warn('读取 petal.json 失败，使用内置数据。', error);
-      return FALLBACK_DATA;
+    var response = await fetch('./petal.json', { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error('读取 petal.json 失败：HTTP ' + response.status);
     }
+    var data = await response.json();
+    if (!isValidData(data)) {
+      throw new Error('petal.json 数据结构不正确，必须包含 dps、heal、shield、dmg_reduce、increase_max_hp。');
+    }
+    return data;
   }
 
   function indexEntries() {
@@ -2247,8 +2354,8 @@
     return total;
   }
 
-  function findMaxTps(healTotal, shieldTotal, normalTick, posion, fire, fireRate) {
-    var incomingWithoutNormal = posion + fire * fireRate;
+  function findMaxTps(healTotal, shieldTotal, normalTick, poison, fire, fireRate) {
+    var incomingWithoutNormal = poison + fire * fireRate;
     for (var tps = 25; tps >= 10; tps -= 1) {
       if (healTotal + shieldTotal >= normalTick * tps + incomingWithoutNormal) {
         return tps;
@@ -2315,9 +2422,9 @@
     var drPercent = dr * 100;
 
     var normalTick = Math.max(0, state.inputs.damage * (1 - dr) - armor);
-    var posionTick = state.inputs.posion / tps;
+    var poisonTick = state.inputs.poison / tps;
     var fireTick = state.inputs.fire * fireRate / tps;
-    var totalDamageTick = normalTick + posionTick + fireTick;
+    var totalDamageTick = normalTick + poisonTick + fireTick;
     var damagePerSecond = totalDamageTick * tps;
     var healTick = healTotal / tps;
     var shieldTick = shieldTotal / tps;
@@ -2327,8 +2434,13 @@
       theoreticalHpPerSecond < 0 &&
       theoreticalHpPerSecond >= -COMBO_EPSILON
     ) ? 0 : theoreticalHpPerSecond;
-    var comboable = theoreticalHpPerSecond >= -COMBO_EPSILON;
-    var maxTps = findMaxTps(healTotal, shieldTotal, normalTick, state.inputs.posion, state.inputs.fire, fireRate);
+
+    /* Healing happens after damage, so a lethal first hit cannot be comboed. */
+    var firstTickShield = Math.min(hp, shieldTick);
+    var firstTickLethal = Boolean(dps) && totalDamageTick >= hp + firstTickShield;
+
+    var comboable = theoreticalHpPerSecond >= -COMBO_EPSILON && !firstTickLethal;
+    var maxTps = findMaxTps(healTotal, shieldTotal, normalTick, state.inputs.poison, state.inputs.fire, fireRate);
 
     var denominator = healTick + shieldTick;
     var pressure;
@@ -2341,7 +2453,9 @@
     var maxDamage = (hp + shieldTick + armor) / (1 - dr);
 
     var breakResult = null;
-    if (dps && !comboable) {
+    if (dps && firstTickLethal) {
+      breakResult = { broken: true, tick: 1 };
+    } else if (dps && !comboable) {
       breakResult = simulateBreak(hp, shieldTick, healTick, totalDamageTick, tps);
     }
 
@@ -2361,7 +2475,7 @@
       dr: dr,
       drPercent: drPercent,
       normalTick: normalTick,
-      posionTick: posionTick,
+      poisonTick: poisonTick,
       fireTick: fireTick,
       totalDamageTick: totalDamageTick,
       damagePerSecond: damagePerSecond,
@@ -2603,6 +2717,7 @@
   }
 
   function makeMiniNumber(kind, key, labelText, min, max, step, value, ariaLabel, extraClass) {
+    var editor = makeElement('div', 'number-editor');
     var label = makeElement('label', 'mini-field');
     label.appendChild(makeElement('span', null, labelText));
     var input = makeElement('input', 'mini-input' + (extraClass ? ' ' + extraClass : ''));
@@ -2615,7 +2730,29 @@
     input.dataset.key = key;
     input.setAttribute('aria-label', ariaLabel);
     label.appendChild(input);
-    return label;
+    editor.appendChild(label);
+
+    var actions = makeElement('div', 'step-actions');
+    [
+      { text: '+1', step: '1', title: '增加 1' },
+      { text: '-1', step: '-1', title: '减少 1' },
+      { text: 'clear', step: 'clear', title: '恢复默认值', clear: true }
+    ].forEach(function (action) {
+      var button = makeElement(
+        'button',
+        'step-button' + (action.clear ? ' is-clear' : ''),
+        action.text
+      );
+      button.type = 'button';
+      button.dataset.stepKind = kind;
+      button.dataset.key = key;
+      button.dataset.step = action.step;
+      button.title = action.title;
+      button.setAttribute('aria-label', ariaLabel + ' ' + action.text);
+      actions.appendChild(button);
+    });
+    editor.appendChild(actions);
+    return editor;
   }
 
   function makePetalItem(entry) {
@@ -2758,7 +2895,17 @@
     var count = makeElement('span', 'card-badge', '0');
     count.dataset.countType = type;
     count.title = meta.kind === 'single' ? '已选择数量' : '数量合计';
-    head.appendChild(count);
+
+    var clearButton = makeElement('button', 'card-clear', '清空');
+    clearButton.type = 'button';
+    clearButton.dataset.clearType = type;
+    clearButton.title = '清空本系列所有选择';
+    clearButton.setAttribute('aria-label', '清空' + meta.title + '的所有选择');
+
+    var headActions = makeElement('div', 'card-head-actions');
+    headActions.appendChild(clearButton);
+    headActions.appendChild(count);
+    head.appendChild(headActions);
     card.appendChild(head);
 
     var scroll = makeElement('div', 'card-scroll');
@@ -2787,6 +2934,137 @@
     });
     ui.talentCoef = byId('talentCoef');
     ui.talentMeter = byId('talentMeter');
+  }
+
+  function showDataError(error) {
+    var message = error && error.message ? error.message : String(error);
+    state.data = null;
+    state.entries.clear();
+
+    ui.statHp.textContent = '-';
+    ui.statArmor.textContent = '-';
+    ui.statHeal.textContent = '-';
+    ui.statShield.textContent = '-';
+    ui.statDr.textContent = '-';
+    ui.hpFormula.textContent = '';
+    setResult(ui.resCombo, '\u2014', 'muted');
+    setResult(ui.resMaxTps, '\u2014', 'muted');
+    setResult(ui.resDps, '\u2014', 'muted');
+    setResult(ui.resHps, '\u2014', 'muted');
+    setResult(ui.resBreak, '\u2014', 'muted', true);
+    setResult(ui.resPressure, '\u2014', 'muted');
+    setResult(ui.resMaxDamage, '\u2014', 'muted');
+
+    var maskTitle = ui.resultsMask.querySelector('strong');
+    var maskHint = ui.resultsMask.querySelector('span');
+    if (maskTitle) {
+      maskTitle.textContent = '花瓣数据读取失败';
+    }
+    if (maskHint) {
+      maskHint.textContent = '请检查 ./petal.json';
+    }
+    ui.resultsMask.hidden = false;
+
+    ui.previewImage.hidden = true;
+    ui.previewImage.removeAttribute('src');
+    ui.previewImage.alt = '';
+    ui.previewFrame.classList.add('is-empty');
+    ui.previewFrame.classList.remove('image-missing');
+    ui.previewFrame.removeAttribute('title');
+
+    ui.contentGrid.innerHTML = '';
+    var errorBox = makeElement('div', 'loading-state error-state');
+    errorBox.setAttribute('role', 'alert');
+    errorBox.appendChild(makeElement('strong', null, '读取 petal.json 失败'));
+    var messageLine = makeElement('p');
+    messageLine.appendChild(document.createTextNode(message));
+    errorBox.appendChild(messageLine);
+    var helpLine = makeElement('p');
+    helpLine.appendChild(document.createTextNode('请通过 HTTP 静态服务器打开本页，并确认 '));
+    helpLine.appendChild(makeElement('code', null, './petal.json'));
+    helpLine.appendChild(document.createTextNode(' 可访问且格式正确。页面不再使用内置兜底数据。'));
+    errorBox.appendChild(helpLine);
+    ui.contentGrid.appendChild(errorBox);
+
+    console.error('读取 petal.json 失败。', error);
+  }
+
+  function handleNumericStep(button) {
+    var kind = button.dataset.stepKind;
+    var key = button.dataset.key;
+    var step = button.dataset.step;
+    var entry = state.entries.get(key);
+    if (!entry) {
+      return;
+    }
+
+    var editor = button.closest('.number-editor');
+    var input = editor ? editor.querySelector('.mini-input') : null;
+
+    if (kind === 'quantity') {
+      var quantity = quantityFor(entry.type, key);
+      var nextQuantity = step === 'clear'
+        ? 0
+        : clamp(quantity + (step === '1' ? 1 : -1), 0, 20);
+      state.quantities[entry.type][key] = nextQuantity;
+      if (input) {
+        input.value = String(nextQuantity);
+      }
+      render();
+    } else if (kind === 'fusion') {
+      var max = fusionMax(entry);
+      if (max === null) {
+        return;
+      }
+      var fusion = fusionFor(entry);
+      var nextFusion = step === 'clear'
+        ? 1
+        : clamp(fusion + (step === '1' ? 1 : -1), 1, max);
+      state.fusion[key] = nextFusion;
+      if (input) {
+        input.value = String(nextFusion);
+      }
+      render();
+    }
+  }
+
+  function clearPetalType(type) {
+    if (!state.data || TYPES.indexOf(type) === -1) {
+      return;
+    }
+
+    if (type === 'dps') {
+      state.selected.dps = null;
+      state.fusion = {};
+    } else if (type === 'dmg_reduce' || type === 'increase_max_hp') {
+      state.selected[type] = null;
+    } else {
+      state.quantities[type] = {};
+    }
+
+    var card = ui.contentGrid.querySelector('[data-card="' + type + '"]');
+    if (card) {
+      card.replaceWith(makeTypeCard(type));
+    }
+    render();
+  }
+
+  function clearAllSelections() {
+    state.inputs = { damage: 0, poison: 0, fire: 0 };
+    state.talent = 0;
+    state.selected = { dps: null, dmg_reduce: null, increase_max_hp: null };
+    state.fusion = {};
+    state.quantities = { heal: {}, shield: {} };
+    syncTopInputValues();
+
+    if (state.data) {
+      buildCards();
+      render();
+      var scrollArea = ui.contentGrid.parentElement;
+      if (scrollArea) {
+        scrollArea.scrollTop = 0;
+      }
+    }
   }
 
   function updateChoiceVisuals() {
@@ -2835,13 +3113,13 @@
 
   function syncTopInputValues() {
     ui.inputDamage.value = String(state.inputs.damage);
-    ui.inputPosion.value = String(state.inputs.posion);
+    ui.inputPoison.value = String(state.inputs.poison);
     ui.inputFire.value = String(state.inputs.fire);
   }
 
   function performDamageAction(action) {
     var damage = Number.isFinite(state.inputs.damage) ? state.inputs.damage : 0;
-    var posion = Number.isFinite(state.inputs.posion) ? state.inputs.posion : 0;
+    var poison = Number.isFinite(state.inputs.poison) ? state.inputs.poison : 0;
     var fire = Number.isFinite(state.inputs.fire) ? state.inputs.fire : 0;
 
     switch (action) {
@@ -2849,7 +3127,7 @@
         damage = 0;
         break;
       case 'clear-status':
-        posion = 0;
+        poison = 0;
         fire = 0;
         break;
       case 'set-normal-65610':
@@ -2869,12 +3147,12 @@
         break;
       case 'multiply-all-3':
         damage = normalizeActionDamage(damage * 3);
-        posion = normalizeActionDamage(posion * 3);
+        poison = normalizeActionDamage(poison * 3);
         fire = normalizeActionDamage(fire * 3);
         break;
       case 'divide-all-3':
         damage = normalizeActionDamage(damage / 3);
-        posion = normalizeActionDamage(posion / 3);
+        poison = normalizeActionDamage(poison / 3);
         fire = normalizeActionDamage(fire / 3);
         break;
       default:
@@ -2882,7 +3160,7 @@
     }
 
     state.inputs.damage = damage;
-    state.inputs.posion = posion;
+    state.inputs.poison = poison;
     state.inputs.fire = fire;
     syncTopInputValues();
     render();
@@ -3037,11 +3315,22 @@
   function bindCardEvents() {
     ui.contentGrid.addEventListener('input', handleGridInput);
     ui.contentGrid.addEventListener('change', handleGridChange);
+    ui.contentGrid.addEventListener('click', function (event) {
+      var stepButton = event.target.closest('.step-button');
+      if (stepButton) {
+        handleNumericStep(stepButton);
+        return;
+      }
+      var clearButton = event.target.closest('[data-clear-type]');
+      if (clearButton) {
+        clearPetalType(clearButton.dataset.clearType);
+      }
+    });
   }
 
   function bindStaticEvents() {
     bindTopInput('damage', ui.inputDamage);
-    bindTopInput('posion', ui.inputPosion);
+    bindTopInput('poison', ui.inputPoison);
     bindTopInput('fire', ui.inputFire);
 
     document.querySelectorAll('[data-damage-action]').forEach(function (button) {
@@ -3049,6 +3338,8 @@
         performDamageAction(button.dataset.damageAction);
       });
     });
+
+    ui.clearAllButton.addEventListener('click', clearAllSelections);
 
     ui.themeToggle.addEventListener('click', function () {
       var current = document.documentElement.getAttribute('data-theme');
@@ -3129,6 +3420,28 @@
     ui.fireRateNumber.addEventListener('change', function () {
       finalizeSettings();
     });
+
+    ui.fontScaleRange.addEventListener('input', function () {
+      var value = normalizeFontScale(ui.fontScaleRange.value);
+      state.settings.fontScale = value;
+      ui.fontScaleNumber.value = String(value);
+      applyFontScale();
+      saveSettings();
+    });
+
+    ui.fontScaleNumber.addEventListener('input', function () {
+      var value = Number(ui.fontScaleNumber.value);
+      if (Number.isFinite(value) && value >= 80 && value <= 140) {
+        state.settings.fontScale = normalizeFontScale(value);
+        ui.fontScaleRange.value = String(state.settings.fontScale);
+        applyFontScale();
+        saveSettings();
+      }
+    });
+
+    ui.fontScaleNumber.addEventListener('change', function () {
+      finalizeSettings();
+    });
   }
 
   function finalizeSettings() {
@@ -3142,9 +3455,17 @@
     } else {
       fireRate = normalizeFireRate(fireRate);
     }
+    var fontScale = Number(ui.fontScaleNumber.value);
+    if (!Number.isFinite(fontScale) || fontScale < 80 || fontScale > 140) {
+      fontScale = 100;
+    } else {
+      fontScale = normalizeFontScale(fontScale);
+    }
     state.settings.tps = tps;
     state.settings.fireRate = fireRate;
+    state.settings.fontScale = fontScale;
     syncSettingsUI(true);
+    applyFontScale();
     saveSettings();
     render();
   }
@@ -3156,9 +3477,11 @@
     if (forceValues !== false) {
       ui.tpsNumber.value = String(state.settings.tps);
       ui.fireRateNumber.value = String(state.settings.fireRate);
+      ui.fontScaleNumber.value = String(state.settings.fontScale);
     }
     ui.tpsRange.value = String(state.settings.tps);
     ui.fireRateRange.value = String(state.settings.fireRate);
+    ui.fontScaleRange.value = String(state.settings.fontScale);
   }
 
   /* ------------------------------------------------------------------
@@ -3166,6 +3489,7 @@
    * ------------------------------------------------------------------ */
 
   function cacheUi() {
+    ui.clearAllButton = byId('clearAllButton');
     ui.themeToggle = byId('themeToggle');
     ui.themeLabel = byId('themeLabel');
     ui.settingsButton = byId('settingsButton');
@@ -3175,9 +3499,11 @@
     ui.tpsNumber = byId('tpsNumber');
     ui.fireRateRange = byId('fireRateRange');
     ui.fireRateNumber = byId('fireRateNumber');
+    ui.fontScaleRange = byId('fontScaleRange');
+    ui.fontScaleNumber = byId('fontScaleNumber');
     ui.contentGrid = byId('contentGrid');
     ui.inputDamage = byId('inputDamage');
-    ui.inputPosion = byId('inputPosion');
+    ui.inputPoison = byId('inputPoison');
     ui.inputFire = byId('inputFire');
     ui.statHp = byId('statHp');
     ui.statArmor = byId('statArmor');
@@ -3204,6 +3530,7 @@
     cacheUi();
     initializeTheme();
     state.settings = loadSettings();
+    applyFontScale();
     syncSettingsUI(true);
     bindStaticEvents();
 
@@ -3211,8 +3538,14 @@
       wireImageFallback(ui.previewImage);
     }
 
-    state.data = await loadPetalData();
-    indexEntries();
+    try {
+      state.data = await loadPetalData();
+      indexEntries();
+    } catch (error) {
+      showDataError(error);
+      return;
+    }
+
     buildCards();
     bindCardEvents();
     render();
