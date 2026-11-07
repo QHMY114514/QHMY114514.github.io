@@ -19,3 +19,7 @@
 ## [小球战争](./html/war)
 
 一个耗时约8~15分钟的肉鸽
+
+## [连击计算器](./html/combocal)
+
+使用Deepseek制作的zorr.pro花瓣连击计算器

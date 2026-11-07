@@ -10,7 +10,7 @@ const path = require('path');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: '狐莱姆在盯着你...',
+  title: '乾狐离光的小站',
   tagline: '可安可可可爱了!',
   favicon: 'img/favicon.ico',
 
@@ -112,11 +112,6 @@ const config = {
             position: 'left',
           },
           {
-            href: 'https://api.lolimi.cn/60/',
-            label: '每日60秒',
-            position: 'left',
-          },
-          {
             href: 'https://github.com/QHMY114514',
             label: 'MyGitHub',
             position: 'right',
@@ -182,10 +177,6 @@ const config = {
               {
                 label: 'KasumiBot(by 户山兔兔)',
                 href: 'https://ksmbot.top',
-              },
-              {
-                label: '桑帛云API',
-                href: 'https://api.lolimi.cn',
               },
               {
                 label: '孤影墨香',
