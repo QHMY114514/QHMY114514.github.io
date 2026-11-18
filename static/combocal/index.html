@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f6f8">
-<title>连击计算器</title>
+<title>Combo Calculator</title>
 <link rel="icon" type="image/png" href="./image/gift.png">
 <script>
   (function () {
@@ -279,6 +279,22 @@
     color: var(--muted);
     font-size: calc(9px * var(--font-scale));
     letter-spacing: 0.04em;
+  }
+
+  .title-cn {
+    margin-left: 6px;
+    color: var(--muted);
+    font-size: 0.72em;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  .inline-cn {
+    margin-left: 4px;
+    color: var(--muted);
+    font-size: 0.82em;
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
 
   /* ---------- Top fixed deck ---------- */
@@ -965,18 +981,39 @@
     font-weight: 700;
     letter-spacing: 0.07em;
     line-height: 1;
-    text-transform: uppercase;
+    text-transform: lowercase;
   }
 
-  [data-rarity="unique"] { color: #c26b1b; }
-  [data-rarity="omega"] { color: #8b5cf6; }
-  [data-rarity="super"] { color: #0e8fbf; }
-  [data-rarity="ultra"] { color: #2e8b57; }
+  [data-rarity="defalt"] { --rarity-color: #d8d8d8; }
+  [data-rarity="unique"] { --rarity-color: #444444; }
+  [data-rarity="omega"] { --rarity-color: #f329d9; }
+  [data-rarity="super"] { --rarity-color: #2bffa3; }
+  [data-rarity="ultra"] { --rarity-color: #ff2b75; }
 
-  html[data-theme="dark"] [data-rarity="unique"] { color: #f5a855; }
-  html[data-theme="dark"] [data-rarity="omega"] { color: #b794ff; }
-  html[data-theme="dark"] [data-rarity="super"] { color: #5bc8ef; }
-  html[data-theme="dark"] [data-rarity="ultra"] { color: #63d994; }
+  .rarity-badge {
+    color: var(--rarity-color, var(--text));
+  }
+
+  .petal-item[data-rarity] .petal-name {
+    color: var(--rarity-color, var(--text));
+    -webkit-text-stroke: 0.3px rgba(15, 23, 42, 0.6);
+    text-shadow: 0 0 1px rgba(15, 23, 42, 0.75), 0 0 3px rgba(15, 23, 42, 0.45);
+  }
+
+  .rarity-badge {
+    -webkit-text-stroke: 0.25px rgba(15, 23, 42, 0.55);
+    text-shadow: 0 0 1px rgba(15, 23, 42, 0.7), 0 0 2px rgba(15, 23, 42, 0.35);
+  }
+
+  html[data-theme="dark"] .petal-item[data-rarity] .petal-name {
+    -webkit-text-stroke-color: rgba(255, 255, 255, 0.58);
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.72), 0 0 3px rgba(255, 255, 255, 0.38);
+  }
+
+  html[data-theme="dark"] .rarity-badge {
+    -webkit-text-stroke-color: rgba(255, 255, 255, 0.52);
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.65), 0 0 2px rgba(255, 255, 255, 0.3);
+  }
 
   .attr-line {
     display: flex;
@@ -1019,6 +1056,57 @@
     flex: 0 0 auto;
     align-items: center;
     gap: 5px;
+  }
+
+  .custom-petal {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    border-color: color-mix(in srgb, var(--border) 80%, var(--accent));
+    background:
+      linear-gradient(145deg, var(--panel-2), var(--panel));
+  }
+
+  .custom-petal .petal-main {
+    width: 100%;
+  }
+
+  .custom-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .custom-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+    color: var(--muted);
+    font-size: calc(8px * var(--font-scale));
+    font-weight: 650;
+  }
+
+  .custom-input {
+    width: 100%;
+    height: 26px;
+    padding: 1px 4px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    outline: none;
+    background: var(--panel);
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: calc(11px * var(--font-scale));
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    text-align: right;
+    transition: border-color 130ms ease, box-shadow 130ms ease;
+  }
+
+  .custom-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-soft);
   }
 
   .mini-field {
@@ -1694,18 +1782,18 @@
 <div class="app">
   <header class="site-header">
     <div class="brand">
-      <img class="brand-icon" src="./image/gift.png" alt="连击计算器图标" onerror="this.style.visibility='hidden'">
-      <h1>连击计算器</h1>
+      <img class="brand-icon" src="./image/gift.png" alt="Combo Calculator icon" onerror="this.style.visibility='hidden'">
+      <h1>Combo Calculator <small class="title-cn">连击计算器</small></h1>
     </div>
     <div class="header-actions">
-      <button class="icon-button" id="clearAllButton" type="button" aria-label="清空所有选择并初始化" title="清空所有选择并初始化">
+      <button class="icon-button" id="clearAllButton" type="button" aria-label="Reset calculator, including custom petal values" title="Reset calculator, including custom petal values / 重置计算器（含自定义花瓣）">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3 11a9 9 0 1 0 3-6.7"></path>
           <path d="M3 4v7h7"></path>
         </svg>
-        <span class="button-label">清空</span>
+        <span class="button-label">Reset</span>
       </button>
-      <button class="icon-button" id="themeToggle" type="button" aria-label="切换至暗色主题" title="切换至暗色主题">
+      <button class="icon-button" id="themeToggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme">
         <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M20.2 14.3A8.4 8.4 0 0 1 9.7 3.8 8.4 8.4 0 1 0 20.2 14.3Z"></path>
         </svg>
@@ -1713,53 +1801,52 @@
           <circle cx="12" cy="12" r="3.7"></circle>
           <path d="M12 2.2v2M12 19.8v2M4.6 4.6 6 6M18 18l1.4 1.4M2.2 12h2M19.8 12h2M4.6 19.4 6 18M18 6l1.4-1.4"></path>
         </svg>
-        <span class="button-label" id="themeLabel">暗色</span>
+        <span class="button-label" id="themeLabel">Dark</span>
       </button>
       <button class="icon-button" id="settingsButton" type="button" aria-haspopup="dialog" aria-controls="settingsDialog">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="3.1"></circle>
           <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.95 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.58 15 1.7 1.7 0 0 0 3.03 14H3v-4h.08A1.7 1.7 0 0 0 4.6 8.95a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 8.97 4.6 1.7 1.7 0 0 0 10 3.03V3h4v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 20.97 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"></path>
         </svg>
-        <span class="button-label">设置</span>
+        <span class="button-label">Settings</span>
       </button>
     </div>
   </header>
 
-  <section class="control-deck" aria-label="输入与计算结果">
+  <section class="control-deck" aria-label="Inputs and results">
     <div class="deck-creature">
       <div class="mob-panel">
-        <img src="./image/mob.png" alt="生物图标" onerror="this.style.visibility='hidden'">
+        <img src="./image/mob.png" alt="Mob icon" onerror="this.style.visibility='hidden'">
       </div>
 
       <div class="input-panel panel">
         <div class="panel-heading">
-          <h2>输入</h2>
-          <span class="heading-hint">INPUT</span>
+          <h2>Mob <small class="title-cn">生物</small></h2>
         </div>
         <div class="input-grid">
           <label class="input-row" for="inputDamage">
             <span class="input-label"><b>Damage</b><small>每刻</small></span>
-            <input class="number-input" id="inputDamage" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Damage，每刻普通伤害">
+            <input class="number-input" id="inputDamage" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Damage per tick">
           </label>
           <label class="input-row" for="inputPoison">
             <span class="input-label"><b>Poison</b><small>每秒</small></span>
-            <input class="number-input" id="inputPoison" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Poison，每秒毒伤">
+            <input class="number-input" id="inputPoison" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Poison damage per second">
           </label>
           <label class="input-row" for="inputFire">
             <span class="input-label"><b>Fire</b><small>每秒</small></span>
-            <input class="number-input" id="inputFire" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Fire，每秒火伤">
+            <input class="number-input" id="inputFire" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Fire damage per second">
           </label>
         </div>
-        <div class="damage-actions" role="group" aria-label="生物伤害快捷操作">
-          <button class="quick-button is-danger" type="button" data-damage-action="clear-normal" title="将普通伤害清空为 0">普通伤害清空</button>
-          <button class="quick-button is-danger" type="button" data-damage-action="clear-status" title="将毒伤和火伤清空为 0">火毒清空</button>
-          <button class="quick-button is-emphasis" type="button" data-damage-action="set-normal-65610" title="将普通伤害设置为 65610">设为65610</button>
-          <button class="quick-button" type="button" data-damage-action="add-normal-65610" title="普通伤害增加 65610">普通+65610</button>
-          <button class="quick-button" type="button" data-damage-action="sub-normal-65610" title="普通伤害减少 65610">普通-65610</button>
-          <button class="quick-button" type="button" data-damage-action="add-normal-32805" title="普通伤害增加 32805">普通+32805</button>
-          <button class="quick-button" type="button" data-damage-action="sub-normal-32805" title="普通伤害减少 32805">普通-32805</button>
-          <button class="quick-button is-emphasis" type="button" data-damage-action="multiply-all-3" title="所有伤害乘以 3">所有伤害*3</button>
-          <button class="quick-button is-emphasis" type="button" data-damage-action="divide-all-3" title="所有伤害除以 3">所有伤害/3</button>
+        <div class="damage-actions" role="group" aria-label="Quick damage actions">
+          <button class="quick-button is-danger" type="button" data-damage-action="clear-normal" title="Clear normal damage / 普通伤害清空">Clear Normal</button>
+          <button class="quick-button is-danger" type="button" data-damage-action="clear-status" title="Clear fire and poison / 火毒清空">Clear DoT</button>
+          <button class="quick-button is-emphasis" type="button" data-damage-action="set-normal-65610" title="Set normal damage to 65610 / 设置为 65610">Set Normal 65610</button>
+          <button class="quick-button" type="button" data-damage-action="add-normal-65610" title="Normal damage +65610 / 普通伤害增加 65610">Normal +65610</button>
+          <button class="quick-button" type="button" data-damage-action="sub-normal-65610" title="Normal damage -65610 / 普通伤害减少 65610">Normal -65610</button>
+          <button class="quick-button" type="button" data-damage-action="add-normal-32805" title="Normal damage +32805 / 普通伤害增加 32805">Normal +32805</button>
+          <button class="quick-button" type="button" data-damage-action="sub-normal-32805" title="Normal damage -32805 / 普通伤害减少 32805">Normal -32805</button>
+          <button class="quick-button is-emphasis" type="button" data-damage-action="multiply-all-3" title="All damage ×3 / 所有伤害 ×3">All Damage *3</button>
+          <button class="quick-button is-emphasis" type="button" data-damage-action="divide-all-3" title="All damage ÷3 / 所有伤害 ÷3">All Damage /3</button>
         </div>
       </div>
     </div>
@@ -1768,29 +1855,28 @@
       <div class="stats-grid">
         <section class="stats-panel panel" aria-labelledby="statsTitle">
           <div class="panel-heading">
-            <h2 id="statsTitle">加成后的花瓣参数</h2>
-            <span class="heading-hint">STATS</span>
+            <h2 id="statsTitle">Petal <small class="title-cn">花瓣</small></h2>
           </div>
           <div class="stat-list">
             <div class="stat-row hp-stat">
-              <span class="stat-label">总耐久 HP</span>
+              <span class="stat-label">HP <small class="inline-cn">总耐久</small></span>
               <span class="stat-value" id="statHp">-</span>
             </div>
             <div class="stat-formula" id="hpFormula"></div>
             <div class="stat-row">
-              <span class="stat-label">护甲 Armor</span>
+              <span class="stat-label">Armor <small class="inline-cn">护甲</small></span>
               <span class="stat-value" id="statArmor">-</span>
             </div>
             <div class="stat-row">
-              <span class="stat-label">总治疗 Heal <small>/s</small></span>
+              <span class="stat-label">Heal/s <small class="inline-cn">总治疗</small></span>
               <span class="stat-value" id="statHeal">0.00</span>
             </div>
             <div class="stat-row">
-              <span class="stat-label">总护盾 Shield <small>/s</small></span>
+              <span class="stat-label">Shield/s <small class="inline-cn">总护盾</small></span>
               <span class="stat-value" id="statShield">0.00</span>
             </div>
             <div class="stat-row">
-              <span class="stat-label">总减伤 Damage Reduce</span>
+              <span class="stat-label">Damage Reduce <small class="inline-cn">总减伤</small></span>
               <span class="stat-value" id="statDr">0.0%</span>
             </div>
           </div>
@@ -1798,47 +1884,51 @@
 
         <section class="results-panel panel" id="resultsPanel" aria-labelledby="resultsTitle">
           <div class="panel-heading">
-            <h2 id="resultsTitle">计算结果</h2>
+            <h2 id="resultsTitle">Results <small class="title-cn">计算结果</small></h2>
             <span class="heading-hint">OUTPUT</span>
           </div>
           <div class="result-list">
             <div class="result-row">
-              <span class="result-label">Comboable</span>
+              <span class="result-label">Comboable <small class="inline-cn">连击能力</small></span>
               <span class="result-value" id="resCombo">—</span>
             </div>
             <div class="result-row">
-              <span class="result-label">Max TPS</span>
+              <span class="result-label">Max TPS <small class="inline-cn">最高可连击刻速度</small></span>
               <span class="result-value" id="resMaxTps">—</span>
             </div>
             <div class="result-row">
-              <span class="result-label">Damage per second</span>
+              <span class="result-label">Damage per second <small class="inline-cn">每秒承伤</small></span>
               <span class="result-value" id="resDps">—</span>
             </div>
             <div class="result-row">
-              <span class="result-label">HP per second</span>
+              <span class="result-label">HP per second <small class="inline-cn">每秒耐久变化</small></span>
               <span class="result-value" id="resHps">—</span>
             </div>
             <div class="result-row">
-              <span class="result-label">Break Time</span>
+              <span class="result-label">Break Time <small class="inline-cn">破坏时间</small></span>
               <span class="result-value is-wide" id="resBreak">—</span>
             </div>
             <div class="result-row">
-              <span class="result-label">Pressure</span>
+              <span class="result-label">Pressure <small class="inline-cn">染色体压力</small></span>
               <span class="result-value" id="resPressure">—</span>
             </div>
             <div class="result-row">
-              <span class="result-label">Max Damage</span>
+              <span class="result-label">Max Damage <small class="inline-cn">最高可承受单刻伤害</small></span>
               <span class="result-value" id="resMaxDamage">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label" title="Max Body Damage under current fire/poison">Max Body Damage <small class="inline-cn">最高可连击生物体伤</small></span>
+              <span class="result-value" id="resMaxBodyDamage">—</span>
             </div>
           </div>
           <div class="output-mask" id="resultsMask">
-            <strong>未选择 DPS 花瓣</strong>
-            <span>请选择一个 DPS 花瓣后计算</span>
+            <strong>Select a DPS Petal <small class="title-cn">未选择 DPS 花瓣</small></strong>
+            <span>Calculations require a selected DPS petal <small class="inline-cn">请选择一个 DPS 花瓣后计算</small></span>
           </div>
         </section>
       </div>
 
-      <div class="dps-preview" aria-label="当前 DPS 花瓣">
+      <div class="dps-preview" aria-label="Selected DPS petal">
         <div class="preview-frame is-empty" id="previewFrame">
           <img id="previewImage" alt="" hidden>
         </div>
@@ -1848,7 +1938,7 @@
 
   <div class="scroll-area" id="scrollArea">
     <div class="content-grid" id="contentGrid" aria-live="off">
-      <div class="loading-state">正在读取 petal.json …</div>
+      <div class="loading-state">Loading petal.json… <small class="title-cn">正在读取</small></div>
     </div>
   </div>
 
@@ -1857,8 +1947,8 @@
 
 <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
   <div class="modal-head">
-    <h2 id="settingsTitle">设置</h2>
-    <button class="modal-close" id="closeSettings" type="button" aria-label="关闭设置">
+    <h2 id="settingsTitle">Settings <small class="title-cn">设置</small></h2>
+    <button class="modal-close" id="closeSettings" type="button" aria-label="Close settings">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m6 6 12 12M18 6 6 18"></path>
       </svg>
@@ -1867,37 +1957,37 @@
   <div class="modal-body">
     <div class="setting-block">
       <div class="setting-label">
-        <label for="tpsNumber">计算模拟TPS</label>
-        <span>10 – 25 / 步长 1</span>
+        <label for="tpsNumber">TPS <small class="inline-cn">计算模拟</small></label>
+        <span>10 – 25 / step 1</span>
       </div>
       <div class="setting-controls">
-        <input class="setting-slider" id="tpsRange" type="range" min="10" max="25" step="1" value="20" aria-label="Caculate TPS 滑动条">
-        <input class="setting-number" id="tpsNumber" type="number" min="10" max="25" step="1" value="20" inputmode="numeric" aria-label="Caculate TPS 数值">
+        <input class="setting-slider" id="tpsRange" type="range" min="10" max="25" step="1" value="20" aria-label="TPS slider">
+        <input class="setting-number" id="tpsNumber" type="number" min="10" max="25" step="1" value="20" inputmode="numeric" aria-label="TPS value">
       </div>
     </div>
     <div class="setting-block">
       <div class="setting-label">
-        <label for="fireRateNumber">火伤倍率(火伤实际上是浮动的，计算可能不精准)</label>
-        <span>1 – 2 / 步长 0.05</span>
+        <label for="fireRateNumber">Fire Rate <small class="inline-cn">火伤倍率（浮动）</small></label>
+        <span>1 – 2 / step 0.05</span>
       </div>
       <div class="setting-controls">
-        <input class="setting-slider" id="fireRateRange" type="range" min="1" max="2" step="0.05" value="1.5" aria-label="Fire Rate 滑动条">
-        <input class="setting-number" id="fireRateNumber" type="number" min="1" max="2" step="0.05" value="1.5" inputmode="decimal" aria-label="Fire Rate 数值">
+        <input class="setting-slider" id="fireRateRange" type="range" min="1" max="2" step="0.05" value="1.5" aria-label="Fire Rate slider">
+        <input class="setting-number" id="fireRateNumber" type="number" min="1" max="2" step="0.05" value="1.5" inputmode="decimal" aria-label="Fire Rate value">
       </div>
     </div>
     <div class="setting-block">
       <div class="setting-label">
-        <label for="fontScaleNumber">字号</label>
-        <span>80 – 140 % / 步长 5</span>
+        <label for="fontScaleNumber">Font Size <small class="inline-cn">字号</small></label>
+        <span>80 – 140% / step 5</span>
       </div>
       <div class="setting-controls">
-        <input class="setting-slider" id="fontScaleRange" type="range" min="80" max="140" step="5" value="100" aria-label="字号滑动条">
-        <input class="setting-number" id="fontScaleNumber" type="number" min="80" max="140" step="5" value="100" inputmode="numeric" aria-label="字号百分比">
+        <input class="setting-slider" id="fontScaleRange" type="range" min="80" max="140" step="5" value="100" aria-label="Font size slider">
+        <input class="setting-number" id="fontScaleNumber" type="number" min="80" max="140" step="5" value="100" inputmode="numeric" aria-label="Font size percentage">
       </div>
     </div>
-    <p class="setting-tip">修改后即时生效，关闭设置窗口时保存。</p>
+    <p class="setting-tip">Changes apply immediately and are saved when this dialog closes. <span class="inline-cn">修改即时生效，关闭窗口时保存</span></p>
   </div>
-  <div class="modal-foot">TPS 默认 20 · 火伤倍率 默认 1.5 · 字号默认 100%</div>
+  <div class="modal-foot">TPS default 20 · Fire Rate default 1.5 · Font Size default 100%</div>
 </dialog>
 
 <script>
@@ -1908,8 +1998,8 @@
    * Constants and application state
    * ------------------------------------------------------------------ */
 
-  var RARITIES = ['unique', 'omega', 'super', 'ultra'];
-  var RARITY_ORDER = { unique: 0, omega: 1, super: 2, ultra: 3 };
+  var RARITIES = ['unique', 'omega', 'super', 'ultra', 'defalt'];
+  var RARITY_ORDER = { unique: 0, omega: 1, super: 2, ultra: 3, defalt: 4 };
   var TYPES = ['dps', 'heal', 'shield', 'dmg_reduce', 'increase_max_hp'];
   var SINGLE_TYPES = ['dps', 'dmg_reduce', 'increase_max_hp'];
   /* Treat a near-zero HP/s balance as comboable (0.01 tolerance). */
@@ -1917,20 +2007,24 @@
   var MAX_BREAK_SECONDS = 120;
 
   var TYPE_META = {
-    dps: { title: 'DPS 花瓣', subtitle: 'DPS PETAL', kind: 'single' },
-    heal: { title: 'Heal 花瓣', subtitle: 'HEAL PETAL', kind: 'quantity' },
-    shield: { title: 'Shield 花瓣', subtitle: 'SHIELD PETAL', kind: 'quantity' },
-    dmg_reduce: { title: 'Damage Reduce 花瓣', subtitle: 'DAMAGE REDUCE', kind: 'single' },
-    increase_max_hp: { title: 'Increase Max HP 花瓣', subtitle: 'INCREASE MAX HP', kind: 'single' }
+    dps: { title: 'DPS Petal', cn: 'DPS 花瓣', subtitle: 'SINGLE SELECT', kind: 'single' },
+    heal: { title: 'Heal Petal', cn: '治疗花瓣', subtitle: 'QUANTITY', kind: 'quantity' },
+    shield: { title: 'Shield Petal', cn: '护盾花瓣', subtitle: 'QUANTITY · HARMONY', kind: 'quantity' },
+    dmg_reduce: { title: 'Damage Reduce Petal', cn: '减伤花瓣', subtitle: 'SINGLE SELECT', kind: 'single' },
+    increase_max_hp: { title: 'Increase Max HP Petal', cn: '增血花瓣', subtitle: 'SINGLE SELECT', kind: 'single' }
   };
 
   var STORAGE_THEME = 'combo-calc-theme';
   var STORAGE_SETTINGS = 'combo-calc-settings';
+  var STORAGE_CUSTOM_PETAL = 'combo-calc-custom-petal';
+  var CUSTOM_DPS_KEY = '__custom_dps__';
+  var CUSTOM_DEFAULT = { hp: 1000, armor: 0, fusion: 1 };
 
   var state = {
     data: null,
     entries: new Map(),
     settings: { tps: 20, fireRate: 1.5, fontScale: 100 },
+    customPetal: { hp: 1000, armor: 0, fusion: 1 },
     inputs: { damage: 0, poison: 0, fire: 0 },
     talent: 0,
     selected: { dps: null, dmg_reduce: null, increase_max_hp: null },
@@ -2051,6 +2145,9 @@
   }
 
   function petalImagePath(entry) {
+    if (entry.isCustom) {
+      return './image/custom_petal.png';
+    }
     var rarity = String(entry.rarity).toLowerCase();
     var petal = String(entry.petal).toLowerCase().replace(/\s+/g, '_');
     return './image/' + rarity + '_' + petal + '_200x200.png';
@@ -2150,16 +2247,72 @@
     }));
   }
 
+  function loadCustomPetal() {
+    var result = {
+      hp: CUSTOM_DEFAULT.hp,
+      armor: CUSTOM_DEFAULT.armor,
+      fusion: CUSTOM_DEFAULT.fusion
+    };
+    var raw = readStorage(STORAGE_CUSTOM_PETAL);
+    if (raw) {
+      try {
+        var parsed = JSON.parse(raw);
+        var hp = Number(parsed.hp);
+        if (Number.isFinite(hp) && hp > 1) {
+          result.hp = hp;
+        }
+        var armor = Number(parsed.armor);
+        if (Number.isFinite(armor)) {
+          result.armor = armor;
+        }
+        var fusion = Number(parsed.fusion);
+        if (Number.isInteger(fusion) && fusion >= 1 && fusion <= 69) {
+          result.fusion = fusion;
+        }
+      } catch (error) {
+        /* Keep defaults for malformed custom petal storage. */
+      }
+    }
+    return result;
+  }
+
+  function saveCustomPetal() {
+    writeStorage(STORAGE_CUSTOM_PETAL, JSON.stringify({
+      hp: state.customPetal.hp,
+      armor: state.customPetal.armor,
+      fusion: state.customPetal.fusion
+    }));
+  }
+
+  function customFusionValue() {
+    var fusion = Number(state.customPetal.fusion);
+    if (!Number.isFinite(fusion)) {
+      return 1;
+    }
+    return clamp(Math.trunc(fusion), 1, 69);
+  }
+
+  function addCustomPetalEntry() {
+    state.entries.set(CUSTOM_DPS_KEY, {
+      key: CUSTOM_DPS_KEY,
+      type: 'dps',
+      petal: 'custom_petal',
+      rarity: 'defalt',
+      attrs: state.customPetal,
+      isCustom: true
+    });
+  }
+
   function applyTheme(theme, persist) {
     var next = theme === 'dark' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
-    var label = next === 'dark' ? '亮色' : '暗色';
+    var label = next === 'dark' ? 'Light' : 'Dark';
     if (ui.themeLabel) {
       ui.themeLabel.textContent = label;
     }
     if (ui.themeToggle) {
-      ui.themeToggle.setAttribute('aria-label', '切换至' + label + '主题');
-      ui.themeToggle.setAttribute('title', '切换至' + label + '主题');
+      ui.themeToggle.setAttribute('aria-label', 'Switch to ' + label.toLowerCase() + ' theme');
+      ui.themeToggle.setAttribute('title', 'Switch to ' + label.toLowerCase() + ' theme');
       ui.themeToggle.setAttribute('aria-pressed', next === 'dark' ? 'true' : 'false');
     }
     var meta = document.querySelector('meta[name="theme-color"]');
@@ -2192,11 +2345,11 @@
   async function loadPetalData() {
     var response = await fetch('./petal.json', { cache: 'no-store' });
     if (!response.ok) {
-      throw new Error('读取 petal.json 失败：HTTP ' + response.status);
+      throw new Error('Failed to load petal.json: HTTP ' + response.status);
     }
     var data = await response.json();
     if (!isValidData(data)) {
-      throw new Error('petal.json 数据结构不正确，必须包含 dps、heal、shield、dmg_reduce、increase_max_hp。');
+      throw new Error('Invalid petal.json schema: requires dps, heal, shield, dmg_reduce, and increase_max_hp.');
     }
     return data;
   }
@@ -2234,7 +2387,7 @@
   function getEntries(type) {
     var result = [];
     state.entries.forEach(function (entry) {
-      if (entry.type === type) {
+      if (entry.type === type && !entry.isCustom) {
         result.push(entry);
       }
     });
@@ -2408,7 +2561,7 @@
     var cactus = numericAttr(cactusEntry, 'increase_max_hp');
     var dr = clamp(numericAttr(reduceEntry, 'dmg_reduce'), 0, 1);
     var talentBonus = state.talent * 0.05;
-    var k = dps ? fusionFor(dps) : 1;
+    var k = dps ? (dps.isCustom ? customFusionValue() : fusionFor(dps)) : 1;
 
     var hp0 = numericAttr(dps, 'hp');
     var armor0 = numericAttr(dps, 'armor');
@@ -2452,6 +2605,19 @@
 
     var maxDamage = (hp + shieldTick + armor) / (1 - dr);
 
+    /* Max normal body damage that still allows combo:
+       1) current recovery surplus after fire/poison;
+       2) first-tick survivability (healing happens after damage). */
+    var sustainNormalLimit = (
+      healTotal + shieldTotal + COMBO_EPSILON - state.inputs.poison - state.inputs.fire * fireRate
+    ) / tps;
+    var durabilityNormalLimit = hp + firstTickShield - poisonTick - fireTick;
+    var normalBodyLimit = Math.min(sustainNormalLimit, durabilityNormalLimit);
+    var maxBodyDamage = 0;
+    if (normalBodyLimit >= 0 && 1 - dr > 0) {
+      maxBodyDamage = Math.max(0, (normalBodyLimit + armor) / (1 - dr));
+    }
+
     var breakResult = null;
     if (dps && firstTickLethal) {
       breakResult = { broken: true, tick: 1 };
@@ -2486,6 +2652,7 @@
       maxTps: maxTps,
       pressure: pressure,
       maxDamage: maxDamage,
+      maxBodyDamage: maxBodyDamage,
       breakResult: breakResult
     };
   }
@@ -2508,7 +2675,7 @@
   }
 
   function hpFormulaText(result) {
-    return '(\u57fa\u7840hp\u00d7(1+' + result.cactus.toFixed(2) + ')\u00d7(1+' +
+    return '(Base HP\u00d7(1+' + result.cactus.toFixed(2) + ')\u00d7(1+' +
       result.talentBonus.toFixed(2) + ')\u00d7' + formatPlain(result.k) + ')';
   }
 
@@ -2617,6 +2784,7 @@
       setResult(ui.resBreak, '\u2014', 'muted', true);
       setResult(ui.resPressure, '\u2014', 'muted');
       setResult(ui.resMaxDamage, '\u2014', 'muted');
+      setResult(ui.resMaxBodyDamage, '\u2014', 'muted');
       ui.resultsMask.hidden = false;
     } else {
       setResult(ui.resCombo, result.comboable ? 'Yes' : 'No', result.comboable ? 'green' : 'red');
@@ -2649,6 +2817,7 @@
       setResult(ui.resBreak, breakData.text, breakData.tone, true);
       setResult(ui.resPressure, pressureText(result.pressure), 'gold');
       setResult(ui.resMaxDamage, formatNumber(result.maxDamage), 'accent');
+      setResult(ui.resMaxBodyDamage, formatNumber(result.maxBodyDamage), 'accent');
       ui.resultsMask.hidden = true;
     }
 
@@ -2705,7 +2874,7 @@
     } else if (entry.type === 'shield') {
       appendAttribute(line, 'Shield/s', formatNumber(numericAttr(entry, 'shield')), false);
       if (entry.attrs.harmony_stack === true) {
-        line.appendChild(makeElement('span', 'harmony-tag', '调和'));
+        line.appendChild(makeElement('span', 'harmony-tag', 'Harmony'));
       }
     } else if (entry.type === 'dmg_reduce') {
       appendAttribute(line, 'Damage Reduce', formatPercent(numericAttr(entry, 'dmg_reduce')), false);
@@ -2734,9 +2903,9 @@
 
     var actions = makeElement('div', 'step-actions');
     [
-      { text: '+1', step: '1', title: '增加 1' },
-      { text: '-1', step: '-1', title: '减少 1' },
-      { text: 'clear', step: 'clear', title: '恢复默认值', clear: true }
+      { text: '+1', step: '1', title: 'Increase by 1' },
+      { text: '-1', step: '-1', title: 'Decrease by 1' },
+      { text: 'clear', step: 'clear', title: 'Reset to default', clear: true }
     ].forEach(function (action) {
       var button = makeElement(
         'button',
@@ -2759,6 +2928,7 @@
     var item = makeElement('article', 'petal-item');
     item.dataset.key = entry.key;
     item.dataset.type = entry.type;
+    item.dataset.rarity = entry.rarity;
 
     var isSelectable = SINGLE_TYPES.indexOf(entry.type) !== -1;
     var main;
@@ -2770,7 +2940,7 @@
       checkbox.value = entry.key;
       checkbox.dataset.choiceType = entry.type;
       checkbox.checked = state.selected[entry.type] === entry.key;
-      checkbox.setAttribute('aria-label', '选择 ' + displayPetalName(entry.petal) + ' ' + entry.rarity);
+      checkbox.setAttribute('aria-label', 'Select ' + displayPetalName(entry.petal) + ' ' + entry.rarity);
       main.appendChild(checkbox);
       main.appendChild(makeElement('span', 'petal-checkbox'));
     } else {
@@ -2796,12 +2966,12 @@
       control.appendChild(makeMiniNumber(
         'fusion',
         entry.key,
-        '聚变',
+        'Fusion',
         1,
         max,
         1,
         current,
-        displayPetalName(entry.petal) + ' ' + entry.rarity + ' 聚变量',
+        displayPetalName(entry.petal) + ' ' + entry.rarity + ' fusion',
         'fusion-input'
       ));
     } else if (entry.type === 'heal' || entry.type === 'shield') {
@@ -2809,12 +2979,12 @@
       control.appendChild(makeMiniNumber(
         'quantity',
         entry.key,
-        '数量',
+        'Qty',
         0,
         20,
         1,
         quantity,
-        displayPetalName(entry.petal) + ' ' + entry.rarity + ' 数量',
+        displayPetalName(entry.petal) + ' ' + entry.rarity + ' quantity',
         'qty-input'
       ));
     }
@@ -2826,14 +2996,80 @@
     return item;
   }
 
+  function makeCustomField(labelText, cnText, field, value, min, max, step, title) {
+    var fieldWrap = makeElement('label', 'custom-field');
+    var labelLine = makeElement('span', 'custom-field-label');
+    labelLine.appendChild(document.createTextNode(labelText));
+    labelLine.appendChild(makeElement('small', 'inline-cn', cnText));
+    fieldWrap.appendChild(labelLine);
+
+    var input = makeElement('input', 'custom-input');
+    input.type = 'number';
+    input.step = step;
+    if (min !== null) {
+      input.min = String(min);
+    }
+    if (max !== null) {
+      input.max = String(max);
+    }
+    input.value = String(value);
+    input.dataset.customField = field;
+    input.title = title;
+    input.setAttribute('aria-label', title);
+    fieldWrap.appendChild(input);
+    return fieldWrap;
+  }
+
+  function makeCustomPetalItem() {
+    var entry = state.entries.get(CUSTOM_DPS_KEY);
+    if (!entry) {
+      return null;
+    }
+
+    var item = makeElement('article', 'petal-item custom-petal');
+    item.dataset.key = entry.key;
+    item.dataset.type = 'dps';
+    item.dataset.rarity = entry.rarity;
+
+    var main = makeElement('label', 'petal-main');
+    var checkbox = makeElement('input', 'petal-check');
+    checkbox.type = 'checkbox';
+    checkbox.value = entry.key;
+    checkbox.dataset.choiceType = 'dps';
+    checkbox.checked = state.selected.dps === entry.key;
+    checkbox.setAttribute('aria-label', 'Select Custom Petal');
+    main.appendChild(checkbox);
+    main.appendChild(makeElement('span', 'petal-checkbox'));
+    main.appendChild(makeThumb(entry));
+
+    var info = makeElement('span', 'petal-info');
+    var nameRow = makeElement('span', 'petal-name-row');
+    nameRow.appendChild(makeElement('span', 'petal-name', 'Custom Petal'));
+    nameRow.appendChild(makeRarityBadge('defalt'));
+    nameRow.appendChild(makeElement('small', 'inline-cn', '自定义花瓣'));
+    info.appendChild(nameRow);
+    info.appendChild(makeElement('span', 'attr-line', 'Player-defined DPS petal'));
+    main.appendChild(info);
+    item.appendChild(main);
+
+    var fields = makeElement('div', 'custom-fields');
+    fields.appendChild(makeCustomField('HP', '耐久', 'hp', state.customPetal.hp, 1.000001, null, 'any', 'Custom petal HP, must be greater than 1'));
+    fields.appendChild(makeCustomField('Armor', '护甲', 'armor', state.customPetal.armor, null, null, 'any', 'Custom petal armor, negative values allowed'));
+    fields.appendChild(makeCustomField('Fusion', '聚变', 'fusion', state.customPetal.fusion, 1, 69, '1', 'Custom petal fusion multiplier, 1 to 69'));
+    item.appendChild(fields);
+    return item;
+  }
+
   function makeTalentCard() {
     var card = makeElement('section', 'card');
     card.dataset.card = 'talent';
 
     var head = makeElement('div', 'card-head');
     var heading = makeElement('div', 'card-heading');
-    heading.appendChild(makeElement('h2', null, '天赋'));
-    heading.appendChild(makeElement('span', 'card-subtitle', 'Talent'));
+    var title = makeElement('h2', null, 'Talent');
+    title.appendChild(makeElement('small', 'title-cn', '天赋'));
+    heading.appendChild(title);
+    heading.appendChild(makeElement('span', 'card-subtitle', 'LEVEL 0–5'));
     head.appendChild(heading);
     head.appendChild(makeElement('span', 'card-badge', '0–5'));
     card.appendChild(head);
@@ -2841,7 +3077,9 @@
     var body = makeElement('div', 'card-scroll talent-body');
 
     var picker = makeElement('label', 'talent-picker');
-    picker.appendChild(makeElement('span', 'talent-picker-label', '天赋等级'));
+    var pickerLabel = makeElement('span', 'talent-picker-label', 'Talent Level');
+    pickerLabel.appendChild(makeElement('small', 'inline-cn', '天赋等级'));
+    picker.appendChild(pickerLabel);
     var input = makeElement('input', 'talent-input');
     input.id = 'talentInput';
     input.type = 'number';
@@ -2849,14 +3087,17 @@
     input.max = '5';
     input.step = '1';
     input.value = String(state.talent);
-    input.setAttribute('aria-label', '天赋等级，范围 0 到 5');
+    input.setAttribute('aria-label', 'Talent level, 0 to 5');
     picker.appendChild(input);
     body.appendChild(picker);
 
-    body.appendChild(makeElement('p', 'talent-caption', '每级提升 5% 花瓣耐久，天赋增血系数最多 25%。'));
+    var caption = makeElement('p', 'talent-caption', 'Each level grants +5% petal HP, up to +25%.');
+    caption.appendChild(makeElement('small', 'inline-cn', '每级提升 5% 花瓣耐久'));
+    body.appendChild(caption);
 
     var coefficient = makeElement('div', 'talent-coef');
-    coefficient.appendChild(document.createTextNode('天赋增血系数'));
+    coefficient.appendChild(document.createTextNode('Talent HP Bonus'));
+    coefficient.appendChild(makeElement('small', 'inline-cn', '天赋增血系数'));
     var coefficientValue = makeElement('b', null, '0.0%');
     coefficientValue.id = 'talentCoef';
     coefficient.appendChild(coefficientValue);
@@ -2888,19 +3129,21 @@
 
     var head = makeElement('div', 'card-head');
     var heading = makeElement('div', 'card-heading');
-    heading.appendChild(makeElement('h2', null, meta.title));
+    var title = makeElement('h2', null, meta.title);
+    title.appendChild(makeElement('small', 'title-cn', meta.cn));
+    heading.appendChild(title);
     heading.appendChild(makeElement('span', 'card-subtitle', meta.subtitle));
     head.appendChild(heading);
 
     var count = makeElement('span', 'card-badge', '0');
     count.dataset.countType = type;
-    count.title = meta.kind === 'single' ? '已选择数量' : '数量合计';
+    count.title = meta.kind === 'single' ? 'Selected count' : 'Total quantity';
 
-    var clearButton = makeElement('button', 'card-clear', '清空');
+    var clearButton = makeElement('button', 'card-clear', 'Clear');
     clearButton.type = 'button';
     clearButton.dataset.clearType = type;
-    clearButton.title = '清空本系列所有选择';
-    clearButton.setAttribute('aria-label', '清空' + meta.title + '的所有选择');
+    clearButton.title = 'Clear all selections in this series / 清空本系列所有选择';
+    clearButton.setAttribute('aria-label', 'Clear ' + meta.title);
 
     var headActions = makeElement('div', 'card-head-actions');
     headActions.appendChild(clearButton);
@@ -2912,6 +3155,13 @@
     scroll.dataset.listType = type;
     scroll.setAttribute('aria-label', meta.title);
     var list = makeElement('div', 'petal-list');
+
+    if (type === 'dps') {
+      var customItem = makeCustomPetalItem();
+      if (customItem) {
+        list.appendChild(customItem);
+      }
+    }
 
     getEntries(type).forEach(function (entry) {
       if (entry.type === 'dps' && fusionMax(entry) !== null && state.fusion[entry.key] === undefined) {
@@ -2954,14 +3204,16 @@
     setResult(ui.resBreak, '\u2014', 'muted', true);
     setResult(ui.resPressure, '\u2014', 'muted');
     setResult(ui.resMaxDamage, '\u2014', 'muted');
+    setResult(ui.resMaxBodyDamage, '\u2014', 'muted');
 
     var maskTitle = ui.resultsMask.querySelector('strong');
     var maskHint = ui.resultsMask.querySelector('span');
     if (maskTitle) {
-      maskTitle.textContent = '花瓣数据读取失败';
+      maskTitle.textContent = 'Data Load Error';
+      maskTitle.appendChild(makeElement('small', 'title-cn', '花瓣数据读取失败'));
     }
     if (maskHint) {
-      maskHint.textContent = '请检查 ./petal.json';
+      maskHint.textContent = 'Check ./petal.json';
     }
     ui.resultsMask.hidden = false;
 
@@ -2975,18 +3227,21 @@
     ui.contentGrid.innerHTML = '';
     var errorBox = makeElement('div', 'loading-state error-state');
     errorBox.setAttribute('role', 'alert');
-    errorBox.appendChild(makeElement('strong', null, '读取 petal.json 失败'));
+    var errorTitle = makeElement('strong', null, 'Data Load Error');
+    errorTitle.appendChild(makeElement('small', 'title-cn', '花瓣数据读取失败'));
+    errorBox.appendChild(errorTitle);
     var messageLine = makeElement('p');
     messageLine.appendChild(document.createTextNode(message));
     errorBox.appendChild(messageLine);
     var helpLine = makeElement('p');
-    helpLine.appendChild(document.createTextNode('请通过 HTTP 静态服务器打开本页，并确认 '));
+    helpLine.appendChild(document.createTextNode('Open this page through an HTTP static server and make sure '));
     helpLine.appendChild(makeElement('code', null, './petal.json'));
-    helpLine.appendChild(document.createTextNode(' 可访问且格式正确。页面不再使用内置兜底数据。'));
+    helpLine.appendChild(document.createTextNode(' is reachable and valid. No embedded fallback data is used.'));
+    helpLine.appendChild(makeElement('small', 'inline-cn', '请通过 HTTP 静态服务器打开，并确认文件可访问且格式正确'));
     errorBox.appendChild(helpLine);
     ui.contentGrid.appendChild(errorBox);
 
-    console.error('读取 petal.json 失败。', error);
+    console.error('Failed to load petal.json.', error);
   }
 
   function handleNumericStep(button) {
@@ -3055,6 +3310,10 @@
     state.selected = { dps: null, dmg_reduce: null, increase_max_hp: null };
     state.fusion = {};
     state.quantities = { heal: {}, shield: {} };
+    state.customPetal.hp = CUSTOM_DEFAULT.hp;
+    state.customPetal.armor = CUSTOM_DEFAULT.armor;
+    state.customPetal.fusion = CUSTOM_DEFAULT.fusion;
+    saveCustomPetal();
     syncTopInputValues();
 
     if (state.data) {
@@ -3211,8 +3470,54 @@
     render();
   }
 
+  function handleCustomPetalInput(input, finalize) {
+    var field = input.dataset.customField;
+    var raw = input.value.trim();
+    var value = Number(raw);
+
+    if (field === 'hp') {
+      if (raw !== '' && Number.isFinite(value) && value > 1) {
+        state.customPetal.hp = value;
+        saveCustomPetal();
+        render();
+      } else if (finalize) {
+        state.customPetal.hp = CUSTOM_DEFAULT.hp;
+        input.value = String(CUSTOM_DEFAULT.hp);
+        saveCustomPetal();
+        render();
+      }
+    } else if (field === 'armor') {
+      if (raw !== '' && Number.isFinite(value)) {
+        state.customPetal.armor = value;
+        saveCustomPetal();
+        render();
+      } else if (finalize) {
+        state.customPetal.armor = CUSTOM_DEFAULT.armor;
+        input.value = String(CUSTOM_DEFAULT.armor);
+        saveCustomPetal();
+        render();
+      }
+    } else if (field === 'fusion') {
+      if (raw !== '' && Number.isInteger(value) && value >= 1 && value <= 69) {
+        state.customPetal.fusion = value;
+        saveCustomPetal();
+        render();
+      } else if (finalize) {
+        state.customPetal.fusion = CUSTOM_DEFAULT.fusion;
+        input.value = String(CUSTOM_DEFAULT.fusion);
+        saveCustomPetal();
+        render();
+      }
+    }
+  }
+
   function handleGridInput(event) {
     var target = event.target;
+
+    if (target.classList && target.classList.contains('custom-input')) {
+      handleCustomPetalInput(target, false);
+      return;
+    }
 
     if (target.id === 'talentInput') {
       var talentValue = Number(target.value);
@@ -3275,6 +3580,11 @@
 
     if (target.id === 'talentInput') {
       finalizeTalentInput(target);
+      return;
+    }
+
+    if (target.classList && target.classList.contains('custom-input')) {
+      handleCustomPetalInput(target, true);
       return;
     }
 
@@ -3519,6 +3829,7 @@
     ui.resBreak = byId('resBreak');
     ui.resPressure = byId('resPressure');
     ui.resMaxDamage = byId('resMaxDamage');
+    ui.resMaxBodyDamage = byId('resMaxBodyDamage');
     ui.previewFrame = byId('previewFrame');
     ui.previewImage = byId('previewImage');
     ui.previewRequestedSource = '';
@@ -3530,6 +3841,7 @@
     cacheUi();
     initializeTheme();
     state.settings = loadSettings();
+    state.customPetal = loadCustomPetal();
     applyFontScale();
     syncSettingsUI(true);
     bindStaticEvents();
@@ -3541,6 +3853,7 @@
     try {
       state.data = await loadPetalData();
       indexEntries();
+      addCustomPetalEntry();
     } catch (error) {
       showDataError(error);
       return;

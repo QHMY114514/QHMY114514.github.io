@@ -1,5 +1,11 @@
 {
     "dps": {
+        "wing": {
+            "omega": {
+                "hp": 196830,
+                "armor": 59049
+            }
+        },
         "trident": {
             "super": {
                 "hp": 32805,
@@ -62,6 +68,50 @@
             "omega": {
                 "hp": 787320,
                 "armor": 59049
+            }
+        },
+        "blood_corn": {
+            "omega": {
+                "hp": 98415000,
+                "armor": -19683
+            }
+        },
+        "date": {
+            "unique": {
+                "hp": 1180980,
+                "armor": 0
+            },
+            "omega": {
+                "hp": 393660,
+                "armor": 0
+            }
+        },
+        "magic_rock": {
+            "super": {
+                "hp": 1640250,
+                "armor": 10935,
+                "fusion": 3
+            },
+            "ultra": {
+                "hp": 546750,
+                "armor": 3645,
+                "fusion": 3
+            }
+        },
+        "rock": {
+            "unique": {
+                "hp": 14762250,
+                "armor": 0
+            },
+            "omega": {
+                "hp": 4920750,
+                "armor": 0
+            }
+        },
+        "diamond": {
+            "omega": {
+                "hp": 19683,
+                "armor": 98415
             }
         }
     },
