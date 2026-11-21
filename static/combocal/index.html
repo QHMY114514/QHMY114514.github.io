@@ -23,6 +23,11 @@
         }
       }
     } catch (e) {}
+    try {
+      if (localStorage.getItem('combo-calc-deck-collapsed') === '1') {
+        document.documentElement.setAttribute('data-deck-collapsed', '1');
+      }
+    } catch (e) {}
   }());
 </script>
 <style>
@@ -302,10 +307,104 @@
   .control-deck {
     display: flex;
     flex: 0 0 auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0 18px 12px;
+    transition: padding-bottom 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .control-deck.is-collapsed,
+  html[data-deck-collapsed="1"] .control-deck {
+    padding-bottom: 6px;
+  }
+
+  .deck-collapse {
+    display: grid;
+    min-width: 0;
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition:
+      grid-template-rows 560ms cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .deck-collapse-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .control-deck.is-collapsed .deck-collapse,
+  html[data-deck-collapsed="1"] .deck-collapse {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .deck-body {
+    display: flex;
+    min-width: 0;
     flex-wrap: wrap;
     align-items: stretch;
     gap: 12px;
-    padding: 0 18px 12px;
+  }
+
+  .deck-toggle-wrap {
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+    transition: padding-top 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .control-deck.is-collapsed .deck-toggle-wrap,
+  html[data-deck-collapsed="1"] .deck-toggle-wrap {
+    padding-top: 0;
+  }
+
+  .deck-toggle-button {
+    display: inline-flex;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--panel);
+    box-shadow: var(--shadow-soft);
+    color: var(--muted);
+    font-family: var(--font-stack);
+    font-size: calc(10px * var(--font-scale));
+    font-weight: 650;
+    transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+  }
+
+  .deck-toggle-button:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .deck-toggle-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+
+  .deck-toggle-button svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+    transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .control-deck.is-collapsed .deck-toggle-button svg,
+  html[data-deck-collapsed="1"] .deck-toggle-button svg {
+    transform: rotate(180deg);
   }
 
   .deck-creature {
@@ -409,6 +508,87 @@
   .number-input::-webkit-inner-spin-button,
   .number-input::-webkit-outer-spin-button {
     opacity: 0.7;
+  }
+
+  .stack-toggle {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 5px 7px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel-2);
+    cursor: pointer;
+  }
+
+  .stack-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .stack-copy b {
+    color: var(--text);
+    font-size: calc(10px * var(--font-scale));
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  .stack-copy small {
+    color: var(--muted);
+    font-size: calc(8px * var(--font-scale));
+    line-height: 1.2;
+  }
+
+  .stack-check {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .stack-switch {
+    position: relative;
+    width: 30px;
+    height: 16px;
+    flex: 0 0 30px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--panel);
+    transition: border-color 140ms ease, background 140ms ease;
+  }
+
+  .stack-switch::after {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    content: "";
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), background 140ms ease;
+  }
+
+  .stack-check:checked + .stack-switch {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .stack-check:checked + .stack-switch::after {
+    background: var(--accent);
+    transform: translateX(14px);
+  }
+
+  .stack-check:focus-visible + .stack-switch {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .damage-actions {
@@ -694,14 +874,254 @@
     scrollbar-width: thin;
   }
 
-  .content-grid {
-    display: grid;
+  .workspace {
     width: 100%;
     max-width: 1500px;
     margin: 0 auto;
+  }
+
+  .workspace-tabs {
+    position: sticky;
+    z-index: 8;
+    top: 0;
+    display: flex;
+    gap: 5px;
+    margin-bottom: 12px;
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    box-shadow: var(--shadow-soft);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .workspace-tab {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 13px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-stack);
+    font-size: calc(11px * var(--font-scale));
+    font-weight: 700;
+    transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+  }
+
+  .workspace-tab:hover {
+    color: var(--text);
+  }
+
+  .workspace-tab[aria-selected="true"] {
+    border-color: var(--border);
+    background: var(--panel);
+    box-shadow: var(--shadow-soft);
+    color: var(--accent);
+  }
+
+  .workspace-tab .inline-cn {
+    font-weight: 500;
+  }
+
+  .workspace-panel[hidden] {
+    display: none;
+  }
+
+  .content-grid {
+    display: grid;
+    width: 100%;
+    margin: 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
     align-items: start;
+  }
+
+  /* ---------- Mob tab ---------- */
+
+  .mobs-page {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mob-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: linear-gradient(100deg, var(--panel-2), var(--panel) 72%);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .mob-toolbar-title {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    color: var(--text);
+    font-size: calc(12px * var(--font-scale));
+    font-weight: 750;
+  }
+
+  .mob-toolbar-title .inline-cn {
+    font-weight: 500;
+  }
+
+  .mob-rarity-control {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: calc(9px * var(--font-scale));
+  }
+
+  .mob-rarity-select {
+    height: 30px;
+    padding: 2px 26px 2px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    background: var(--panel);
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: calc(11px * var(--font-scale));
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .mob-rarity-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .mob-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .mob-card {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 76px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    padding: 9px 10px;
+    overflow: hidden;
+    appearance: none;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--panel);
+    color: var(--text);
+    font-family: var(--font-stack);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 140ms ease, background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+  }
+
+  .mob-card:hover {
+    border-color: var(--accent);
+    background: var(--panel-2);
+    transform: translateY(-1px);
+  }
+
+  .mob-card.is-selected {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 1px var(--accent) inset;
+  }
+
+  .mob-card-head {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .mob-name {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--rarity-color, var(--text));
+    font-size: calc(12px * var(--font-scale));
+    font-weight: 750;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 1px rgba(15, 23, 42, 0.65), 0 0 2px rgba(15, 23, 42, 0.35);
+    -webkit-text-stroke: 0.25px rgba(15, 23, 42, 0.55);
+    white-space: nowrap;
+  }
+
+  html[data-theme="dark"] .mob-name {
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.65), 0 0 2px rgba(255, 255, 255, 0.3);
+    -webkit-text-stroke-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .mob-stack-tag {
+    flex: 0 0 auto;
+    color: #f39d00;
+    font-size: calc(8px * var(--font-scale));
+    font-weight: 750;
+    letter-spacing: 0.05em;
+  }
+
+  .mob-stats {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 3px 8px;
+    font-size: calc(9px * var(--font-scale));
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .mob-stat {
+    color: var(--muted);
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .mob-stat b {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+
+  .mob-damage b { color: #1FDBDE; }
+  .mob-fire b { color: #DE1F1F; }
+  .mob-poison b { color: #f329d9; }
+
+  .mobs-message {
+    display: flex;
+    min-height: 160px;
+    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: calc(11px * var(--font-scale));
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .mobs-message strong {
+    color: var(--red);
+    font-size: calc(14px * var(--font-scale));
   }
 
   .card {
@@ -981,14 +1401,8 @@
     font-weight: 700;
     letter-spacing: 0.07em;
     line-height: 1;
-    text-transform: lowercase;
+    text-transform: none;
   }
-
-  [data-rarity="defalt"] { --rarity-color: #d8d8d8; }
-  [data-rarity="unique"] { --rarity-color: #444444; }
-  [data-rarity="omega"] { --rarity-color: #f329d9; }
-  [data-rarity="super"] { --rarity-color: #2bffa3; }
-  [data-rarity="ultra"] { --rarity-color: #ff2b75; }
 
   .rarity-badge {
     color: var(--rarity-color, var(--text));
@@ -1461,6 +1875,44 @@
     text-align: right;
   }
 
+  .toast {
+    position: fixed;
+    z-index: 50;
+    bottom: 22px;
+    left: 50%;
+    padding: 8px 14px;
+    border: 1px solid var(--green);
+    border-radius: 999px;
+    background: var(--panel);
+    box-shadow: var(--shadow);
+    color: var(--green);
+    font-family: var(--font-stack);
+    font-size: calc(10.5px * var(--font-scale));
+    font-weight: 700;
+    transform: translateX(-50%);
+    animation: toast-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .toast.is-error {
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .toast[hidden] {
+    display: none;
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 8px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
   /* ---------- Loading / empty states ---------- */
 
   .loading-state {
@@ -1533,6 +1985,10 @@
       grid-template-columns: minmax(0, 1fr);
       gap: 2px;
     }
+
+    .mob-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 760px) {
@@ -1540,9 +1996,16 @@
       padding: 8px 12px 7px;
     }
 
+    .header-actions .button-label {
+      display: none;
+    }
+
     .control-deck {
-      gap: 9px;
       padding: 0 12px 10px;
+    }
+
+    .deck-body {
+      gap: 9px;
     }
 
     .deck-combat {
@@ -1661,6 +2124,31 @@
 
     .mini-field {
       font-size: calc(7.5px * var(--font-scale));
+    }
+
+    .workspace-tabs {
+      margin-bottom: 9px;
+      padding: 3px;
+    }
+
+    .workspace-tab {
+      min-height: 30px;
+      padding: 4px 10px;
+      font-size: calc(10px * var(--font-scale));
+    }
+
+    .mob-card {
+      min-height: 72px;
+      padding: 8px;
+    }
+
+    .mob-name {
+      font-size: calc(11px * var(--font-scale));
+    }
+
+    .mob-stats {
+      gap: 2px 6px;
+      font-size: calc(8.5px * var(--font-scale));
     }
   }
 
@@ -1810,10 +2298,22 @@
         </svg>
         <span class="button-label">Settings</span>
       </button>
+      <button class="icon-button" id="shareButton" type="button" aria-label="Share current state" title="Share current state / 分享当前状态">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="18" cy="5" r="2.4"></circle>
+          <circle cx="6" cy="12" r="2.4"></circle>
+          <circle cx="18" cy="19" r="2.4"></circle>
+          <path d="m8.1 10.9 7.8-4.5M8.1 13.1l7.8 4.5"></path>
+        </svg>
+        <span class="button-label"><span id="shareLabel">Share</span> <small class="inline-cn" id="shareCn">分享</small></span>
+      </button>
     </div>
   </header>
 
-  <section class="control-deck" aria-label="Inputs and results">
+  <section class="control-deck" id="controlDeck" aria-label="Inputs and results">
+    <div class="deck-collapse" id="deckCollapse">
+      <div class="deck-collapse-inner">
+        <div class="deck-body">
     <div class="deck-creature">
       <div class="mob-panel">
         <img src="./image/mob.png" alt="Mob icon" onerror="this.style.visibility='hidden'">
@@ -1837,6 +2337,14 @@
             <input class="number-input" id="inputFire" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Fire damage per second">
           </label>
         </div>
+        <label class="stack-toggle" for="stackToggle" title="Layered fire/poison stacks: fire 3s, poison 5s / 火毒逐层叠加：火 3 秒，毒 5 秒">
+          <span class="stack-copy">
+            <b>Stack DoT</b>
+            <small>Fire 3s · Poison 5s <span class="inline-cn">火毒叠加</span></small>
+          </span>
+          <input class="stack-check" id="stackToggle" type="checkbox" aria-label="Enable layered fire and poison stacking">
+          <span class="stack-switch" aria-hidden="true"></span>
+        </label>
         <div class="damage-actions" role="group" aria-label="Quick damage actions">
           <button class="quick-button is-danger" type="button" data-damage-action="clear-normal" title="Clear normal damage / 普通伤害清空">Clear Normal</button>
           <button class="quick-button is-danger" type="button" data-damage-action="clear-status" title="Clear fire and poison / 火毒清空">Clear DoT</button>
@@ -1934,16 +2442,52 @@
         </div>
       </div>
     </div>
+        </div>
+      </div>
+    </div>
+    <div class="deck-toggle-wrap">
+      <button class="deck-toggle-button" id="deckToggle" type="button" aria-expanded="true" aria-controls="deckCollapse" title="Collapse deck / 收起计算栏">
+        <span class="deck-toggle-label"><span id="deckToggleText">Collapse Deck</span> <small class="inline-cn" id="deckToggleCn">收起计算栏</small></span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+      </button>
+    </div>
   </section>
 
   <div class="scroll-area" id="scrollArea">
-    <div class="content-grid" id="contentGrid" aria-live="off">
-      <div class="loading-state">Loading petal.json… <small class="title-cn">正在读取</small></div>
+    <div class="workspace" id="workspace">
+      <div class="workspace-tabs" role="tablist" aria-label="Workspace tabs">
+        <button class="workspace-tab" id="petalsTab" type="button" role="tab" aria-selected="true" aria-controls="petalsPanel" data-tab="petals">
+          Petals <small class="inline-cn">花瓣</small>
+        </button>
+        <button class="workspace-tab" id="mobsTab" type="button" role="tab" aria-selected="false" aria-controls="mobsPanel" data-tab="mobs">
+          Mobs <small class="inline-cn">生物</small>
+        </button>
+      </div>
+      <section class="workspace-panel" id="petalsPanel" role="tabpanel" aria-labelledby="petalsTab">
+        <div class="content-grid" id="contentGrid" aria-live="off">
+          <div class="loading-state">Loading petal.json… <small class="title-cn">正在读取</small></div>
+        </div>
+      </section>
+      <section class="mobs-page workspace-panel" id="mobsPanel" role="tabpanel" aria-labelledby="mobsTab" hidden>
+        <div class="mob-toolbar panel">
+          <div class="mob-toolbar-title">Mob List <small class="inline-cn">生物列表</small></div>
+          <label class="mob-rarity-control" for="mobRaritySelect">Rarity <small class="inline-cn">稀有度</small>
+            <select class="mob-rarity-select" id="mobRaritySelect">
+              <option value="Super">Super</option>
+              <option value="Omega">Omega</option>
+              <option value="Unique">Unique</option>
+            </select>
+          </label>
+        </div>
+        <div class="mob-grid" id="mobGrid"></div>
+      </section>
     </div>
   </div>
 
   <footer class="site-footer">copyright @2026 QHLG</footer>
 </div>
+
+<div class="toast" id="shareToast" role="status" hidden></div>
 
 <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
   <div class="modal-head">
@@ -1998,13 +2542,43 @@
    * Constants and application state
    * ------------------------------------------------------------------ */
 
-  var RARITIES = ['unique', 'omega', 'super', 'ultra', 'defalt'];
-  var RARITY_ORDER = { unique: 0, omega: 1, super: 2, ultra: 3, defalt: 4 };
+  var RARITY_TABLE = [
+    ['Common', '#7EEF6D'],
+    ['Unusual', '#FFE65D'],
+    ['Rare', '#4D52E3'],
+    ['Epic', '#861FDE'],
+    ['Legendary', '#DE1F1F'],
+    ['Mythic', '#1FDBDE'],
+    ['Ultra', '#FF2B75'],
+    ['Super', '#2BFFA3'],
+    ['Omega', '#f329d9'],
+    ['Unique', '#444444']
+  ];
+  var DEFALT_RARITY = { key: 'defalt', name: 'defalt', color: '#d8d8d8', rank: Infinity };
+  var RARITY_INDEX = {};
+  var RARITY_RANK = {};
+  RARITY_TABLE.forEach(function (row, index) {
+    var key = row[0].toLowerCase();
+    RARITY_INDEX[key] = index;
+    RARITY_RANK[key] = RARITY_TABLE.length - 1 - index;
+  });
+
   var TYPES = ['dps', 'heal', 'shield', 'dmg_reduce', 'increase_max_hp'];
   var SINGLE_TYPES = ['dps', 'dmg_reduce', 'increase_max_hp'];
   /* Treat a near-zero HP/s balance as comboable (0.01 tolerance). */
   var COMBO_EPSILON = 0.01 + 1e-9;
   var MAX_BREAK_SECONDS = 120;
+  var STACK_FIRE_SECONDS = 3;
+  var STACK_POISON_SECONDS = 5;
+  var MOB_RARITY_MULTIPLIER = {
+    Super: 2187,
+    Omega: 6561,
+    Unique: 19683
+  };
+  var MOB_RARITY_OPTIONS = ['Super', 'Omega', 'Unique'];
+  /* Accept both the requested mobs.json name and the existing mob.json file. */
+  var MOB_DATA_PATHS = ['./mob.json', './mobs.json'];
+  var DEFAULT_MOB_RARITY = 'Super';
 
   var TYPE_META = {
     dps: { title: 'DPS Petal', cn: 'DPS 花瓣', subtitle: 'SINGLE SELECT', kind: 'single' },
@@ -2017,11 +2591,14 @@
   var STORAGE_THEME = 'combo-calc-theme';
   var STORAGE_SETTINGS = 'combo-calc-settings';
   var STORAGE_CUSTOM_PETAL = 'combo-calc-custom-petal';
+  var STORAGE_DECK_COLLAPSED = 'combo-calc-deck-collapsed';
   var CUSTOM_DPS_KEY = '__custom_dps__';
   var CUSTOM_DEFAULT = { hp: 1000, armor: 0, fusion: 1 };
 
   var state = {
     data: null,
+    mobs: [],
+    mobsError: null,
     entries: new Map(),
     settings: { tps: 20, fireRate: 1.5, fontScale: 100 },
     customPetal: { hp: 1000, armor: 0, fusion: 1 },
@@ -2029,7 +2606,13 @@
     talent: 0,
     selected: { dps: null, dmg_reduce: null, increase_max_hp: null },
     fusion: {},
-    quantities: { heal: {}, shield: {} }
+    quantities: { heal: {}, shield: {} },
+    mobRarity: DEFAULT_MOB_RARITY,
+    selectedMob: null,
+    mobStack: false,
+    activeTab: 'petals',
+    deckCollapsed: false,
+    shareCodeFromUrl: null
   };
 
   var ui = {};
@@ -2148,15 +2731,59 @@
     if (entry.isCustom) {
       return './image/custom_petal.png';
     }
-    var rarity = String(entry.rarity).toLowerCase();
+    var rarity = String(entry.rarityKey || entry.rarity || 'common').toLowerCase();
     var petal = String(entry.petal).toLowerCase().replace(/\s+/g, '_');
     return './image/' + rarity + '_' + petal + '_200x200.png';
   }
 
-  function rarityRank(rarity) {
-    return Object.prototype.hasOwnProperty.call(RARITY_ORDER, rarity)
-      ? RARITY_ORDER[rarity]
-      : 99;
+  function normalizeRarity(value) {
+    var key = String(value == null ? '' : value).trim().toLowerCase();
+    if (key === 'defalt') {
+      return {
+        key: DEFALT_RARITY.key,
+        name: DEFALT_RARITY.name,
+        color: DEFALT_RARITY.color,
+        rank: DEFALT_RARITY.rank
+      };
+    }
+    if (!Object.prototype.hasOwnProperty.call(RARITY_INDEX, key)) {
+      key = 'common';
+    }
+    var index = RARITY_INDEX[key];
+    return {
+      key: key,
+      name: RARITY_TABLE[index][0],
+      color: RARITY_TABLE[index][1],
+      rank: RARITY_RANK[key]
+    };
+  }
+
+  function installRarityStyles() {
+    var style = byId('rarity-color-style');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'rarity-color-style';
+      document.head.appendChild(style);
+    }
+    var rules = RARITY_TABLE.map(function (row) {
+      return '[data-rarity="' + row[0].toLowerCase() + '"]{--rarity-color:' + row[1] + ';}';
+    });
+    rules.push('[data-rarity="defalt"]{--rarity-color:' + DEFALT_RARITY.color + ';}');
+    style.textContent = rules.join('\n');
+  }
+
+  function normalizeMobRarity(value) {
+    var key = String(value == null ? '' : value).trim().toLowerCase();
+    for (var i = 0; i < MOB_RARITY_OPTIONS.length; i += 1) {
+      if (MOB_RARITY_OPTIONS[i].toLowerCase() === key) {
+        return MOB_RARITY_OPTIONS[i];
+      }
+    }
+    return DEFAULT_MOB_RARITY;
+  }
+
+  function mobMultiplier() {
+    return MOB_RARITY_MULTIPLIER[state.mobRarity] || MOB_RARITY_MULTIPLIER[DEFAULT_MOB_RARITY];
   }
 
   function wireImageFallback(image) {
@@ -2297,7 +2924,10 @@
       key: CUSTOM_DPS_KEY,
       type: 'dps',
       petal: 'custom_petal',
-      rarity: 'defalt',
+      rarity: DEFALT_RARITY.name,
+      rarityKey: DEFALT_RARITY.key,
+      rarityRank: DEFALT_RARITY.rank,
+      rarityColor: DEFALT_RARITY.color,
       attrs: state.customPetal,
       isCustom: true
     });
@@ -2329,6 +2959,68 @@
     applyTheme(saved === 'dark' ? 'dark' : 'light', false);
   }
 
+  function applyDeckCollapsed(collapsed, persist) {
+    state.deckCollapsed = Boolean(collapsed);
+    if (ui.controlDeck) {
+      ui.controlDeck.classList.toggle('is-collapsed', state.deckCollapsed);
+    }
+    document.documentElement.setAttribute('data-deck-collapsed', state.deckCollapsed ? '1' : '0');
+    if (ui.deckCollapse) {
+      if (state.deckCollapsed) {
+        ui.deckCollapse.setAttribute('inert', '');
+      } else {
+        ui.deckCollapse.removeAttribute('inert');
+      }
+      ui.deckCollapse.setAttribute('aria-hidden', state.deckCollapsed ? 'true' : 'false');
+    }
+    if (ui.deckToggle) {
+      ui.deckToggle.setAttribute('aria-expanded', state.deckCollapsed ? 'false' : 'true');
+      var english = state.deckCollapsed ? 'Expand Deck' : 'Collapse Deck';
+      var chinese = state.deckCollapsed ? '展开计算栏' : '收起计算栏';
+      ui.deckToggle.setAttribute('aria-label', english + ' / ' + chinese);
+      ui.deckToggle.title = english + ' / ' + chinese;
+      if (ui.deckToggleText) {
+        ui.deckToggleText.textContent = english;
+      }
+      if (ui.deckToggleCn) {
+        ui.deckToggleCn.textContent = chinese;
+      }
+    }
+    if (persist) {
+      writeStorage(STORAGE_DECK_COLLAPSED, state.deckCollapsed ? '1' : '0');
+    }
+  }
+
+  function setActiveTab(tab) {
+    var next = tab === 'mobs' ? 'mobs' : 'petals';
+    state.activeTab = next;
+    if (ui.petalsPanel) {
+      ui.petalsPanel.hidden = next !== 'petals';
+    }
+    if (ui.mobsPanel) {
+      ui.mobsPanel.hidden = next !== 'mobs';
+    }
+    [ui.petalsTab, ui.mobsTab].forEach(function (button) {
+      if (!button) {
+        return;
+      }
+      var selected = button.dataset.tab === next;
+      button.setAttribute('aria-selected', selected ? 'true' : 'false');
+      button.tabIndex = selected ? 0 : -1;
+    });
+    if (ui.scrollArea) {
+      ui.scrollArea.scrollTop = 0;
+    }
+  }
+
+  function setMobStack(value) {
+    state.mobStack = Boolean(value);
+    if (ui.stackToggle) {
+      ui.stackToggle.checked = state.mobStack;
+    }
+    render();
+  }
+
   /* ------------------------------------------------------------------
    * Data loading and indexing
    * ------------------------------------------------------------------ */
@@ -2354,6 +3046,405 @@
     return data;
   }
 
+  async function loadMobData() {
+    var errors = [];
+    for (var i = 0; i < MOB_DATA_PATHS.length; i += 1) {
+      var path = MOB_DATA_PATHS[i];
+      try {
+        var response = await fetch(path, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+        var data = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error('mob data is not an array');
+        }
+        var mobs = data
+          .filter(function (mob) {
+            return mob && typeof mob === 'object' && typeof mob.name === 'string';
+          })
+          .map(function (mob) {
+            return {
+              name: mob.name,
+              damage: Math.max(0, Number(mob.damage) || 0),
+              fire: Math.max(0, Number(mob.fire) || 0),
+              poison: Math.max(0, Number(mob.poison) || 0),
+              stack: mob.stack === true
+            };
+          });
+        if (mobs.length === 0) {
+          throw new Error('mob data is empty');
+        }
+        return mobs;
+      } catch (error) {
+        errors.push(path + ': ' + error.message);
+      }
+    }
+    throw new Error('Failed to load mob data. ' + errors.join(' | '));
+  }
+
+  function findMobByName(name) {
+    if (!name) {
+      return null;
+    }
+    for (var i = 0; i < state.mobs.length; i += 1) {
+      if (state.mobs[i].name === name) {
+        return state.mobs[i];
+      }
+    }
+    return null;
+  }
+
+  function applyMobToInputs(mob) {
+    var multiplier = mobMultiplier();
+    state.inputs.damage = mob.damage * multiplier;
+    state.inputs.fire = mob.fire * multiplier;
+    state.inputs.poison = mob.poison * multiplier;
+    state.mobStack = Boolean(mob.stack);
+    syncTopInputValues();
+  }
+
+  function renderMobGrid() {
+    if (!ui.mobGrid) {
+      return;
+    }
+    var rarity = normalizeRarity(state.mobRarity);
+    if (ui.mobRaritySelect) {
+      ui.mobRaritySelect.value = state.mobRarity;
+      ui.mobRaritySelect.disabled = Boolean(state.mobsError) || state.mobs.length === 0;
+    }
+
+    ui.mobGrid.innerHTML = '';
+    if (state.mobsError) {
+      var errorBox = makeElement('div', 'mobs-message');
+      var errorTitle = makeElement('strong', null, 'Mob Data Error');
+      errorTitle.appendChild(makeElement('span', 'inline-cn', ' 生物数据读取失败'));
+      errorBox.appendChild(errorTitle);
+      var errorText = makeElement('span', null, state.mobsError);
+      errorBox.appendChild(errorText);
+      ui.mobGrid.appendChild(errorBox);
+      return;
+    }
+
+    var multiplier = mobMultiplier();
+    state.mobs.forEach(function (mob) {
+      var card = makeElement('button', 'mob-card');
+      card.type = 'button';
+      card.dataset.mobName = mob.name;
+      card.dataset.rarity = rarity.key;
+      var selected = state.selectedMob === mob.name;
+      card.classList.toggle('is-selected', selected);
+      card.setAttribute('aria-pressed', selected ? 'true' : 'false');
+
+      var head = makeElement('span', 'mob-card-head');
+      head.appendChild(makeElement('span', 'mob-name', mob.name));
+      if (mob.stack) {
+        head.appendChild(makeElement('span', 'mob-stack-tag', 'Stack'));
+      }
+      card.appendChild(head);
+
+      var stats = makeElement('span', 'mob-stats');
+      [
+        ['Damage', mob.damage * multiplier, 'mob-damage'],
+        ['Fire', mob.fire * multiplier, 'mob-fire'],
+        ['Poison', mob.poison * multiplier, 'mob-poison']
+      ].forEach(function (item) {
+        var stat = makeElement('span', 'mob-stat ' + item[2]);
+        stat.appendChild(document.createTextNode(item[0] + ' '));
+        stat.appendChild(makeElement('b', null, formatNumber(item[1])));
+        stats.appendChild(stat);
+      });
+      card.appendChild(stats);
+      ui.mobGrid.appendChild(card);
+    });
+  }
+
+  function updateMobSelection() {
+    if (!ui.mobGrid) {
+      return;
+    }
+    ui.mobGrid.querySelectorAll('.mob-card').forEach(function (card) {
+      var selected = card.dataset.mobName === state.selectedMob;
+      card.classList.toggle('is-selected', selected);
+      card.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    });
+  }
+
+  function selectMob(name) {
+    var mob = findMobByName(name);
+    if (!mob) {
+      return;
+    }
+    state.selectedMob = mob.name;
+    applyMobToInputs(mob);
+    updateMobSelection();
+    render();
+  }
+
+  function changeMobRarity(value) {
+    state.mobRarity = normalizeMobRarity(value);
+    var selected = findMobByName(state.selectedMob);
+    if (selected) {
+      applyMobToInputs(selected);
+    } else {
+      state.selectedMob = null;
+    }
+    renderMobGrid();
+    render();
+  }
+
+  function encodeSharePayload(payload) {
+    var bytes = new TextEncoder().encode(JSON.stringify(payload));
+    var binary = '';
+    var chunk = 0x8000;
+    for (var i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  }
+
+  function decodeSharePayload(code) {
+    var normalized = code.replace(/-/g, '+').replace(/_/g, '/');
+    while (normalized.length % 4 !== 0) {
+      normalized += '=';
+    }
+    var binary = atob(normalized);
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+
+  function buildSharePayload() {
+    var fusion = {};
+    Object.keys(state.fusion).forEach(function (key) {
+      var entry = state.entries.get(key);
+      if (!entry || entry.isCustom || entry.type !== 'dps') {
+        return;
+      }
+      var value = fusionFor(entry);
+      if (value !== 1) {
+        fusion[key] = value;
+      }
+    });
+
+    var heal = {};
+    var shield = {};
+    state.entries.forEach(function (entry) {
+      if (entry.type !== 'heal' && entry.type !== 'shield') {
+        return;
+      }
+      var quantity = quantityFor(entry.type, entry.key);
+      if (quantity > 0) {
+        (entry.type === 'heal' ? heal : shield)[entry.key] = quantity;
+      }
+    });
+
+    return {
+      v: 1,
+      i: [state.inputs.damage, state.inputs.fire, state.inputs.poison],
+      s: state.mobStack ? 1 : 0,
+      mr: state.mobRarity,
+      sm: state.selectedMob,
+      t: state.talent,
+      d: state.selected.dps,
+      r: state.selected.dmg_reduce,
+      h: state.selected.increase_max_hp,
+      f: fusion,
+      q: { h: heal, s: shield },
+      c: [state.customPetal.hp, state.customPetal.armor, state.customPetal.fusion]
+    };
+  }
+
+  function applySharePayload(payload) {
+    if (!payload || typeof payload !== 'object' || payload.v !== 1) {
+      return false;
+    }
+
+    if (Array.isArray(payload.i)) {
+      var inputKeys = ['damage', 'fire', 'poison'];
+      inputKeys.forEach(function (key, index) {
+        var value = Number(payload.i[index]);
+        if (Number.isFinite(value) && value >= 0) {
+          state.inputs[key] = value;
+        }
+      });
+    }
+
+    state.mobStack = Boolean(payload.s);
+    state.mobRarity = normalizeMobRarity(payload.mr);
+    state.selectedMob = findMobByName(payload.sm) ? payload.sm : null;
+
+    var talent = Number(payload.t);
+    state.talent = Number.isInteger(talent) && talent >= 0 && talent <= 5 ? talent : 0;
+
+    ['dps', 'dmg_reduce', 'increase_max_hp'].forEach(function (type, index) {
+      var shareKey = ['d', 'r', 'h'][index];
+      var key = payload[shareKey];
+      var entry = key ? state.entries.get(key) : null;
+      state.selected[type] = entry && entry.type === type ? key : null;
+    });
+
+    state.fusion = {};
+    if (payload.f && typeof payload.f === 'object') {
+      Object.keys(payload.f).forEach(function (key) {
+        var entry = state.entries.get(key);
+        var max = fusionMax(entry);
+        var value = Number(payload.f[key]);
+        if (entry && !entry.isCustom && entry.type === 'dps' && max !== null &&
+            Number.isInteger(value) && value >= 1 && value <= max) {
+          state.fusion[key] = value;
+        }
+      });
+    }
+
+    state.quantities = { heal: {}, shield: {} };
+    if (payload.q && typeof payload.q === 'object') {
+      ['heal', 'shield'].forEach(function (type) {
+        var map = type === 'heal' ? payload.q.h : payload.q.s;
+        if (!map || typeof map !== 'object') {
+          return;
+        }
+        Object.keys(map).forEach(function (key) {
+          var entry = state.entries.get(key);
+          var value = Number(map[key]);
+          if (entry && entry.type === type && Number.isInteger(value) && value >= 0 && value <= 20) {
+            state.quantities[type][key] = value;
+          }
+        });
+      });
+    }
+
+    if (Array.isArray(payload.c) && payload.c.length >= 3) {
+      var customHp = Number(payload.c[0]);
+      var customArmor = Number(payload.c[1]);
+      var customFusion = Number(payload.c[2]);
+      if (Number.isFinite(customHp) && customHp > 1) {
+        state.customPetal.hp = customHp;
+      }
+      if (Number.isFinite(customArmor)) {
+        state.customPetal.armor = customArmor;
+      }
+      if (Number.isInteger(customFusion) && customFusion >= 1 && customFusion <= 69) {
+        state.customPetal.fusion = customFusion;
+      }
+    }
+
+    syncTopInputValues();
+    return true;
+  }
+
+  function readSharePayloadFromUrl() {
+    var parts = window.location.pathname.split('/').filter(Boolean);
+    var segment = parts.length ? parts[parts.length - 1] : '';
+    if (!/^s[A-Za-z0-9_-]{16,}$/.test(segment)) {
+      return null;
+    }
+    state.shareCodeFromUrl = segment;
+    try {
+      var payload = decodeSharePayload(segment.slice(1));
+      if (!payload || typeof payload !== 'object') {
+        throw new Error('empty share payload');
+      }
+      return payload;
+    } catch (error) {
+      console.warn('Ignoring invalid share link.', error);
+      return null;
+    }
+  }
+
+  function getShareBasePath() {
+    var path = (window.location.pathname || '/').replace(/\/+$/g, '');
+    if (state.shareCodeFromUrl) {
+      var suffix = '/' + state.shareCodeFromUrl;
+      if (path.slice(-suffix.length) === suffix) {
+        path = path.slice(0, -suffix.length);
+      }
+    }
+    path = path.replace(/\/[^/]*\.html?$/i, '');
+    if (!path.endsWith('/')) {
+      path += '/';
+    }
+    return path || '/';
+  }
+
+  function buildShareUrl() {
+    var code = 's' + encodeSharePayload(buildSharePayload());
+    if (window.location.protocol === 'file:') {
+      return window.location.href.split('#')[0].split('?')[0].replace(/[^/]*$/, '') + code;
+    }
+    return window.location.origin + getShareBasePath() + code;
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (error) {
+        /* Fall through to the legacy copy path. */
+      }
+    }
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-9999px';
+    textarea.style.top = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    var copied = false;
+    try {
+      copied = document.execCommand('copy');
+    } catch (error) {
+      copied = false;
+    }
+    document.body.removeChild(textarea);
+    return copied;
+  }
+
+  var shareFeedbackTimer = null;
+
+  function showShareFeedback(success) {
+    if (ui.shareLabel) {
+      ui.shareLabel.textContent = success ? 'Copied' : 'Copy Failed';
+    }
+    if (ui.shareCn) {
+      ui.shareCn.textContent = success ? '已复制' : '复制失败';
+    }
+    if (ui.shareToast) {
+      ui.shareToast.hidden = false;
+      ui.shareToast.classList.toggle('is-error', !success);
+      ui.shareToast.textContent = success
+        ? 'Link copied / 链接已复制'
+        : 'Copy failed / 复制失败';
+    }
+    if (shareFeedbackTimer) {
+      window.clearTimeout(shareFeedbackTimer);
+    }
+    shareFeedbackTimer = window.setTimeout(function () {
+      if (ui.shareLabel) {
+        ui.shareLabel.textContent = 'Share';
+      }
+      if (ui.shareCn) {
+        ui.shareCn.textContent = '分享';
+      }
+      if (ui.shareToast) {
+        ui.shareToast.hidden = true;
+      }
+    }, 1600);
+  }
+
+  async function shareCurrentState() {
+    var url = buildShareUrl();
+    var copied = await copyText(url);
+    if (!copied) {
+      window.prompt('Copy share link / 复制分享链接', url);
+    }
+    showShareFeedback(copied);
+  }
+
   function indexEntries() {
     state.entries.clear();
     TYPES.forEach(function (type) {
@@ -2371,12 +3462,19 @@
           if (!attrs || typeof attrs !== 'object') {
             return;
           }
-          var key = itemKey(type, petal, rarity);
+          var rarityInfo = normalizeRarity(rarity);
+          if (rarityInfo.key === 'defalt') {
+            return;
+          }
+          var key = itemKey(type, petal, rarityInfo.key);
           state.entries.set(key, {
             key: key,
             type: type,
             petal: petal,
-            rarity: rarity,
+            rarity: rarityInfo.name,
+            rarityKey: rarityInfo.key,
+            rarityRank: rarityInfo.rank,
+            rarityColor: rarityInfo.color,
             attrs: attrs
           });
         });
@@ -2392,7 +3490,7 @@
       }
     });
     result.sort(function (a, b) {
-      var rarityDifference = rarityRank(a.rarity) - rarityRank(b.rarity);
+      var rarityDifference = a.rarityRank - b.rarityRank;
       if (rarityDifference !== 0) {
         return rarityDifference;
       }
@@ -2483,7 +3581,7 @@
       if (entry.attrs.harmony_stack === true) {
         for (var index = 0; index < quantity; index += 1) {
           instances.push({
-            rarity: entry.rarity,
+            rarityRank: entry.rarityRank,
             value: shieldValue
           });
         }
@@ -2493,7 +3591,7 @@
     });
 
     instances.sort(function (a, b) {
-      var rarityDifference = rarityRank(a.rarity) - rarityRank(b.rarity);
+      var rarityDifference = a.rarityRank - b.rarityRank;
       if (rarityDifference !== 0) {
         return rarityDifference;
       }
@@ -2507,30 +3605,65 @@
     return total;
   }
 
-  function findMaxTps(healTotal, shieldTotal, normalTick, poison, fire, fireRate) {
-    var incomingWithoutNormal = poison + fire * fireRate;
+  function findMaxTps(healTotal, shieldTotal, normalTick, poison, fire, fireRate, stack) {
     for (var tps = 25; tps >= 10; tps -= 1) {
-      if (healTotal + shieldTotal >= normalTick * tps + incomingWithoutNormal) {
+      var dotPerSecond;
+      if (stack) {
+        /* Steady state: one new layer each tick, duration seconds = duration*TPS layers.
+           Layer damage is the panel per-tick value, so total per second scales by TPS. */
+        dotPerSecond =
+          (poison > 0 ? STACK_POISON_SECONDS * tps * poison : 0) +
+          (fire > 0 ? STACK_FIRE_SECONDS * tps * fire * fireRate : 0);
+      } else {
+        dotPerSecond = poison + fire * fireRate;
+      }
+      if (healTotal + shieldTotal >= normalTick * tps + dotPerSecond) {
         return tps;
       }
     }
     return null;
   }
 
-  function simulateBreak(maxHp, shieldTick, healTick, damageTick, tps) {
+  function simulateBreak(maxHp, shieldTick, healTick, normalTick, poisonTick, fireTick, tps, stack) {
     var hp = maxHp;
     var shieldPool = 0;
+    var fireExpiries = [];
+    var poisonExpiries = [];
+    var fireDurationTicks = Math.round(STACK_FIRE_SECONDS * tps);
+    var poisonDurationTicks = Math.round(STACK_POISON_SECONDS * tps);
     /* 120 second cap; at the default 20 TPS this is exactly 2400 ticks. */
     var maxTicks = Math.max(1, Math.round(MAX_BREAK_SECONDS * tps));
 
     for (var tick = 1; tick <= maxTicks; tick += 1) {
+      /* Layered DoT queue: each element stores its exclusive expiry tick.
+         New layers are appended first, expired layers (expiry <= tick) are
+         removed, then the remaining queue contributes to this tick's damage. */
+      if (stack && fireTick > 0) {
+        fireExpiries.push(tick + fireDurationTicks);
+      }
+      if (stack && poisonTick > 0) {
+        poisonExpiries.push(tick + poisonDurationTicks);
+      }
+      while (fireExpiries.length > 0 && fireExpiries[0] <= tick) {
+        fireExpiries.shift();
+      }
+      while (poisonExpiries.length > 0 && poisonExpiries[0] <= tick) {
+        poisonExpiries.shift();
+      }
+
+      var incoming = normalTick;
+      if (stack) {
+        incoming += fireExpiries.length * fireTick + poisonExpiries.length * poisonTick;
+      } else {
+        incoming += fireTick + poisonTick;
+      }
+
       /* 1. Gain shield first. The shield pool persists across ticks. */
       shieldPool = Math.min(maxHp, shieldPool + shieldTick);
 
       /* 2. Take damage. Shield absorbs first, then HP. */
       var shieldBefore = shieldPool;
       var hpBefore = hp;
-      var incoming = damageTick;
 
       if (incoming >= hpBefore + shieldBefore) {
         return { broken: true, tick: tick };
@@ -2577,10 +3710,20 @@
     var normalTick = Math.max(0, state.inputs.damage * (1 - dr) - armor);
     var poisonTick = state.inputs.poison / tps;
     var fireTick = state.inputs.fire * fireRate / tps;
-    var totalDamageTick = normalTick + poisonTick + fireTick;
+    var stackEnabled = Boolean(state.mobStack);
+    /* Steady-state layered DoT: one layer per tick, independent expiry.
+       Fire lasts 3s, poison 5s, so at TPS T there are 3*T / 5*T active layers. */
+    var stackFireLayers = stackEnabled && state.inputs.fire > 0 ? STACK_FIRE_SECONDS * tps : 0;
+    var stackPoisonLayers = stackEnabled && state.inputs.poison > 0 ? STACK_POISON_SECONDS * tps : 0;
+    var totalFireTick = stackEnabled ? stackFireLayers * fireTick : fireTick;
+    var totalPoisonTick = stackEnabled ? stackPoisonLayers * poisonTick : poisonTick;
+    var totalDotTick = totalFireTick + totalPoisonTick;
+    var firstTickDot = fireTick + poisonTick;
+    var totalDamageTick = normalTick + totalDotTick;
     var damagePerSecond = totalDamageTick * tps;
     var healTick = healTotal / tps;
     var shieldTick = shieldTotal / tps;
+    var stackActive = stackEnabled && (stackFireLayers > 0 || stackPoisonLayers > 0);
 
     var theoreticalHpPerSecond = healTotal + shieldTotal - damagePerSecond;
     var hpPerSecond = (
@@ -2588,12 +3731,13 @@
       theoreticalHpPerSecond >= -COMBO_EPSILON
     ) ? 0 : theoreticalHpPerSecond;
 
-    /* Healing happens after damage, so a lethal first hit cannot be comboed. */
+    /* Healing happens after damage, so a lethal first hit cannot be comboed.
+       The first tick contains one layer of each active DoT, not the steady-state count. */
     var firstTickShield = Math.min(hp, shieldTick);
-    var firstTickLethal = Boolean(dps) && totalDamageTick >= hp + firstTickShield;
+    var firstTickLethal = Boolean(dps) && normalTick + firstTickDot >= hp + firstTickShield;
 
     var comboable = theoreticalHpPerSecond >= -COMBO_EPSILON && !firstTickLethal;
-    var maxTps = findMaxTps(healTotal, shieldTotal, normalTick, state.inputs.poison, state.inputs.fire, fireRate);
+    var maxTps = findMaxTps(healTotal, shieldTotal, normalTick, state.inputs.poison, state.inputs.fire, fireRate, stackEnabled);
 
     var denominator = healTick + shieldTick;
     var pressure;
@@ -2603,15 +3747,18 @@
       pressure = totalDamageTick / denominator * 100;
     }
 
-    var maxDamage = (hp + shieldTick + armor) / (1 - dr);
+    var maxDamage = Math.max(
+      0,
+      (hp + shieldTick + armor - (stackEnabled ? totalDotTick : 0)) / (1 - dr)
+    );
 
     /* Max normal body damage that still allows combo:
-       1) current recovery surplus after fire/poison;
-       2) first-tick survivability (healing happens after damage). */
+       1) recovery surplus after the steady-state fire/poison load;
+       2) first-tick survivability against the maximum layered DoT tick. */
     var sustainNormalLimit = (
-      healTotal + shieldTotal + COMBO_EPSILON - state.inputs.poison - state.inputs.fire * fireRate
+      healTotal + shieldTotal + COMBO_EPSILON - totalDotTick * tps
     ) / tps;
-    var durabilityNormalLimit = hp + firstTickShield - poisonTick - fireTick;
+    var durabilityNormalLimit = hp + firstTickShield - totalDotTick;
     var normalBodyLimit = Math.min(sustainNormalLimit, durabilityNormalLimit);
     var maxBodyDamage = 0;
     if (normalBodyLimit >= 0 && 1 - dr > 0) {
@@ -2619,10 +3766,17 @@
     }
 
     var breakResult = null;
-    if (dps && firstTickLethal) {
+    if (dps && stackActive) {
+      /* Stack damage ramps up over time, so always simulate it to catch a
+         later burst even when the steady-state HP/s is positive. */
+      breakResult = simulateBreak(hp, shieldTick, healTick, normalTick, poisonTick, fireTick, tps, true);
+      if (breakResult.broken) {
+        comboable = false;
+      }
+    } else if (dps && firstTickLethal) {
       breakResult = { broken: true, tick: 1 };
     } else if (dps && !comboable) {
-      breakResult = simulateBreak(hp, shieldTick, healTick, totalDamageTick, tps);
+      breakResult = simulateBreak(hp, shieldTick, healTick, normalTick, poisonTick, fireTick, tps, false);
     }
 
     return {
@@ -2757,6 +3911,9 @@
   }
 
   function render() {
+    if (ui.stackToggle) {
+      ui.stackToggle.checked = state.mobStack;
+    }
     if (!state.data) {
       return;
     }
@@ -2843,9 +4000,9 @@
     return thumb;
   }
 
-  function makeRarityBadge(rarity) {
-    var badge = makeElement('span', 'rarity-badge', rarity);
-    badge.dataset.rarity = rarity;
+  function makeRarityBadge(rarityName, rarityKey) {
+    var badge = makeElement('span', 'rarity-badge', rarityName);
+    badge.dataset.rarity = rarityKey;
     return badge;
   }
 
@@ -2928,7 +4085,7 @@
     var item = makeElement('article', 'petal-item');
     item.dataset.key = entry.key;
     item.dataset.type = entry.type;
-    item.dataset.rarity = entry.rarity;
+    item.dataset.rarity = entry.rarityKey;
 
     var isSelectable = SINGLE_TYPES.indexOf(entry.type) !== -1;
     var main;
@@ -2952,7 +4109,7 @@
     var info = makeElement('span', 'petal-info');
     var nameRow = makeElement('span', 'petal-name-row');
     nameRow.appendChild(makeElement('span', 'petal-name', displayPetalName(entry.petal)));
-    nameRow.appendChild(makeRarityBadge(entry.rarity));
+    nameRow.appendChild(makeRarityBadge(entry.rarity, entry.rarityKey));
     info.appendChild(nameRow);
     info.appendChild(makeAttributeLine(entry));
     main.appendChild(info);
@@ -3029,7 +4186,7 @@
     var item = makeElement('article', 'petal-item custom-petal');
     item.dataset.key = entry.key;
     item.dataset.type = 'dps';
-    item.dataset.rarity = entry.rarity;
+    item.dataset.rarity = entry.rarityKey;
 
     var main = makeElement('label', 'petal-main');
     var checkbox = makeElement('input', 'petal-check');
@@ -3045,7 +4202,7 @@
     var info = makeElement('span', 'petal-info');
     var nameRow = makeElement('span', 'petal-name-row');
     nameRow.appendChild(makeElement('span', 'petal-name', 'Custom Petal'));
-    nameRow.appendChild(makeRarityBadge('defalt'));
+    nameRow.appendChild(makeRarityBadge(DEFALT_RARITY.name, DEFALT_RARITY.key));
     nameRow.appendChild(makeElement('small', 'inline-cn', '自定义花瓣'));
     info.appendChild(nameRow);
     info.appendChild(makeElement('span', 'attr-line', 'Player-defined DPS petal'));
@@ -3313,15 +4470,18 @@
     state.customPetal.hp = CUSTOM_DEFAULT.hp;
     state.customPetal.armor = CUSTOM_DEFAULT.armor;
     state.customPetal.fusion = CUSTOM_DEFAULT.fusion;
+    state.mobStack = false;
+    state.selectedMob = null;
+    state.mobRarity = DEFAULT_MOB_RARITY;
     saveCustomPetal();
     syncTopInputValues();
 
     if (state.data) {
       buildCards();
+      renderMobGrid();
       render();
-      var scrollArea = ui.contentGrid.parentElement;
-      if (scrollArea) {
-        scrollArea.scrollTop = 0;
+      if (ui.scrollArea) {
+        ui.scrollArea.scrollTop = 0;
       }
     }
   }
@@ -3650,6 +4810,43 @@
     });
 
     ui.clearAllButton.addEventListener('click', clearAllSelections);
+    ui.shareButton.addEventListener('click', shareCurrentState);
+    ui.deckToggle.addEventListener('click', function () {
+      applyDeckCollapsed(!state.deckCollapsed, true);
+    });
+    ui.stackToggle.addEventListener('change', function () {
+      setMobStack(ui.stackToggle.checked);
+    });
+    ui.petalsTab.addEventListener('click', function () {
+      setActiveTab('petals');
+    });
+    ui.mobsTab.addEventListener('click', function () {
+      setActiveTab('mobs');
+    });
+    ui.petalsTab.parentElement.addEventListener('keydown', function (event) {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' &&
+          event.key !== 'Home' && event.key !== 'End') {
+        return;
+      }
+      event.preventDefault();
+      var next = state.activeTab === 'petals' ? 'mobs' : 'petals';
+      if (event.key === 'Home') {
+        next = 'petals';
+      } else if (event.key === 'End') {
+        next = 'mobs';
+      }
+      setActiveTab(next);
+      (next === 'petals' ? ui.petalsTab : ui.mobsTab).focus();
+    });
+    ui.mobRaritySelect.addEventListener('change', function () {
+      changeMobRarity(ui.mobRaritySelect.value);
+    });
+    ui.mobGrid.addEventListener('click', function (event) {
+      var card = event.target.closest('.mob-card');
+      if (card) {
+        selectMob(card.dataset.mobName);
+      }
+    });
 
     ui.themeToggle.addEventListener('click', function () {
       var current = document.documentElement.getAttribute('data-theme');
@@ -3800,11 +4997,28 @@
 
   function cacheUi() {
     ui.clearAllButton = byId('clearAllButton');
+    ui.shareButton = byId('shareButton');
+    ui.shareLabel = byId('shareLabel');
+    ui.shareCn = byId('shareCn');
+    ui.shareToast = byId('shareToast');
     ui.themeToggle = byId('themeToggle');
     ui.themeLabel = byId('themeLabel');
     ui.settingsButton = byId('settingsButton');
     ui.settingsDialog = byId('settingsDialog');
     ui.closeSettings = byId('closeSettings');
+    ui.controlDeck = byId('controlDeck');
+    ui.deckCollapse = byId('deckCollapse');
+    ui.deckToggle = byId('deckToggle');
+    ui.deckToggleText = byId('deckToggleText');
+    ui.deckToggleCn = byId('deckToggleCn');
+    ui.stackToggle = byId('stackToggle');
+    ui.scrollArea = byId('scrollArea');
+    ui.petalsTab = byId('petalsTab');
+    ui.mobsTab = byId('mobsTab');
+    ui.petalsPanel = byId('petalsPanel');
+    ui.mobsPanel = byId('mobsPanel');
+    ui.mobRaritySelect = byId('mobRaritySelect');
+    ui.mobGrid = byId('mobGrid');
     ui.tpsRange = byId('tpsRange');
     ui.tpsNumber = byId('tpsNumber');
     ui.fireRateRange = byId('fireRateRange');
@@ -3842,8 +5056,12 @@
     initializeTheme();
     state.settings = loadSettings();
     state.customPetal = loadCustomPetal();
+    state.deckCollapsed = readStorage(STORAGE_DECK_COLLAPSED) === '1';
+    installRarityStyles();
     applyFontScale();
+    applyDeckCollapsed(state.deckCollapsed, false);
     syncSettingsUI(true);
+    setActiveTab('petals');
     bindStaticEvents();
 
     if (ui.previewImage) {
@@ -3859,8 +5077,23 @@
       return;
     }
 
+    try {
+      state.mobs = await loadMobData();
+    } catch (error) {
+      state.mobs = [];
+      state.mobsError = error.message;
+      console.warn('Failed to load mob data.', error);
+    }
+
+    var sharedPayload = readSharePayloadFromUrl();
+    if (sharedPayload && !applySharePayload(sharedPayload)) {
+      console.warn('Share link payload was not valid.');
+    }
+
     buildCards();
+    renderMobGrid();
     bindCardEvents();
+    setActiveTab(state.activeTab);
     render();
   }
 

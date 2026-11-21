@@ -1,0 +1,755 @@
+[
+  {
+    "name": "Rock",
+    "damage": 40
+  },
+  {
+    "name": "Ladybug",
+    "damage": 10
+  },
+  {
+    "name": "Bush",
+    "damage": 10
+  },
+  {
+    "name": "Sponge",
+    "damage": 10
+  },
+  {
+    "name": "Cactus",
+    "damage": 75
+  },
+  {
+    "name": "Baby Ant",
+    "damage": 10
+  },
+  {
+    "name": "Soldier Ant",
+    "damage": 10
+  },
+  {
+    "name": "Worker Ant",
+    "damage": 10
+  },
+  {
+    "name": "Queen Ant",
+    "damage": 10
+  },
+  {
+    "name": "Baby Fire Ant",
+    "damage": 20
+  },
+  {
+    "name": "Soldier Fire Ant",
+    "damage": 20
+  },
+  {
+    "name": "Worker Fire Ant",
+    "damage": 20
+  },
+  {
+    "name": "Queen Fire Ant",
+    "damage": 20
+  },
+  {
+    "name": "Mushroom",
+    "damage": 15,
+    "poison": 40
+  },
+  {
+    "name": "Jellyfish",
+    "damage": 25
+  },
+  {
+    "name": "Spider",
+    "damage": 15,
+    "poison": 15
+  },
+  {
+    "name": "Hel Spider",
+    "damage": 15,
+    "poison": 30
+  },
+  {
+    "name": "Bee",
+    "damage": 50
+  },
+  {
+    "name": "Hel Bee",
+    "damage": 50,
+    "fire": 1.25
+  },
+  {
+    "name": "Hornet",
+    "damage": 50
+  },
+  {
+    "name": "Hel Hornet",
+    "damage": 50
+  },
+  {
+    "name": "Shell",
+    "damage": 25
+  },
+  {
+    "name": "Ant Hole",
+    "damage": 10
+  },
+  {
+    "name": "Fire Ant Hole",
+    "damage": 20
+  },
+  {
+    "name": "Spider Cave",
+    "damage": 35
+  },
+  {
+    "name": "Hive",
+    "damage": 75
+  },
+  {
+    "name": "Yoba",
+    "damage": 40
+  },
+  {
+    "name": "Spider Yoba",
+    "damage": 30,
+    "poison": 30
+  },
+  {
+    "name": "Centipede",
+    "damage": 10
+  },
+  {
+    "name": "Desert Centipede",
+    "damage": 10
+  },
+  {
+    "name": "Evil Centipede",
+    "damage": 10,
+    "poison": 5
+  },
+  {
+    "name": "Sunflower",
+    "damage": 10
+  },
+  {
+    "name": "Boba",
+    "damage": 50
+  },
+  {
+    "name": "Bubble",
+    "damage": 1
+  },
+  {
+    "name": "M28",
+    "damage": 55
+  },
+  {
+    "name": "Beetle",
+    "damage": 30
+  },
+  {
+    "name": "Avocado",
+    "damage": 10
+  },
+  {
+    "name": "Target Dummy",
+    "damage": 10
+  },
+  {
+    "name": "Target Mummy",
+    "damage": 100
+  },
+  {
+    "name": "Dark Ladybug",
+    "damage": 20
+  },
+  {
+    "name": "Shiny Ladybug",
+    "damage": 30
+  },
+  {
+    "name": "Sandstorm",
+    "damage": 40
+  },
+  {
+    "name": "Firestorm",
+    "damage": 40
+  },
+  {
+    "name": "Scorpion",
+    "damage": 15,
+    "poison": 15
+  },
+  {
+    "name": "Starfish",
+    "damage": 20
+  },
+  {
+    "name": "Crab",
+    "damage": 25
+  },
+  {
+    "name": "Dandelion",
+    "damage": 15
+  },
+  {
+    "name": "Dragon",
+    "damage": 40,
+    "fire": 1
+  },
+  {
+    "name": "Leech",
+    "damage": 10
+  },
+  {
+    "name": "Hel Worm",
+    "damage": 40
+  },
+  {
+    "name": "Nazar Beetle",
+    "damage": 30
+  },
+  {
+    "name": "Toxic Dragon",
+    "damage": 40,
+    "fire": 2,
+    "poison": 40
+  },
+  {
+    "name": "Hel Beetle",
+    "damage": 30
+  },
+  {
+    "name": "Hel Jellyfish",
+    "damage": 25
+  },
+  {
+    "name": "Tumbleweed",
+    "damage": 40
+  },
+  {
+    "name": "Dragon Nest",
+    "damage": 40
+  },
+  {
+    "name": "Bugatti",
+    "damage": 20
+  },
+  {
+    "name": "Fly",
+    "damage": 10
+  },
+  {
+    "name": "Mantis",
+    "damage": 30
+  },
+  {
+    "name": "Firefly",
+    "damage": 25
+  },
+  {
+    "name": "Wasp",
+    "damage": 65
+  },
+  {
+    "name": "Stickbug",
+    "damage": 15
+  },
+  {
+    "name": "Snowbush",
+    "damage": 15
+  },
+  {
+    "name": "Ice Cube",
+    "damage": 50
+  },
+  {
+    "name": "Snowstorm",
+    "damage": 65
+  },
+  {
+    "name": "Arctic Centipede",
+    "damage": 15
+  },
+  {
+    "name": "Arctic Spider",
+    "damage": 25,
+    "poison": 5
+  },
+  {
+    "name": "Ice Dragon",
+    "damage": 50,
+    "fire": 1
+  },
+  {
+    "name": "Tick",
+    "damage": 20
+  },
+  {
+    "name": "Waterspout",
+    "damage": 20
+  },
+  {
+    "name": "Urchin",
+    "damage": 75
+  },
+  {
+    "name": "Volcano",
+    "damage": 25
+  },
+  {
+    "name": "Geyser",
+    "damage": 25
+  },
+  {
+    "name": "Ice Hornet",
+    "damage": 50
+  },
+  {
+    "name": "Bacteriophage",
+    "damage": 30,
+    "poison": 20
+  },
+  {
+    "name": "Bacteria",
+    "damage": 10,
+    "poison": 35
+  },
+  {
+    "name": "Virus",
+    "damage": 10,
+    "poison": 75
+  },
+  {
+    "name": "Red Blood Cell",
+    "damage": 40
+  },
+  {
+    "name": "White Blood Cell",
+    "damage": 30,
+    "poison": 30
+  },
+  {
+    "name": "Cancer",
+    "damage": 10,
+    "poison": 125
+  },
+  {
+    "name": "Parasite",
+    "damage": 30,
+    "poison": 30
+  },
+  {
+    "name": "Atom",
+    "damage": 50
+  },
+  {
+    "name": "Snake",
+    "damage": 30,
+    "poison": 30
+  },
+  {
+    "name": "Turtle",
+    "damage": 10
+  },
+  {
+    "name": "Hel Hive",
+    "damage": 100
+  },
+  {
+    "name": "Fossil",
+    "damage": 10
+  },
+  {
+    "name": "Rattlesnake",
+    "damage": 30,
+    "poison": 30
+  },
+  {
+    "name": "Cicada",
+    "damage": 25
+  },
+  {
+    "name": "Snowman",
+    "damage": 30
+  },
+  {
+    "name": "Igloo",
+    "damage": 25
+  },
+  {
+    "name": "Rain Frog",
+    "damage": 10
+  },
+  {
+    "name": "Illuminati",
+    "damage": 40,
+    "fire": 2
+  },
+  {
+    "name": "Black Hole",
+    "damage": 85
+  },
+  {
+    "name": "Troll",
+    "damage": 100
+  },
+  {
+    "name": "UFO",
+    "damage": 20
+  },
+  {
+    "name": "Alien",
+    "damage": 42
+  },
+  {
+    "name": "Angel",
+    "damage": 25
+  },
+  {
+    "name": "Momy",
+    "damage": 75
+  },
+  {
+    "name": "Ghost",
+    "damage": 0.1
+  },
+  {
+    "name": "Gravestone",
+    "damage": 65
+  },
+  {
+    "name": "Electric Eel",
+    "damage": 20
+  },
+  {
+    "name": "Eye",
+    "damage": 40,
+    "fire": 2
+  },
+  {
+    "name": "Square",
+    "damage": 10
+  },
+  {
+    "name": "Tesla Coil",
+    "damage": 15
+  },
+  {
+    "name": "Snail",
+    "damage": 30
+  },
+  {
+    "name": "Stem Cell",
+    "damage": 40,
+    "poison": 75
+  },
+  {
+    "name": "Barrel",
+    "damage": 30
+  },
+  {
+    "name": "Nuke",
+    "damage": 50
+  },
+  {
+    "name": "Digger",
+    "damage": 150
+  },
+  {
+    "name": "Spider Digger",
+    "damage": 190,
+    "poison": 75
+  },
+  {
+    "name": "Hel Digger",
+    "damage": 80
+  },
+  {
+    "name": "Grave Digger",
+    "damage": 15
+  },
+  {
+    "name": "Sandstone",
+    "damage": 25
+  },
+  {
+    "name": "Termite Overmind",
+    "damage": 10
+  },
+  {
+    "name": "Baby Termite",
+    "damage": 10
+  },
+  {
+    "name": "Worker Termite",
+    "damage": 10
+  },
+  {
+    "name": "Soldier Termite",
+    "damage": 10
+  },
+  {
+    "name": "Termite Hole",
+    "damage": 10
+  },
+  {
+    "name": "Termite Digger",
+    "damage": 150
+  },
+  {
+    "name": "Shipwreck",
+    "damage": 30
+  },
+  {
+    "name": "Pirate Digger",
+    "damage": 125
+  },
+  {
+    "name": "Palm Tree",
+    "damage": 20
+  },
+  {
+    "name": "Stalagmite",
+    "damage": 100
+  },
+  {
+    "name": "Arctic Spider Cave",
+    "damage": 35
+  },
+  {
+    "name": "Beekeeper",
+    "damage": 225
+  },
+  {
+    "name": "Hel Beekeeper",
+    "damage": 240
+  },
+  {
+    "name": "Alien Digger",
+    "damage": 200
+  },
+  {
+    "name": "Queen Bee",
+    "damage": 75
+  },
+  {
+    "name": "Hel Queen Bee",
+    "damage": 105,
+    "fire": 2.5
+  },
+  {
+    "name": "Hel Centipede",
+    "damage": 20
+  },
+  {
+    "name": "Fire Eel",
+    "damage": 15
+  },
+  {
+    "name": "Lamprey Eel",
+    "damage": 10
+  },
+  {
+    "name": "Frost Digger",
+    "damage": 200
+  },
+  {
+    "name": "Cube",
+    "damage": 10
+  },
+  {
+    "name": "White Hole",
+    "damage": 105
+  },
+  {
+    "name": "Tesseract",
+    "damage": 10
+  },
+  {
+    "name": "Unabomber",
+    "damage": 65
+  },
+  {
+    "name": "Biologist",
+    "damage": 100,
+    "poison": 150
+  },
+  {
+    "name": "Shark",
+    "damage": 75
+  },
+  {
+    "name": "Squid",
+    "damage": 45
+  },
+  {
+    "name": "Roach",
+    "damage": 60,
+    "poison": 60
+  },
+  {
+    "name": "Yeba",
+    "damage": 50,
+    "poison": 50
+  },
+  {
+    "name": "Trashcan",
+    "damage": 25
+  },
+  {
+    "name": "Rat",
+    "damage": 75,
+    "poison": 150
+  },
+  {
+    "name": "Baby Rat",
+    "damage": 40,
+    "poison": 75
+  },
+  {
+    "name": "Poostorm",
+    "damage": 20,
+    "poison": 75
+  },
+  {
+    "name": "Silverfish",
+    "damage": 85
+  },
+  {
+    "name": "Larva",
+    "damage": 20,
+    "poison": 50
+  },
+  {
+    "name": "Mosquito",
+    "damage": 50,
+    "poison": 70
+  },
+  {
+    "name": "Nazarlion",
+    "damage": 15,
+    "poison": 125
+  },
+  {
+    "name": "Trash Digger",
+    "damage": 45,
+    "poison": 50,
+    "stack": true
+  },
+  {
+    "name": "Manhole",
+    "damage": 50
+  },
+  {
+    "name": "Pooworm",
+    "damage": 40,
+    "poison": 10,
+    "stack": true
+  },
+  {
+    "name": "Monkey",
+    "damage": 129.52,
+    "fire": 69.34,
+    "poison": 97.27
+  },
+  {
+    "name": "Bat",
+    "damage": 25
+  },
+  {
+    "name": "Lily Pad",
+    "damage": 30
+  },
+  {
+    "name": "Bat Cave",
+    "damage": 55
+  },
+  {
+    "name": "Vampire Digger",
+    "damage": 165
+  },
+  {
+    "name": "Pumpkin",
+    "damage": 25
+  },
+  {
+    "name": "Zatan",
+    "damage": 150
+  },
+  {
+    "name": "Gift",
+    "damage": 30
+  },
+  {
+    "name": "Acid Bubble",
+    "damage": 1,
+    "poison": 100
+  },
+  {
+    "name": "Stegosaurus",
+    "damage": 55
+  },
+  {
+    "name": "Tyrannosaurus",
+    "damage": 175,
+    "poison": 85
+  },
+  {
+    "name": "Nigersaurus",
+    "damage": 200,
+    "poison": 50,
+    "stack": true
+  },
+  {
+    "name": "Diplodocus",
+    "damage": 25,
+    "poison": 35,
+    "stack": true
+  },
+  {
+    "name": "Velociraptor",
+    "damage": 80,
+    "poison": 30,
+    "stack": true
+  },
+  {
+    "name": "Pterodactyl",
+    "damage": 110
+  },
+  {
+    "name": "Meteor",
+    "damage": 40,
+    "fire": 60,
+    "stack": true
+  },
+  {
+    "name": "Fern",
+    "damage": 30,
+    "poison": 20,
+    "stack": true
+  },
+  {
+    "name": "Dodo",
+    "damage": 110
+  },
+  {
+    "name": "Elasmosaurus",
+    "damage": 125,
+    "poison": 35,
+    "stack": true
+  },
+  {
+    "name": "Ankylosaurus",
+    "damage": 165
+  },
+  {
+    "name": "Totem",
+    "damage": 20,
+    "fire": 20,
+    "poison": 60,
+    "stack": true
+  }
+]
