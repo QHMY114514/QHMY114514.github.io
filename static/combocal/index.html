@@ -5,6 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4f6f8">
 <title>Combo Calculator</title>
+<script>
+  (function () {
+    try {
+      var path = window.location.pathname || '/';
+      var basePath = '';
+      var indexMatch = path.match(/^(.*\/)index\.html?(?:\/.*)?$/i);
+      if (indexMatch) {
+        basePath = indexMatch[1];
+      } else if (/\/s[A-Za-z0-9_-]{16,}\/?$/.test(path)) {
+        basePath = path.replace(/\/s[A-Za-z0-9_-]{16,}\/?$/, '/');
+      } else {
+        basePath = path.replace(/\/+$/g, '') + '/';
+      }
+      if (!basePath) {
+        basePath = '/';
+      }
+      var base = document.createElement('base');
+      base.href = window.location.protocol === 'file:'
+        ? 'file://' + basePath
+        : window.location.origin + basePath;
+      document.head.appendChild(base);
+    } catch (e) {}
+  }());
+</script>
 <link rel="icon" type="image/png" href="./image/gift.png">
 <script>
   (function () {
@@ -399,12 +423,13 @@
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-width: 2;
+    transform: rotate(180deg);
     transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .control-deck.is-collapsed .deck-toggle-button svg,
   html[data-deck-collapsed="1"] .deck-toggle-button svg {
-    transform: rotate(180deg);
+    transform: rotate(0deg);
   }
 
   .deck-creature {
@@ -2298,14 +2323,14 @@
         </svg>
         <span class="button-label">Settings</span>
       </button>
-      <button class="icon-button" id="shareButton" type="button" aria-label="Share current state" title="Share current state / 分享当前状态">
+      <button class="icon-button" id="shareButton" type="button" aria-label="Share current state" title="Share current state">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="18" cy="5" r="2.4"></circle>
           <circle cx="6" cy="12" r="2.4"></circle>
           <circle cx="18" cy="19" r="2.4"></circle>
           <path d="m8.1 10.9 7.8-4.5M8.1 13.1l7.8 4.5"></path>
         </svg>
-        <span class="button-label"><span id="shareLabel">Share</span> <small class="inline-cn" id="shareCn">分享</small></span>
+        <span class="button-label" id="shareLabel">Share</span>
       </button>
     </div>
   </header>
@@ -3336,6 +3361,21 @@
   }
 
   function readSharePayloadFromUrl() {
+    var queryCode = new URLSearchParams(window.location.search).get('s');
+    if (queryCode) {
+      try {
+        var queryPayload = decodeSharePayload(queryCode);
+        if (!queryPayload || typeof queryPayload !== 'object') {
+          throw new Error('empty share payload');
+        }
+        return queryPayload;
+      } catch (error) {
+        console.warn('Ignoring invalid share link.', error);
+        return null;
+      }
+    }
+
+    /* Backward compatibility for the previously generated /s<base64> path links. */
     var parts = window.location.pathname.split('/').filter(Boolean);
     var segment = parts.length ? parts[parts.length - 1] : '';
     if (!/^s[A-Za-z0-9_-]{16,}$/.test(segment)) {
@@ -3362,6 +3402,7 @@
         path = path.slice(0, -suffix.length);
       }
     }
+    path = path.replace(/\/index\.html?(?:\/.*)?$/i, '');
     path = path.replace(/\/[^/]*\.html?$/i, '');
     if (!path.endsWith('/')) {
       path += '/';
@@ -3370,11 +3411,14 @@
   }
 
   function buildShareUrl() {
-    var code = 's' + encodeSharePayload(buildSharePayload());
+    var code = encodeSharePayload(buildSharePayload());
     if (window.location.protocol === 'file:') {
-      return window.location.href.split('#')[0].split('?')[0].replace(/[^/]*$/, '') + code;
+      var fileBase = window.location.href.split('#')[0].split('?')[0]
+        .replace(/\/index\.html?(?:\/.*)?$/i, '/')
+        .replace(/\/s[A-Za-z0-9_-]{16,}\/?$/, '/');
+      return fileBase + 'index.html?s=' + code;
     }
-    return window.location.origin + getShareBasePath() + code;
+    return window.location.origin + getShareBasePath() + 'index.html?s=' + code;
   }
 
   async function copyText(text) {
@@ -3410,15 +3454,10 @@
     if (ui.shareLabel) {
       ui.shareLabel.textContent = success ? 'Copied' : 'Copy Failed';
     }
-    if (ui.shareCn) {
-      ui.shareCn.textContent = success ? '已复制' : '复制失败';
-    }
     if (ui.shareToast) {
       ui.shareToast.hidden = false;
       ui.shareToast.classList.toggle('is-error', !success);
-      ui.shareToast.textContent = success
-        ? 'Link copied / 链接已复制'
-        : 'Copy failed / 复制失败';
+      ui.shareToast.textContent = success ? 'Link copied' : 'Copy failed';
     }
     if (shareFeedbackTimer) {
       window.clearTimeout(shareFeedbackTimer);
@@ -3426,9 +3465,6 @@
     shareFeedbackTimer = window.setTimeout(function () {
       if (ui.shareLabel) {
         ui.shareLabel.textContent = 'Share';
-      }
-      if (ui.shareCn) {
-        ui.shareCn.textContent = '分享';
       }
       if (ui.shareToast) {
         ui.shareToast.hidden = true;
@@ -3440,7 +3476,7 @@
     var url = buildShareUrl();
     var copied = await copyText(url);
     if (!copied) {
-      window.prompt('Copy share link / 复制分享链接', url);
+      window.prompt('Copy share link', url);
     }
     showShareFeedback(copied);
   }
@@ -4999,7 +5035,6 @@
     ui.clearAllButton = byId('clearAllButton');
     ui.shareButton = byId('shareButton');
     ui.shareLabel = byId('shareLabel');
-    ui.shareCn = byId('shareCn');
     ui.shareToast = byId('shareToast');
     ui.themeToggle = byId('themeToggle');
     ui.themeLabel = byId('themeLabel');
