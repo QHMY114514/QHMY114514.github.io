@@ -76,8 +76,7 @@
   },
   {
     "name": "Hel Bee",
-    "damage": 50,
-    "fire": 1.25
+    "damage": 50
   },
   {
     "name": "Hornet",
@@ -114,7 +113,8 @@
   {
     "name": "Spider Yoba",
     "damage": 30,
-    "poison": 30
+    "poison": 30,
+    "fire": 30
   },
   {
     "name": "Centipede",
@@ -175,7 +175,8 @@
   },
   {
     "name": "Firestorm",
-    "damage": 40
+    "damage": 40,
+    "fire": 40
   },
   {
     "name": "Scorpion",
@@ -196,8 +197,7 @@
   },
   {
     "name": "Dragon",
-    "damage": 40,
-    "fire": 1
+    "damage": 40
   },
   {
     "name": "Leech",
@@ -214,7 +214,6 @@
   {
     "name": "Toxic Dragon",
     "damage": 40,
-    "fire": 2,
     "poison": 40
   },
   {
@@ -223,7 +222,8 @@
   },
   {
     "name": "Hel Jellyfish",
-    "damage": 25
+    "damage": 25,
+    "fire": 1
   },
   {
     "name": "Tumbleweed",
@@ -247,7 +247,8 @@
   },
   {
     "name": "Firefly",
-    "damage": 25
+    "damage": 25,
+    "lightning": 2
   },
   {
     "name": "Wasp",
@@ -280,8 +281,7 @@
   },
   {
     "name": "Ice Dragon",
-    "damage": 50,
-    "fire": 1
+    "damage": 50
   },
   {
     "name": "Tick",
@@ -297,11 +297,13 @@
   },
   {
     "name": "Volcano",
-    "damage": 25
+    "damage": 25,
+    "fire": 25
   },
   {
     "name": "Geyser",
-    "damage": 25
+    "damage": 25,
+    "fire": 45
   },
   {
     "name": "Ice Hornet",
@@ -385,8 +387,7 @@
   },
   {
     "name": "Illuminati",
-    "damage": 40,
-    "fire": 2
+    "damage": 40
   },
   {
     "name": "Black Hole",
@@ -422,20 +423,34 @@
   },
   {
     "name": "Electric Eel",
-    "damage": 20
+    "damage": 20,
+    "lightning": 6
   },
   {
     "name": "Eye",
-    "damage": 40,
-    "fire": 2
+    "damage": 40
   },
   {
     "name": "Square",
     "damage": 10
   },
   {
+    "name": "Oracle",
+    "damage": 0
+  },
+  {
+    "name": "Trader",
+    "damage": 0
+  },
+  {
+    "name": "Titan",
+    "damage": 0
+  },
+  {
     "name": "Tesla Coil",
-    "damage": 15
+    "damage": 15,
+    "fire": 15,
+    "lightning": 2
   },
   {
     "name": "Snail",
@@ -465,11 +480,13 @@
   },
   {
     "name": "Hel Digger",
-    "damage": 80
+    "damage": 80,
+    "fire": 120
   },
   {
     "name": "Grave Digger",
-    "damage": 15
+    "damage": 15,
+    "fire": 30
   },
   {
     "name": "Sandstone",
@@ -525,7 +542,8 @@
   },
   {
     "name": "Hel Beekeeper",
-    "damage": 240
+    "damage": 240,
+    "fire": 50
   },
   {
     "name": "Alien Digger",
@@ -537,8 +555,7 @@
   },
   {
     "name": "Hel Queen Bee",
-    "damage": 105,
-    "fire": 2.5
+    "damage": 105
   },
   {
     "name": "Hel Centipede",
@@ -546,11 +563,13 @@
   },
   {
     "name": "Fire Eel",
-    "damage": 15
+    "damage": 15,
+    "lightning": 10
   },
   {
     "name": "Lamprey Eel",
-    "damage": 10
+    "damage": 10,
+    "lightning": 15
   },
   {
     "name": "Frost Digger",
@@ -576,6 +595,10 @@
     "name": "Biologist",
     "damage": 100,
     "poison": 150
+  },
+  {
+    "name": "Cicada 3301",
+    "damage": 11
   },
   {
     "name": "Shark",
@@ -652,7 +675,6 @@
   {
     "name": "Monkey",
     "damage": 129.52,
-    "fire": 69.34,
     "poison": 97.27
   },
   {
@@ -746,9 +768,12 @@
     "damage": 165
   },
   {
+    "name": "Assembler",
+    "damage": 0
+  },
+  {
     "name": "Totem",
     "damage": 20,
-    "fire": 20,
     "poison": 60,
     "stack": true
   }

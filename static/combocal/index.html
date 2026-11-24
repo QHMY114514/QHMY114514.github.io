@@ -41,7 +41,7 @@
       if (savedSettings) {
         var parsedSettings = JSON.parse(savedSettings);
         var savedScale = Number(parsedSettings.fontScale);
-        if (Number.isFinite(savedScale) && savedScale >= 80 && savedScale <= 140) {
+        if (Number.isFinite(savedScale) && savedScale >= 75 && savedScale <= 150) {
           var normalizedScale = Math.round(savedScale / 5) * 5;
           document.documentElement.style.setProperty('--font-scale', String(normalizedScale / 100));
         }
@@ -976,15 +976,75 @@
 
   .mob-toolbar {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
     padding: 10px 13px;
     border: 1px solid var(--border);
     border-radius: 14px;
     background: linear-gradient(100deg, var(--panel-2), var(--panel) 72%);
     box-shadow: var(--shadow-soft);
+  }
+
+  .mob-search {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 7px;
+    height: 33px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--panel);
+    transition: border-color 140ms ease, box-shadow 140ms ease;
+  }
+
+  .mob-search:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .mob-search svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+    fill: none;
+    stroke: var(--muted);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.9;
+  }
+
+  .mob-search input {
+    min-width: 0;
+    flex: 1 1 auto;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-stack);
+    font-size: calc(11px * var(--font-scale));
+  }
+
+  .mob-search input::placeholder {
+    color: var(--muted);
+  }
+
+  .mob-toolbar-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .mob-toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
   }
 
   .mob-toolbar-title {
@@ -1025,6 +1085,35 @@
   .mob-rarity-select:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .mob-clear-button {
+    height: 30px;
+    padding: 2px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+    color: var(--muted);
+    font-family: var(--font-stack);
+    font-size: calc(9.5px * var(--font-scale));
+    font-weight: 650;
+    white-space: nowrap;
+    transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+  }
+
+  .mob-clear-button:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .mob-clear-button:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  .mob-clear-button .inline-cn {
+    font-weight: 500;
   }
 
   .mob-grid {
@@ -1125,6 +1214,11 @@
   .mob-damage b { color: #1FDBDE; }
   .mob-fire b { color: #DE1F1F; }
   .mob-poison b { color: #f329d9; }
+  .mob-lightning b { color: #FFD43B; text-shadow: 0 0 1px rgba(15, 23, 42, 0.55); }
+
+  html[data-theme="dark"] .mob-lightning b {
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.55);
+  }
 
   .mobs-message {
     display: flex;
@@ -1147,6 +1241,10 @@
   .mobs-message strong {
     color: var(--red);
     font-size: calc(14px * var(--font-scale));
+  }
+
+  .mobs-message.is-empty strong {
+    color: var(--text);
   }
 
   .card {
@@ -2003,7 +2101,7 @@
 
     .input-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     .input-row {
@@ -2084,6 +2182,20 @@
   @media (max-width: 540px) {
     .control-deck {
       zoom: 0.92;
+    }
+
+    .input-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mob-toolbar-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .mob-toolbar-actions {
+      width: 100%;
+      justify-content: space-between;
     }
 
     .brand h1 {
@@ -2353,6 +2465,10 @@
             <span class="input-label"><b>Damage</b><small>每刻</small></span>
             <input class="number-input" id="inputDamage" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Damage per tick">
           </label>
+          <label class="input-row" for="inputLightning">
+            <span class="input-label" title="Lightning ignores armor and damage reduction / 闪电伤害不受护甲和减伤影响"><b>Lightning</b><small>每刻</small></span>
+            <input class="number-input" id="inputLightning" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Lightning damage per tick, ignoring armor and damage reduction">
+          </label>
           <label class="input-row" for="inputPoison">
             <span class="input-label"><b>Poison</b><small>每秒</small></span>
             <input class="number-input" id="inputPoison" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Poison damage per second">
@@ -2362,17 +2478,17 @@
             <input class="number-input" id="inputFire" type="number" min="0" step="any" inputmode="decimal" value="0" aria-label="Fire damage per second">
           </label>
         </div>
-        <label class="stack-toggle" for="stackToggle" title="Layered fire/poison stacks: fire 3s, poison 5s / 火毒逐层叠加：火 3 秒，毒 5 秒">
+        <label class="stack-toggle" for="stackToggle" title="Special Stack: fire 3s, poison 5s; lightning does not stack / 特殊叠层：火 3 秒、毒 5 秒；闪电不叠加">
           <span class="stack-copy">
-            <b>Stack DoT</b>
-            <small>Fire 3s · Poison 5s <span class="inline-cn">火毒叠加</span></small>
+            <b>Special Stack</b>
+            <small>Fire/Poison · 3s / 5s <span class="inline-cn">闪电不叠</span></small>
           </span>
-          <input class="stack-check" id="stackToggle" type="checkbox" aria-label="Enable layered fire and poison stacking">
+          <input class="stack-check" id="stackToggle" type="checkbox" aria-label="Enable special stacking for fire and poison; lightning does not stack">
           <span class="stack-switch" aria-hidden="true"></span>
         </label>
         <div class="damage-actions" role="group" aria-label="Quick damage actions">
           <button class="quick-button is-danger" type="button" data-damage-action="clear-normal" title="Clear normal damage / 普通伤害清空">Clear Normal</button>
-          <button class="quick-button is-danger" type="button" data-damage-action="clear-status" title="Clear fire and poison / 火毒清空">Clear DoT</button>
+          <button class="quick-button is-danger" type="button" data-damage-action="clear-special" title="Clear fire, poison, and lightning / 清空火、毒、闪电">Clear Special</button>
           <button class="quick-button is-emphasis" type="button" data-damage-action="set-normal-65610" title="Set normal damage to 65610 / 设置为 65610">Set Normal 65610</button>
           <button class="quick-button" type="button" data-damage-action="add-normal-65610" title="Normal damage +65610 / 普通伤害增加 65610">Normal +65610</button>
           <button class="quick-button" type="button" data-damage-action="sub-normal-65610" title="Normal damage -65610 / 普通伤害减少 65610">Normal -65610</button>
@@ -2450,7 +2566,7 @@
               <span class="result-value" id="resMaxDamage">—</span>
             </div>
             <div class="result-row">
-              <span class="result-label" title="Max Body Damage under current fire/poison">Max Body Damage <small class="inline-cn">最高可连击生物体伤</small></span>
+              <span class="result-label" title="Max Body Damage under current lightning and fire/poison">Max Body Damage <small class="inline-cn">最高可连击生物体伤</small></span>
               <span class="result-value" id="resMaxBodyDamage">—</span>
             </div>
           </div>
@@ -2495,14 +2611,26 @@
       </section>
       <section class="mobs-page workspace-panel" id="mobsPanel" role="tabpanel" aria-labelledby="mobsTab" hidden>
         <div class="mob-toolbar panel">
-          <div class="mob-toolbar-title">Mob List <small class="inline-cn">生物列表</small></div>
-          <label class="mob-rarity-control" for="mobRaritySelect">Rarity <small class="inline-cn">稀有度</small>
-            <select class="mob-rarity-select" id="mobRaritySelect">
-              <option value="Super">Super</option>
-              <option value="Omega">Omega</option>
-              <option value="Unique">Unique</option>
-            </select>
+          <label class="mob-search" for="mobSearch">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.3"></circle>
+              <path d="m15.5 15.5 4.2 4.2"></path>
+            </svg>
+            <input id="mobSearch" type="search" placeholder="Search mobs / 搜索生物" autocomplete="off" aria-label="Search mobs">
           </label>
+          <div class="mob-toolbar-row">
+            <div class="mob-toolbar-title">Mob List <small class="inline-cn">生物列表</small></div>
+            <div class="mob-toolbar-actions">
+              <label class="mob-rarity-control" for="mobRaritySelect">Rarity <small class="inline-cn">稀有度</small>
+                <select class="mob-rarity-select" id="mobRaritySelect">
+                  <option value="Super">Super</option>
+                  <option value="Omega">Omega</option>
+                  <option value="Unique">Unique</option>
+                </select>
+              </label>
+              <button class="mob-clear-button" id="clearMobSelection" type="button" disabled title="Clear selected mob, keeping current values / 清除已选生物（保留当前数值）">Clear Selection <small class="inline-cn">清除选择</small></button>
+            </div>
+          </div>
         </div>
         <div class="mob-grid" id="mobGrid"></div>
       </section>
@@ -2547,11 +2675,11 @@
     <div class="setting-block">
       <div class="setting-label">
         <label for="fontScaleNumber">Font Size <small class="inline-cn">字号</small></label>
-        <span>80 – 140% / step 5</span>
+        <span>75 – 150% / step 5</span>
       </div>
       <div class="setting-controls">
-        <input class="setting-slider" id="fontScaleRange" type="range" min="80" max="140" step="5" value="100" aria-label="Font size slider">
-        <input class="setting-number" id="fontScaleNumber" type="number" min="80" max="140" step="5" value="100" inputmode="numeric" aria-label="Font size percentage">
+        <input class="setting-slider" id="fontScaleRange" type="range" min="75" max="150" step="5" value="100" aria-label="Font size slider">
+        <input class="setting-number" id="fontScaleNumber" type="number" min="75" max="150" step="5" value="100" inputmode="numeric" aria-label="Font size percentage">
       </div>
     </div>
     <p class="setting-tip">Changes apply immediately and are saved when this dialog closes. <span class="inline-cn">修改即时生效，关闭窗口时保存</span></p>
@@ -2627,13 +2755,14 @@
     entries: new Map(),
     settings: { tps: 20, fireRate: 1.5, fontScale: 100 },
     customPetal: { hp: 1000, armor: 0, fusion: 1 },
-    inputs: { damage: 0, poison: 0, fire: 0 },
+    inputs: { damage: 0, poison: 0, fire: 0, lightning: 0 },
     talent: 0,
     selected: { dps: null, dmg_reduce: null, increase_max_hp: null },
     fusion: {},
     quantities: { heal: {}, shield: {} },
     mobRarity: DEFAULT_MOB_RARITY,
     selectedMob: null,
+    mobSearch: '',
     mobStack: false,
     activeTab: 'petals',
     deckCollapsed: false,
@@ -2857,7 +2986,7 @@
     if (!Number.isFinite(n)) {
       return 100;
     }
-    n = clamp(n, 80, 140);
+    n = clamp(n, 75, 150);
     return Math.round(n / 5) * 5;
   }
 
@@ -2881,7 +3010,7 @@
           result.fireRate = normalizeFireRate(fireRate);
         }
         var fontScale = Number(parsed.fontScale);
-        if (Number.isFinite(fontScale) && fontScale >= 80 && fontScale <= 140) {
+        if (Number.isFinite(fontScale) && fontScale >= 75 && fontScale <= 150) {
           result.fontScale = normalizeFontScale(fontScale);
         }
       } catch (error) {
@@ -3094,8 +3223,12 @@
               damage: Math.max(0, Number(mob.damage) || 0),
               fire: Math.max(0, Number(mob.fire) || 0),
               poison: Math.max(0, Number(mob.poison) || 0),
+              lightning: Math.max(0, Number(mob.lightning) || 0),
               stack: mob.stack === true
             };
+          })
+          .sort(function (a, b) {
+            return a.name.localeCompare(b.name, 'en', { sensitivity: 'base' });
           });
         if (mobs.length === 0) {
           throw new Error('mob data is empty');
@@ -3125,6 +3258,7 @@
     state.inputs.damage = mob.damage * multiplier;
     state.inputs.fire = mob.fire * multiplier;
     state.inputs.poison = mob.poison * multiplier;
+    state.inputs.lightning = mob.lightning * multiplier;
     state.mobStack = Boolean(mob.stack);
     syncTopInputValues();
   }
@@ -3148,11 +3282,28 @@
       var errorText = makeElement('span', null, state.mobsError);
       errorBox.appendChild(errorText);
       ui.mobGrid.appendChild(errorBox);
+      updateMobSelectionControls();
+      return;
+    }
+
+    var query = state.mobSearch.trim().toLowerCase();
+    var visibleMobs = query
+      ? state.mobs.filter(function (mob) {
+          return mob.name.toLowerCase().includes(query);
+        })
+      : state.mobs;
+
+    if (visibleMobs.length === 0) {
+      var emptyBox = makeElement('div', 'mobs-message is-empty');
+      emptyBox.appendChild(makeElement('strong', null, 'No matching mobs'));
+      emptyBox.appendChild(makeElement('span', null, 'Try a different search / 请尝试其他搜索词'));
+      ui.mobGrid.appendChild(emptyBox);
+      updateMobSelectionControls();
       return;
     }
 
     var multiplier = mobMultiplier();
-    state.mobs.forEach(function (mob) {
+    visibleMobs.forEach(function (mob) {
       var card = makeElement('button', 'mob-card');
       card.type = 'button';
       card.dataset.mobName = mob.name;
@@ -3171,6 +3322,7 @@
       var stats = makeElement('span', 'mob-stats');
       [
         ['Damage', mob.damage * multiplier, 'mob-damage'],
+        ['Lightning', mob.lightning * multiplier, 'mob-lightning'],
         ['Fire', mob.fire * multiplier, 'mob-fire'],
         ['Poison', mob.poison * multiplier, 'mob-poison']
       ].forEach(function (item) {
@@ -3182,9 +3334,19 @@
       card.appendChild(stats);
       ui.mobGrid.appendChild(card);
     });
+    updateMobSelectionControls();
+  }
+
+  function updateMobSelectionControls() {
+    if (ui.clearMobSelection) {
+      ui.clearMobSelection.disabled = !state.selectedMob;
+    }
   }
 
   function updateMobSelection() {
+    if (ui.clearMobSelection) {
+      ui.clearMobSelection.disabled = !state.selectedMob;
+    }
     if (!ui.mobGrid) {
       return;
     }
@@ -3195,9 +3357,21 @@
     });
   }
 
+  function clearMobSelection() {
+    if (!state.selectedMob) {
+      return;
+    }
+    state.selectedMob = null;
+    updateMobSelection();
+  }
+
   function selectMob(name) {
     var mob = findMobByName(name);
     if (!mob) {
+      return;
+    }
+    if (state.selectedMob === mob.name) {
+      clearMobSelection();
       return;
     }
     state.selectedMob = mob.name;
@@ -3268,7 +3442,7 @@
 
     return {
       v: 1,
-      i: [state.inputs.damage, state.inputs.fire, state.inputs.poison],
+      i: [state.inputs.damage, state.inputs.fire, state.inputs.poison, state.inputs.lightning],
       s: state.mobStack ? 1 : 0,
       mr: state.mobRarity,
       sm: state.selectedMob,
@@ -3288,7 +3462,7 @@
     }
 
     if (Array.isArray(payload.i)) {
-      var inputKeys = ['damage', 'fire', 'poison'];
+      var inputKeys = ['damage', 'fire', 'poison', 'lightning'];
       inputKeys.forEach(function (key, index) {
         var value = Number(payload.i[index]);
         if (Number.isFinite(value) && value >= 0) {
@@ -3744,6 +3918,9 @@
     var drPercent = dr * 100;
 
     var normalTick = Math.max(0, state.inputs.damage * (1 - dr) - armor);
+    /* Lightning is raw per-tick damage: neither armor nor damage reduction applies. */
+    var lightningTick = Math.max(0, Number(state.inputs.lightning) || 0);
+    var bodyTick = normalTick + lightningTick;
     var poisonTick = state.inputs.poison / tps;
     var fireTick = state.inputs.fire * fireRate / tps;
     var stackEnabled = Boolean(state.mobStack);
@@ -3755,7 +3932,7 @@
     var totalPoisonTick = stackEnabled ? stackPoisonLayers * poisonTick : poisonTick;
     var totalDotTick = totalFireTick + totalPoisonTick;
     var firstTickDot = fireTick + poisonTick;
-    var totalDamageTick = normalTick + totalDotTick;
+    var totalDamageTick = bodyTick + totalDotTick;
     var damagePerSecond = totalDamageTick * tps;
     var healTick = healTotal / tps;
     var shieldTick = shieldTotal / tps;
@@ -3770,10 +3947,10 @@
     /* Healing happens after damage, so a lethal first hit cannot be comboed.
        The first tick contains one layer of each active DoT, not the steady-state count. */
     var firstTickShield = Math.min(hp, shieldTick);
-    var firstTickLethal = Boolean(dps) && normalTick + firstTickDot >= hp + firstTickShield;
+    var firstTickLethal = Boolean(dps) && bodyTick + firstTickDot >= hp + firstTickShield;
 
     var comboable = theoreticalHpPerSecond >= -COMBO_EPSILON && !firstTickLethal;
-    var maxTps = findMaxTps(healTotal, shieldTotal, normalTick, state.inputs.poison, state.inputs.fire, fireRate, stackEnabled);
+    var maxTps = findMaxTps(healTotal, shieldTotal, bodyTick, state.inputs.poison, state.inputs.fire, fireRate, stackEnabled);
 
     var denominator = healTick + shieldTick;
     var pressure;
@@ -3785,16 +3962,16 @@
 
     var maxDamage = Math.max(
       0,
-      (hp + shieldTick + armor - (stackEnabled ? totalDotTick : 0)) / (1 - dr)
+      (hp + shieldTick + armor - lightningTick - (stackEnabled ? totalDotTick : 0)) / (1 - dr)
     );
 
     /* Max normal body damage that still allows combo:
-       1) recovery surplus after the steady-state fire/poison load;
-       2) first-tick survivability against the maximum layered DoT tick. */
+       1) recovery surplus after lightning and the steady-state fire/poison load;
+       2) first-tick survivability against lightning plus the maximum layered DoT tick. */
     var sustainNormalLimit = (
-      healTotal + shieldTotal + COMBO_EPSILON - totalDotTick * tps
+      healTotal + shieldTotal + COMBO_EPSILON - (lightningTick + totalDotTick) * tps
     ) / tps;
-    var durabilityNormalLimit = hp + firstTickShield - totalDotTick;
+    var durabilityNormalLimit = hp + firstTickShield - lightningTick - totalDotTick;
     var normalBodyLimit = Math.min(sustainNormalLimit, durabilityNormalLimit);
     var maxBodyDamage = 0;
     if (normalBodyLimit >= 0 && 1 - dr > 0) {
@@ -3805,14 +3982,14 @@
     if (dps && stackActive) {
       /* Stack damage ramps up over time, so always simulate it to catch a
          later burst even when the steady-state HP/s is positive. */
-      breakResult = simulateBreak(hp, shieldTick, healTick, normalTick, poisonTick, fireTick, tps, true);
+      breakResult = simulateBreak(hp, shieldTick, healTick, bodyTick, poisonTick, fireTick, tps, true);
       if (breakResult.broken) {
         comboable = false;
       }
     } else if (dps && firstTickLethal) {
       breakResult = { broken: true, tick: 1 };
     } else if (dps && !comboable) {
-      breakResult = simulateBreak(hp, shieldTick, healTick, normalTick, poisonTick, fireTick, tps, false);
+      breakResult = simulateBreak(hp, shieldTick, healTick, bodyTick, poisonTick, fireTick, tps, false);
     }
 
     return {
@@ -3831,6 +4008,8 @@
       dr: dr,
       drPercent: drPercent,
       normalTick: normalTick,
+      lightningTick: lightningTick,
+      bodyTick: bodyTick,
       poisonTick: poisonTick,
       fireTick: fireTick,
       totalDamageTick: totalDamageTick,
@@ -4498,7 +4677,7 @@
   }
 
   function clearAllSelections() {
-    state.inputs = { damage: 0, poison: 0, fire: 0 };
+    state.inputs = { damage: 0, poison: 0, fire: 0, lightning: 0 };
     state.talent = 0;
     state.selected = { dps: null, dmg_reduce: null, increase_max_hp: null };
     state.fusion = {};
@@ -4568,6 +4747,7 @@
 
   function syncTopInputValues() {
     ui.inputDamage.value = String(state.inputs.damage);
+    ui.inputLightning.value = String(state.inputs.lightning);
     ui.inputPoison.value = String(state.inputs.poison);
     ui.inputFire.value = String(state.inputs.fire);
   }
@@ -4576,14 +4756,16 @@
     var damage = Number.isFinite(state.inputs.damage) ? state.inputs.damage : 0;
     var poison = Number.isFinite(state.inputs.poison) ? state.inputs.poison : 0;
     var fire = Number.isFinite(state.inputs.fire) ? state.inputs.fire : 0;
+    var lightning = Number.isFinite(state.inputs.lightning) ? state.inputs.lightning : 0;
 
     switch (action) {
       case 'clear-normal':
         damage = 0;
         break;
-      case 'clear-status':
+      case 'clear-special':
         poison = 0;
         fire = 0;
+        lightning = 0;
         break;
       case 'set-normal-65610':
         damage = 65610;
@@ -4604,11 +4786,13 @@
         damage = normalizeActionDamage(damage * 3);
         poison = normalizeActionDamage(poison * 3);
         fire = normalizeActionDamage(fire * 3);
+        lightning = normalizeActionDamage(lightning * 3);
         break;
       case 'divide-all-3':
         damage = normalizeActionDamage(damage / 3);
         poison = normalizeActionDamage(poison / 3);
         fire = normalizeActionDamage(fire / 3);
+        lightning = normalizeActionDamage(lightning / 3);
         break;
       default:
         return;
@@ -4617,6 +4801,7 @@
     state.inputs.damage = damage;
     state.inputs.poison = poison;
     state.inputs.fire = fire;
+    state.inputs.lightning = lightning;
     syncTopInputValues();
     render();
   }
@@ -4836,6 +5021,7 @@
 
   function bindStaticEvents() {
     bindTopInput('damage', ui.inputDamage);
+    bindTopInput('lightning', ui.inputLightning);
     bindTopInput('poison', ui.inputPoison);
     bindTopInput('fire', ui.inputFire);
 
@@ -4877,6 +5063,11 @@
     ui.mobRaritySelect.addEventListener('change', function () {
       changeMobRarity(ui.mobRaritySelect.value);
     });
+    ui.mobSearch.addEventListener('input', function () {
+      state.mobSearch = ui.mobSearch.value;
+      renderMobGrid();
+    });
+    ui.clearMobSelection.addEventListener('click', clearMobSelection);
     ui.mobGrid.addEventListener('click', function (event) {
       var card = event.target.closest('.mob-card');
       if (card) {
@@ -4974,7 +5165,7 @@
 
     ui.fontScaleNumber.addEventListener('input', function () {
       var value = Number(ui.fontScaleNumber.value);
-      if (Number.isFinite(value) && value >= 80 && value <= 140) {
+      if (Number.isFinite(value) && value >= 75 && value <= 150) {
         state.settings.fontScale = normalizeFontScale(value);
         ui.fontScaleRange.value = String(state.settings.fontScale);
         applyFontScale();
@@ -4999,7 +5190,7 @@
       fireRate = normalizeFireRate(fireRate);
     }
     var fontScale = Number(ui.fontScaleNumber.value);
-    if (!Number.isFinite(fontScale) || fontScale < 80 || fontScale > 140) {
+    if (!Number.isFinite(fontScale) || fontScale < 75 || fontScale > 150) {
       fontScale = 100;
     } else {
       fontScale = normalizeFontScale(fontScale);
@@ -5053,6 +5244,8 @@
     ui.petalsPanel = byId('petalsPanel');
     ui.mobsPanel = byId('mobsPanel');
     ui.mobRaritySelect = byId('mobRaritySelect');
+    ui.mobSearch = byId('mobSearch');
+    ui.clearMobSelection = byId('clearMobSelection');
     ui.mobGrid = byId('mobGrid');
     ui.tpsRange = byId('tpsRange');
     ui.tpsNumber = byId('tpsNumber');
@@ -5062,6 +5255,7 @@
     ui.fontScaleNumber = byId('fontScaleNumber');
     ui.contentGrid = byId('contentGrid');
     ui.inputDamage = byId('inputDamage');
+    ui.inputLightning = byId('inputLightning');
     ui.inputPoison = byId('inputPoison');
     ui.inputFire = byId('inputFire');
     ui.statHp = byId('statHp');
